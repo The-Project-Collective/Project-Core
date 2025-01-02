@@ -1,4 +1,4 @@
-package com.collective.blocks;
+package com.collective.projectcore.blocks;
 
 import net.minecraft.block.FallingBlock;
 

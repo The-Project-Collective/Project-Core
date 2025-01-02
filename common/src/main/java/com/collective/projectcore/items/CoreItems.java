@@ -1,6 +1,6 @@
-package com.collective.items;
+package com.collective.projectcore.items;
 
-import com.collective.ProjectCore;
+import com.collective.projectcore.ProjectCore;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.item.Item;
@@ -14,7 +14,7 @@ public class CoreItems {
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ProjectCore.MOD_ID, RegistryKeys.ITEM);
 
-    public static final RegistrySupplier<Item> DEV_TOOL = ITEMS.register("dev_tool", () -> new CoreBaseItem(getItemSettings("dev_tool", new Item.Settings().maxCount(64).arch$tab(ItemGroups.TOOLS))));
+    public static final RegistrySupplier<Item> DEV_TOOL = ITEMS.register("dev_tool", () -> new com.collective.projectcore.items.CoreBaseItem(getItemSettings("dev_tool", new Item.Settings().maxCount(64).arch$tab(ItemGroups.TOOLS))));
 
 
     // === HELPER METHODS ===

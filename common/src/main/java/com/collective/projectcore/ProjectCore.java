@@ -1,6 +1,6 @@
-package com.collective;
+package com.collective.projectcore;
 
-import com.collective.items.CoreItems;
+import com.collective.projectcore.items.CoreItems;
 
 public final class ProjectCore {
     public static final String MOD_ID = "project_core";
