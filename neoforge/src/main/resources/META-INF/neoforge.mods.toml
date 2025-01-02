@@ -1,0 +1,38 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+#issueTrackerURL = ""
+license = "Apache License 2.0"
+
+[[mods]]
+modId = "project_core"
+version = "${version}"
+displayName = "Project Core"
+authors = "Kangalia"
+description = '''
+The core mod for all Project Collective mods.
+'''
+#logoFile = ""
+
+[[dependencies.project_core]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.4,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.project_core]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.4,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.project_core]]
+modId = "architectury"
+type = "required"
+versionRange = "[15.0.1,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[mixins]]
+config = "project_core.mixins.json"
