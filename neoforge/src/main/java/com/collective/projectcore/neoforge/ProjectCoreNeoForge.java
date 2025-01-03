@@ -1,8 +1,8 @@
-package com.collective.neoforge;
+package com.collective.projectcore.neoforge;
 
 import net.neoforged.fml.common.Mod;
 
-import com.collective.ProjectCore;
+import com.collective.projectcore.ProjectCore;
 
 @Mod(ProjectCore.MOD_ID)
 public final class ProjectCoreNeoForge {

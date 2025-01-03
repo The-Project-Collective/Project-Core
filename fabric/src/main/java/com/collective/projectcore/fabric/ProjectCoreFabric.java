@@ -1,8 +1,8 @@
-package com.collective.fabric;
+package com.collective.projectcore.fabric;
 
 import net.fabricmc.api.ModInitializer;
 
-import com.collective.ProjectCore;
+import com.collective.projectcore.ProjectCore;
 
 public final class ProjectCoreFabric implements ModInitializer {
     @Override
