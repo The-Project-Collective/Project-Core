@@ -1,4 +1,4 @@
-package com.collective.projectcore.items;
+package com.collective.projectcore.items.base;
 
 import net.minecraft.item.Item;
 
