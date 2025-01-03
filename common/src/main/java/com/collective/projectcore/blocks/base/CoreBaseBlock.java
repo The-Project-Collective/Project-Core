@@ -1,4 +1,4 @@
-package com.collective.projectcore.blocks;
+package com.collective.projectcore.blocks.base;
 
 import net.minecraft.block.Block;
 
