@@ -1,6 +1,8 @@
 package com.collective.projectcore.blockentities;
 
 import com.collective.projectcore.blockentities.base.CoreBaseLockableContainerBlockEntity;
+import com.collective.projectcore.entities.base.CoreBaseEntity;
+import com.collective.projectcore.groups.tags.CoreTags;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerInventory;
@@ -94,7 +96,7 @@ public class CoreFeederBlockEntity extends CoreBaseLockableContainerBlockEntity 
                         flag = true;
                     }
                     if (flag) {
-                        entity.getWorld().playSound(null, entity.getSteppingPos(), SoundEvents.ENTITY_GENERIC_EAT, SoundCategory.NEUTRAL, 1.0F, entity.getPitch());
+                        entity.getWorld().playSound(null, entity.getSteppingPos(), SoundEvents.ENTITY_GENERIC_EAT.value(), SoundCategory.NEUTRAL, 1.0F, entity.getPitch());
                         if (entity.getWorld() != null) {
                             entity.getWorld().updateListeners(pos, getCachedState(), getCachedState(), 3);
                             markDirty();
