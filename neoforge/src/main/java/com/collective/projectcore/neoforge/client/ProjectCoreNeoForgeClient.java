@@ -1,4 +1,4 @@
-package com.collective.projectcore.client;
+package com.collective.projectcore.neoforge.client;
 
 import net.neoforged.bus.api.IEventBus;
 

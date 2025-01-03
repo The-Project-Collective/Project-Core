@@ -1,4 +1,4 @@
-package com.collective.projectcore.client;
+package com.collective.projectcore.fabric.client;
 
 import net.fabricmc.api.ClientModInitializer;
 

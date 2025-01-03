@@ -19,7 +19,7 @@
       "com.collective.projectcore.fabric.ProjectCoreFabric"
     ],
     "client": [
-      "com.collective.projectcore.client.ProjectCoreFabricClient"
+      "com.collective.projectcore.fabric.client.ProjectCoreFabricClient"
     ]
   },
   "mixins": [
