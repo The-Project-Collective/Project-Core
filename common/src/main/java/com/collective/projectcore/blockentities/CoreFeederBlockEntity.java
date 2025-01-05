@@ -1,7 +1,7 @@
 package com.collective.projectcore.blockentities;
 
 import com.collective.projectcore.blockentities.base.CoreBaseLockableContainerBlockEntity;
-import com.collective.projectcore.entities.base.CoreBaseEntity;
+import com.collective.projectcore.entities.CoreAnimalEntity;
 import com.collective.projectcore.groups.tags.CoreTags;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
@@ -63,7 +63,7 @@ public class CoreFeederBlockEntity extends CoreBaseLockableContainerBlockEntity 
         }
     }
 
-    public boolean hasFood(CoreBaseEntity entity) {
+    public boolean hasFood(CoreAnimalEntity entity) {
         if (!this.isEmpty()) {
             for (ItemStack itemStack : this.inventory) {
                 if (itemStack.isIn(entity.getGeneralDiet()) || itemStack.isIn(entity.getSpecificDiet())) {
@@ -74,7 +74,7 @@ public class CoreFeederBlockEntity extends CoreBaseLockableContainerBlockEntity 
         return false;
     }
 
-    public void feedEntity(CoreBaseEntity entity) {
+    public void feedEntity(CoreAnimalEntity entity) {
         for (ItemStack itemStack : this.inventory) {
             if (entity.getHunger() < entity.getMaxFood()) {
                 if (itemStack.isIn(entity.getGeneralDiet()) || itemStack.isIn(entity.getSpecificDiet())) {
@@ -84,7 +84,7 @@ public class CoreFeederBlockEntity extends CoreBaseLockableContainerBlockEntity 
         }
     }
 
-    public void eatFood(CoreBaseEntity entity, ItemStack stack) {
+    public void eatFood(CoreAnimalEntity entity, ItemStack stack) {
         boolean flag = false;
         boolean flag2 = true;
         while (flag2) {
@@ -113,7 +113,7 @@ public class CoreFeederBlockEntity extends CoreBaseLockableContainerBlockEntity 
         }
     }
 
-    public int getFoodValue(CoreBaseEntity entity, ItemStack stack) {
+    public int getFoodValue(CoreAnimalEntity entity, ItemStack stack) {
         int value = 0;
         if (stack.isIn(CoreTags.LARGE_FOODS)) {
             value = 6;

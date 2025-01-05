@@ -1,6 +1,5 @@
 package com.collective.projectcore.entities;
 
-import com.collective.projectcore.entities.base.CoreBaseEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -16,7 +15,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public abstract class CoreAngerableEntity extends CoreBaseEntity implements Angerable {
+/**
+ * This is the angerable version of the base animal class that all angerable animals created by Project Core dependent mods extends.
+ */
+
+public abstract class CoreAngerableAnimalEntity extends CoreAnimalEntity implements Angerable {
 
     private static final TrackedData<Integer> ANGER_TIME;
 
@@ -24,7 +27,7 @@ public abstract class CoreAngerableEntity extends CoreBaseEntity implements Ange
 
     private UUID angryAt;
 
-    public CoreAngerableEntity(EntityType<? extends TameableEntity> entityType, World world) {
+    public CoreAngerableAnimalEntity(EntityType<? extends TameableEntity> entityType, World world) {
         super(entityType, world);
     }
 
@@ -73,7 +76,7 @@ public abstract class CoreAngerableEntity extends CoreBaseEntity implements Ange
 
     // --- Data Registry ------------------------------------------------------------------------------------------
     static {
-        ANGER_TIME = DataTracker.registerData(CoreAngerableEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        ANGER_TIME = DataTracker.registerData(CoreAngerableAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         ANGER_TIME_RANGE = TimeHelper.betweenSeconds(20, 39);
     }
 

@@ -1,6 +1,6 @@
 package com.collective.projectcore.items;
 
-import com.collective.projectcore.entities.base.CoreBaseEntity;
+import com.collective.projectcore.entities.CoreAnimalEntity;
 import dev.architectury.core.item.ArchitecturySpawnEggItem;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.component.DataComponentTypes;
@@ -35,7 +35,7 @@ public class CoreSpawnEggItem extends ArchitecturySpawnEggItem {
             return Optional.empty();
         } else {
             MobEntity mobEntity;
-            if (entity instanceof CoreBaseEntity parent) {
+            if (entity instanceof CoreAnimalEntity parent) {
                 if (parent.getGender() == 1) {
                     mobEntity = parent.createChild(world, parent);
                 } else {
@@ -48,10 +48,10 @@ public class CoreSpawnEggItem extends ArchitecturySpawnEggItem {
             if (mobEntity == null) {
                 return Optional.empty();
             } else {
-                if (mobEntity instanceof CoreBaseEntity baby) {
+                if (mobEntity instanceof CoreAnimalEntity baby) {
                     baby.setAgeTicks(0);
                     baby.setGender(random.nextInt(2));
-                    if (((CoreBaseEntity) entity).isAdult()) {
+                    if (((CoreAnimalEntity) entity).isAdult()) {
                         baby.setMotherUUID(entity.getUuidAsString());
                     }
                     baby.setVariant(baby.calculateWildVariant());
