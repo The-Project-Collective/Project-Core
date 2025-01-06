@@ -59,10 +59,14 @@ public interface VariantContext {
         int lightValue();
         List<Integer> possibleLightLevels();
         int rarity();
-        boolean isLight();
-        boolean isDark();
         String relativeTexturePath();
         String modID();
+        default boolean isLight() {
+            return lightValue() < 4;
+        }
+        default boolean isDark() {
+            return lightValue() > 7;
+        }
         default Identifier identifier() {
             return Identifier.of(modID(), "textures/entity/"+relativeTexturePath());
         }
