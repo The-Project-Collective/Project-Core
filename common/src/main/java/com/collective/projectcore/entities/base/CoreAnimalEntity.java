@@ -60,19 +60,47 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
     protected boolean hasGender;
     protected boolean hasHunger;
     protected boolean canBeTamed;
+    protected boolean hasVariants;
 
     private boolean adultFlag = false;
     private boolean juviFlag = false;
     private boolean childFlag = false;
 
     protected CoreAnimalEntity(EntityType<? extends AnimalEntity> entityType, World world,
-                               boolean doesAge, boolean doesBreed, boolean hasGender, boolean hasHunger, boolean canBeTamed) {
+                               boolean doesAge, boolean doesBreed, boolean hasGender, boolean hasHunger, boolean canBeTamed, boolean hasVariants) {
         super(entityType, world);
         this.doesAge = doesAge;
         this.doesBreed = doesBreed;
         this.hasGender = hasGender;
         this.hasHunger = hasHunger;
         this.canBeTamed = canBeTamed;
+    }
+
+    // === CHARACTERISTICS CONTROL =======================================================================================================================================================================
+
+    // --- Boolean Checks ------------------------------------------------------------------------------------------
+    public boolean doesAge() {
+        return doesAge;
+    }
+
+    public boolean doesBreed() {
+        return doesBreed;
+    }
+
+    public boolean hasGender() {
+        return hasGender;
+    }
+
+    public boolean hasHunger() {
+        return hasHunger;
+    }
+
+    public boolean canBeTamed() {
+        return canBeTamed;
+    }
+
+    public boolean hasVariants() {
+        return hasVariants;
     }
 
     // === TICK HANDLING =======================================================================================================================================================================
@@ -82,10 +110,10 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
     protected void mobTick(ServerWorld world) {
         super.mobTick(world);
         if (!this.getWorld().isClient()) {
-            if (this.doesAge) {
+            if (this.doesAge()) {
                 ageHandler();
             }
-            if (this.isAdult()) {
+            if (this.doesBreed() && this.isAdult()) {
                 breedingHandler();
                 if (this.getGender() == 0) {
                     fatherHandler();
@@ -94,7 +122,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
                     pregnancyHandler();
                 }
             }
-            hungerHandler();
+            if (this.hasHunger()) {
+                hungerHandler();
+            }
         }
     }
 
@@ -121,7 +151,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
 
     // --- Breeding Tickers ------------------------------------------------------------------------------------------
     public void breedingHandler() {
-        if (this.isAdult() && !this.isPregnant()) {
+        if (this.isAdult() && !this.isPregnant() && this.isFull()) {
             if (!this.isBabyMother() && !this.isChildMother()) {
                 if (this.getBreedingTicks() > 0) {
                     this.setBreedingTicks(this.getBreedingTicks() - 1);
@@ -463,9 +493,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
 
     public void setHunger(int hunger) {
         this.dataTracker.set(HUNGER, hunger);
-        if (this.dataTracker.get(HUNGER) > this.getMaxFood()) {
-            this.dataTracker.set(HUNGER, this.getMaxFood());
-        }
     }
 
     public int getLowMaxFood() {
@@ -539,7 +566,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
 
     // --- Size ------------------------------------------------------------------------------------------
     public float getGenderMaxSize() {
-        if (this.getGender() == 0) {
+        if (this.getGender() == 0 || this.getGender() == 2) {
             return this.getMaleMaxSize();
         } else {
             return this.getFemaleMaxSize();
@@ -638,17 +665,11 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
     @Override
     public abstract PassiveEntity createChild(ServerWorld world, PassiveEntity entity);
 
-    public int getMaxOffspring() {
-        return 1;
-    }
+    public abstract int getMaxOffspring();
 
-    public int getMinOffspring() {
-        return 1;
-    }
+    public abstract int getMinOffspring();
 
-    public boolean rareOffspring() {
-        return false;
-    }
+    public abstract boolean rareOffspring();
 
     // --- General ------------------------------------------------------------------------------------------
     @Override

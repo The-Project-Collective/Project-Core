@@ -49,13 +49,24 @@ public class CoreSpawnEggItem extends ArchitecturySpawnEggItem {
                 return Optional.empty();
             } else {
                 if (mobEntity instanceof CoreAnimalEntity baby) {
-                    baby.setAgeTicks(0);
-                    baby.setGender(random.nextInt(2));
-                    if (((CoreAnimalEntity) entity).isAdult()) {
+                    if (baby.doesAge()) {
+                        baby.setAgeTicks(0);
+                        baby.setAttributes(3);
+                    } else {
+                        baby.setAgeTicks(baby.getAdultDays() * 24000);
+                        baby.setAttributes(0);
+                    }
+                    if (baby.hasGender()) {
+                        baby.setGender(random.nextInt(2));
+                    } else {
+                        baby.setGender(2);
+                    }
+                    if (baby.doesBreed() && ((CoreAnimalEntity) entity).isAdult()) {
                         baby.setMotherUUID(entity.getUuidAsString());
                     }
-                    baby.setVariant(baby.calculateWildVariant());
-                    baby.setAttributes(3);
+                    if (baby.hasVariants()) {
+                        baby.setVariant(baby.calculateWildVariant());
+                    }
 
                     baby.refreshPositionAndAngles(pos.getX(), pos.getY(), pos.getZ(), 0.0F, 0.0F);
                     world.spawnEntityAndPassengers(baby);

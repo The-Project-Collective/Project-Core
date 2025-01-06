@@ -28,20 +28,4 @@ public class CoreTags {
     public static final TagKey<Item> MEDIUM_FOODS = TagKey.of(RegistryKeys.ITEM, Identifier.of(ProjectCore.MOD_ID, "diets/values/medium_foods"));
     public static final TagKey<Item> SMALL_FOODS = TagKey.of(RegistryKeys.ITEM, Identifier.of(ProjectCore.MOD_ID, "diets/values/small_foods"));
 
-
-
-    // === SPECIFIC DIETS ===
-
-    // Wildlife
-    public static final TagKey<Item> AMERICAN_RED_FOX = TagKey.of(RegistryKeys.ITEM, Identifier.of(WILDLIFE_ID, "diets/specific/american_red_fox"));
-
-    // Primeval
-
-
-
-    // === OTHER GROUPS ===
-
-    // Items
-    public static final TagKey<Item> INSECTS = TagKey.of(RegistryKeys.ITEM, Identifier.of(WILDLIFE_ID, "insects"));
-
 }

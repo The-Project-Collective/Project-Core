@@ -16,9 +16,10 @@ import net.minecraft.world.WorldView;
 
 public abstract class CoreAquaticAnimalEntity extends CoreAnimalEntity {
 
+    //TODO: This whole class needs work - currently NOT FUNCTIONAL!!
     protected CoreAquaticAnimalEntity(EntityType<? extends AnimalEntity> entityType, World world,
-                                      boolean doesAge, boolean doesBreed, boolean hasGender, boolean hasHunger, boolean canBeTamed) {
-        super(entityType, world, doesAge, doesBreed, hasGender, hasHunger, canBeTamed);
+                                      boolean doesAge, boolean doesBreed, boolean hasGender, boolean hasHunger, boolean canBeTamed, boolean hasVariants) {
+        super(entityType, world, doesAge, doesBreed, hasGender, hasHunger, canBeTamed, hasVariants);
         this.setPathfindingPenalty(PathNodeType.WATER, 0.0F);
     }
 

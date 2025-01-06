@@ -65,7 +65,7 @@ public class CoreFeederBlockEntity extends CoreBaseLockableContainerBlockEntity 
     public boolean hasFood(CoreAnimalEntity entity) {
         if (!this.isEmpty()) {
             for (ItemStack itemStack : this.inventory) {
-                if (itemStack.isIn(entity.getGeneralDiet()) || itemStack.isIn(entity.getSpecificDiet())) {
+                if (entity.isValidFood(itemStack)) {
                     return true;
                 }
             }
@@ -75,29 +75,33 @@ public class CoreFeederBlockEntity extends CoreBaseLockableContainerBlockEntity 
 
     public void feedEntity(CoreAnimalEntity entity) {
         for (ItemStack itemStack : this.inventory) {
-            if (entity.getHunger() < entity.getMaxFood()) {
-                if (itemStack.isIn(entity.getGeneralDiet()) || itemStack.isIn(entity.getSpecificDiet())) {
-                    this.eatFood(entity, itemStack);
-                }
+            int maxFood = entity.getLowMaxFood();
+            if (entity.isFavouriteFood(itemStack)) {
+                maxFood = entity.getMaxFood();
+            }
+            if (entity.getHunger() < maxFood && entity.isValidFood(itemStack)) {
+                this.eatFood(entity, itemStack, maxFood);
             }
         }
     }
 
-    public void eatFood(CoreAnimalEntity entity, ItemStack stack) {
+    public void eatFood(CoreAnimalEntity entity, ItemStack stack, int maxFood) {
         boolean flag = false;
         boolean flag2 = true;
         while (flag2) {
             if (!stack.isEmpty()) {
-                if (stack.isIn(entity.getGeneralDiet()) || stack.isIn(entity.getSpecificDiet())) {
-                    if (entity.getHunger() < entity.getMaxFood()) {
+                if (entity.isValidFood(stack)) {
+                    if (entity.getHunger() < maxFood) {
                         entity.setHunger(entity.getHunger() + entity.getFoodValue(stack));
+                        if (entity.getHunger() > maxFood) {
+                            entity.setHunger(maxFood);
+                        }
                         stack.decrement(1);
                         flag = true;
                     }
                     if (flag) {
                         entity.getWorld().playSound(null, entity.getSteppingPos(), SoundEvents.ENTITY_GENERIC_EAT.value(), SoundCategory.NEUTRAL, 1.0F, entity.getPitch());
                         if (entity.getWorld() != null) {
-                            entity.getWorld().updateListeners(pos, getCachedState(), getCachedState(), 3);
                             markDirty();
                         }
                     } else {
