@@ -16,28 +16,29 @@ import net.minecraft.world.WorldView;
 
 public abstract class CoreAquaticAnimalEntity extends CoreAnimalEntity {
 
-    //TODO: This whole class needs work - currently NOT FUNCTIONAL!!
     protected CoreAquaticAnimalEntity(EntityType<? extends AnimalEntity> entityType, World world,
                                       boolean doesAge, boolean doesBreed, boolean hasGender, boolean hasHunger, boolean canBeTamed, boolean hasVariants) {
         super(entityType, world, doesAge, doesBreed, hasGender, hasHunger, canBeTamed, hasVariants);
         this.setPathfindingPenalty(PathNodeType.WATER, 0.0F);
     }
 
+    // === TICK HANDLING =======================================================================================================================================================================
+
+    // --- Aquatic Ticker ------------------------------------------------------------------------------------------
+    public void baseTick() {
+        int i = this.getAir();
+        super.baseTick();
+        this.tickBreathing(i);
+    }
+
     // === MAIN METHODS =======================================================================================================================================================================
 
-
-    public boolean canSpawn(WorldView world) {
-        return world.doesNotIntersectEntities(this);
-    }
-
-    public int getMinAmbientSoundDelay() {
-        return 120;
-    }
-
-    public int getExperienceToDrop(ServerWorld world) {
-        return 1 + this.random.nextInt(3);
-    }
-
+    // --- Aquatic Breathing ------------------------------------------------------------------------------------------
+    /**
+     * Controls the breathing for underwater animals.
+     * Override this method and leave it empty for aquatic animals that live in water but breathe air.
+     * @param air
+     */
     @SuppressWarnings("deprecation")
     protected void tickBreathing(int air) {
         if (this.isAlive() && !this.isInsideWaterOrBubbleColumn()) {
@@ -49,13 +50,21 @@ public abstract class CoreAquaticAnimalEntity extends CoreAnimalEntity {
         } else {
             this.setAir(300);
         }
-
     }
 
-    public void baseTick() {
-        int i = this.getAir();
-        super.baseTick();
-        this.tickBreathing(i);
+    // === GETTERS AND SETTERS =======================================================================================================================================================================
+
+    // --- Aquatic  ------------------------------------------------------------------------------------------
+    public boolean canSpawn(WorldView world) {
+        return world.doesNotIntersectEntities(this);
+    }
+
+    public int getMinAmbientSoundDelay() {
+        return 120;
+    }
+
+    public int getExperienceToDrop(ServerWorld world) {
+        return 1 + this.random.nextInt(3);
     }
 
     public boolean isPushedByFluids() {

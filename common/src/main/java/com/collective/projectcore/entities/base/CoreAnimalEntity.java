@@ -774,6 +774,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
     }
 
     // --- NBT ------------------------------------------------------------------------------------------
+    @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putInt("AgeTicks", this.getAgeTicks());
@@ -797,6 +798,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
 
     }
 
+    @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.setAgeTicks(nbt.getInt("AgeTicks"));
