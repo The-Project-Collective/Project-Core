@@ -1,3 +1,20 @@
 {
-  "item.project_core.dev_tool": "Dev Tool"
+  "item.project_core.dev_tool": "Dev Tool",
+
+
+  "group.project_core.core_blocks": "Project Blocks",
+  "group.project_core.core_items": "Project Items",
+
+
+  "tag.item.project_core.diets.general.all_foods": "All Foods Tag",
+  "tag.item.project_core.diets.general.carnivore_foods": "Carnivore Foods Tag",
+  "tag.item.project_core.diets.general.herbivore_foods": "Herbivore Foods Tag",
+  "tag.item.project_core.diets.general.insectivore_foods": "Insectivore Foods Tag",
+  "tag.item.project_core.diets.general.omnivore_foods": "Omnivore Foods Tag",
+  "tag.item.project_core.diets.general.piscivore_foods": "Piscivore Foods Tag",
+
+  "tag.item.project_core.diets.values.large_foods": "Large Foods",
+  "tag.item.project_core.diets.values.medium_foods": "Medium Foods",
+  "tag.item.project_core.diets.values.small_foods": "Small Foods"
+
 }

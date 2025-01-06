@@ -1,0 +1,26 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:allium",
+    "minecraft:azure_bluet",
+    "minecraft:bamboo",
+    "minecraft:beetroot",
+    "minecraft:beetroot_seeds",
+    "minecraft:blue_orchid",
+    "minecraft:brown_mushroom",
+    "minecraft:chorus_fruit",
+    "minecraft:cornflower",
+    "minecraft:dandelion",
+    "minecraft:glow_berries",
+    "minecraft:glow_lichen",
+    "minecraft:lily_pad",
+    "minecraft:melon_slice",
+    "minecraft:pink_petals",
+    "minecraft:red_mushroom",
+    "minecraft:small_dripleaf",
+    "minecraft:spore_blossom",
+    "minecraft:sugar_cane",
+    "minecraft:sweet_berries",
+    "minecraft:vine"
+  ]
+}

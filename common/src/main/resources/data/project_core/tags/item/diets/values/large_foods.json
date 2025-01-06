@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:hay_block",
+    "minecraft:melon",
+
+    "minecraft:beef",
+    "minecraft:porkchop",
+    "minecraft:sniffer_egg",
+
+    "minecraft:salmon",
+
+    "minecraft:honey_block",
+    "minecraft:honeycomb_block"
+  ]
+}
