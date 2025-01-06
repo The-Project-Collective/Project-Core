@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:egg",
+    "minecraft:beef",
+    "minecraft:chicken",
+    "minecraft:mutton",
+    "minecraft:porkchop",
+    "minecraft:rabbit",
+    "minecraft:sniffer_egg",
+    "minecraft:turtle_egg"
+  ]
+}

@@ -1,8 +1,7 @@
 package com.collective.projectcore.blockentities;
 
 import com.collective.projectcore.blockentities.base.CoreBaseLockableContainerBlockEntity;
-import com.collective.projectcore.entities.CoreAnimalEntity;
-import com.collective.projectcore.groups.tags.CoreTags;
+import com.collective.projectcore.entities.base.CoreAnimalEntity;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerInventory;
@@ -91,7 +90,7 @@ public class CoreFeederBlockEntity extends CoreBaseLockableContainerBlockEntity 
             if (!stack.isEmpty()) {
                 if (stack.isIn(entity.getGeneralDiet()) || stack.isIn(entity.getSpecificDiet())) {
                     if (entity.getHunger() < entity.getMaxFood()) {
-                        entity.setHunger(entity.getHunger() + this.getFoodValue(entity, stack));
+                        entity.setHunger(entity.getHunger() + entity.getFoodValue(stack));
                         stack.decrement(1);
                         flag = true;
                     }
@@ -111,21 +110,6 @@ public class CoreFeederBlockEntity extends CoreBaseLockableContainerBlockEntity 
                 flag2 = false;
             }
         }
-    }
-
-    public int getFoodValue(CoreAnimalEntity entity, ItemStack stack) {
-        int value = 0;
-        if (stack.isIn(CoreTags.LARGE_FOODS)) {
-            value = 6;
-        } else if (stack.isIn(CoreTags.MEDIUM_FOODS)) {
-            value = 4;
-        } else if (stack.isIn(CoreTags.SMALL_FOODS)) {
-            value = 2;
-        }
-        if (stack.isIn(entity.getSpecificDiet())) {
-            value = value * 2;
-        }
-        return value;
     }
 
     @Override

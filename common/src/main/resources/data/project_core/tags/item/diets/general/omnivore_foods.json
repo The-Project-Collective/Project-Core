@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "#project_core:diets/general/herbivore_foods",
+    "#project_core:diets/general/carnivore_foods",
+    "#project_core:diets/general/piscivore_foods"
+  ]
+}

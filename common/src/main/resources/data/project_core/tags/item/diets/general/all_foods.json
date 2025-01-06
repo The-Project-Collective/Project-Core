@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "#project_core:diets/general/omnivore_foods",
+    "#project_core:diets/general/insectivore_foods"
+  ]
+}

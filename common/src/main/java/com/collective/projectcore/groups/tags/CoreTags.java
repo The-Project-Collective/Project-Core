@@ -8,9 +8,13 @@ import net.minecraft.util.Identifier;
 
 public class CoreTags {
 
-    // === DIETS ===
+    private static final String PRIMEVAL_ID = "project_wildlife";
+    private static final String WILDLIFE_ID = "project_primeval";
 
-    // General Diets
+
+    // === GENERAL DIETS ===
+
+    // Diets
     public static final TagKey<Item> ALL_FOODS = TagKey.of(RegistryKeys.ITEM, Identifier.of(ProjectCore.MOD_ID, "diets/general/all_foods"));
 
     public static final TagKey<Item> HERBIVORE_FOODS = TagKey.of(RegistryKeys.ITEM, Identifier.of(ProjectCore.MOD_ID, "diets/general/herbivore_foods"));
@@ -19,20 +23,25 @@ public class CoreTags {
     public static final TagKey<Item> INSECTIVORE_FOODS = TagKey.of(RegistryKeys.ITEM, Identifier.of(ProjectCore.MOD_ID, "diets/general/insectivore_foods"));
     public static final TagKey<Item> OMNIVORE_FOODS = TagKey.of(RegistryKeys.ITEM, Identifier.of(ProjectCore.MOD_ID, "diets/general/omnivore_foods"));
 
-    // Specific Diets
-    public static final TagKey<Item> AMERICAN_RED_FOX = TagKey.of(RegistryKeys.ITEM, Identifier.of(ProjectCore.MOD_ID, "diets/specific/american_red_fox"));
-
     // Food Values
     public static final TagKey<Item> LARGE_FOODS = TagKey.of(RegistryKeys.ITEM, Identifier.of(ProjectCore.MOD_ID, "diets/values/large_foods.json"));
     public static final TagKey<Item> MEDIUM_FOODS = TagKey.of(RegistryKeys.ITEM, Identifier.of(ProjectCore.MOD_ID, "diets/values/medium_foods"));
     public static final TagKey<Item> SMALL_FOODS = TagKey.of(RegistryKeys.ITEM, Identifier.of(ProjectCore.MOD_ID, "diets/values/small_foods"));
 
 
+
+    // === SPECIFIC DIETS ===
+
+    // Wildlife
+    public static final TagKey<Item> AMERICAN_RED_FOX = TagKey.of(RegistryKeys.ITEM, Identifier.of(WILDLIFE_ID, "diets/specific/american_red_fox"));
+
+    // Primeval
+
+
+
     // === OTHER GROUPS ===
 
     // Items
-    public static final TagKey<Item> INSECTS = TagKey.of(RegistryKeys.ITEM, Identifier.of(ProjectCore.MOD_ID, "insects"));
+    public static final TagKey<Item> INSECTS = TagKey.of(RegistryKeys.ITEM, Identifier.of(WILDLIFE_ID, "insects"));
 
-    // Shared Tags
-    public static final TagKey<Item> SHARED = TagKey.of(RegistryKeys.ITEM, Identifier.of("shared", "shared_tag"));
 }

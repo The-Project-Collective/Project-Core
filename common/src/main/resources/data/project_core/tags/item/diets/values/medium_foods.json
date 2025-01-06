@@ -1,0 +1,23 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:leaves",
+
+    "minecraft:apple",
+    "minecraft:big_dripleaf",
+    "minecraft:cactus",
+    "minecraft:carrot",
+    "minecraft:fern",
+    "minecraft:potato",
+    "minecraft:pumpkin",
+    "minecraft:short_grass",
+    "minecraft:wheat",
+
+    "minecraft:chicken",
+    "minecraft:mutton",
+    "minecraft:turtle_egg",
+
+    "minecraft:cod",
+    "minecraft:tropical_fish"
+  ]
+}

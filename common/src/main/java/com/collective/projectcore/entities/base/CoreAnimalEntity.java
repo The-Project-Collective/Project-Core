@@ -1,32 +1,42 @@
-package com.collective.projectcore.entities;
+package com.collective.projectcore.entities.base;
 
 import com.collective.projectcore.groups.tags.CoreTags;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.Tameable;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.TameableEntity;
+import net.minecraft.entity.passive.PassiveEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.server.ServerConfigHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * This is the base animal entity class that all animals created by Project Core's dependent mods extends.
- */
+import java.util.Optional;
+import java.util.UUID;
 
-public abstract class CoreAnimalEntity extends TameableEntity {
+public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable {
 
     private static final TrackedData<Float> AGE_SCALE;
     private static final TrackedData<Integer> AGE_TICKS;
@@ -40,32 +50,41 @@ public abstract class CoreAnimalEntity extends TameableEntity {
     private static final TrackedData<String> MATE_VARIANT;
     private static final TrackedData<Integer> MOTHER_TICKS;
     private static final TrackedData<String> MOTHER_UUID;
+    protected static final TrackedData<Optional<UUID>> OWNER_UUID;
     private static final TrackedData<Integer> PREGNANCY_TICKS;
+    protected static final TrackedData<Byte> TAMEABLE_FLAGS;
     private static final TrackedData<String> VARIANT;
+
+    protected boolean doesAge;
+    protected boolean doesBreed;
+    protected boolean hasGender;
+    protected boolean hasHunger;
+    protected boolean canBeTamed;
 
     private boolean adultFlag = false;
     private boolean juviFlag = false;
     private boolean childFlag = false;
 
-    public CoreAnimalEntity(EntityType<? extends TameableEntity> entityType, World world) {
+    protected CoreAnimalEntity(EntityType<? extends AnimalEntity> entityType, World world,
+                               boolean doesAge, boolean doesBreed, boolean hasGender, boolean hasHunger, boolean canBeTamed) {
         super(entityType, world);
-        this.setTamed(false, false);
+        this.doesAge = doesAge;
+        this.doesBreed = doesBreed;
+        this.hasGender = hasGender;
+        this.hasHunger = hasHunger;
+        this.canBeTamed = canBeTamed;
     }
-
-    @Override
-    public boolean isBreedingItem(ItemStack stack) {
-        return false;
-    }
-    
 
     // === TICK HANDLING =======================================================================================================================================================================
 
     // --- Main Ticker ------------------------------------------------------------------------------------------
     @Override
-    public void tick() {
-        super.tick();
+    protected void mobTick(ServerWorld world) {
+        super.mobTick(world);
         if (!this.getWorld().isClient()) {
-            ageTicker();
+            if (this.doesAge) {
+                ageHandler();
+            }
             if (this.isAdult()) {
                 breedingHandler();
                 if (this.getGender() == 0) {
@@ -80,7 +99,7 @@ public abstract class CoreAnimalEntity extends TameableEntity {
     }
 
     // --- Age Ticker ------------------------------------------------------------------------------------------
-    public void ageTicker() {
+    public void ageHandler() {
         if (this.isAdult() && !adultFlag) {
             this.setAttributes(0);
             calculateDimensions();
@@ -151,21 +170,53 @@ public abstract class CoreAnimalEntity extends TameableEntity {
         }
     }
 
-    // === OTHER METHODS =======================================================================================================================================================================
+
+
+    // === MAIN METHODS =======================================================================================================================================================================
+
+    // --- General ------------------------------------------------------------------------------------------
+    @Override
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack itemStack = player.getStackInHand(hand);
+        if (this.isValidFood(itemStack)) {
+            if (this.getHunger() >= this.getMaxFood() && this.isFavouriteFood(itemStack)) {
+                if (this.canBeTamed) {
+                    if (this.isTamed()) {
+                        if (this.getHealth() < this.getMaxHealth()) {
+                            this.handHeal(itemStack, player);
+                            return ActionResult.SUCCESS;
+                        }
+                    } else if (!this.getWorld().isClient) {
+                        itemStack.decrementUnlessCreative(1, player);
+                        this.tryTame(player);
+                        return ActionResult.SUCCESS_SERVER;
+                    }
+                } else {
+                    if (this.getHealth() < this.getMaxHealth()) {
+                        this.handHeal(itemStack, player);
+                        return ActionResult.SUCCESS;
+                    }
+                }
+            } else {
+                if (this.canEatNutritionally(itemStack)) {
+                    this.handFeed(itemStack, player);
+                }
+            }
+        }
+        return super.interactMob(player, hand);
+    }
 
     // --- Breeding ------------------------------------------------------------------------------------------
     @Override
     public boolean canBreedWith(AnimalEntity other) {
         if (other instanceof CoreAnimalEntity coreAnimalEntity) {
             if (this.getClass().equals(coreAnimalEntity.getClass())) {
-                if (this.getGender() != coreAnimalEntity.getGender()) {
-                    if (!this.isMother() && !this.isFather() && !coreAnimalEntity.isMother() && !coreAnimalEntity.isFather()) {
-                        if (this.getBreedingTicks() <= 0 && coreAnimalEntity.getBreedingTicks() <= 0) {
-                            if (this.getMateUUID().equals(coreAnimalEntity.getUuidAsString()) && coreAnimalEntity.getMateUUID().equals(this.getUuidAsString())) {
-                                return !this.isPregnant() && !coreAnimalEntity.isPregnant();
-                            } else if (!this.isMated() && !coreAnimalEntity.isMated()) {
-                                return !this.isPregnant() && !coreAnimalEntity.isPregnant();
-                            }
+                if (this.getGender() != coreAnimalEntity.getGender() && !this.isMother() && !this.isFather() && !coreAnimalEntity.isMother() && !coreAnimalEntity.isFather()) {
+                    if (this.getBreedingTicks() <= 0 && coreAnimalEntity.getBreedingTicks() <= 0) {
+                        if (this.getMateUUID().equals(coreAnimalEntity.getUuidAsString()) && coreAnimalEntity.getMateUUID().equals(this.getUuidAsString())) {
+                            return !this.isPregnant() && !coreAnimalEntity.isPregnant();
+                        } else if (!this.isMated() && !coreAnimalEntity.isMated()) {
+                            return !this.isPregnant() && !coreAnimalEntity.isPregnant();
                         }
                     }
                 }
@@ -195,11 +246,89 @@ public abstract class CoreAnimalEntity extends TameableEntity {
                     this.setBreedingTicks(this.random.nextInt(6000) + 6000);
                     this.setFatherTicks(this.getGestationTicks() + (int)((this.getAdultDays() * 24000) * 0.6));
                 }
-                this.resetLoveTicks();
-                mate.resetLoveTicks();
             }
             world.sendEntityStatus(this, (byte)18);
         }
+    }
+
+    // --- Health ------------------------------------------------------------------------------------------
+    public void handHeal(ItemStack itemStack, PlayerEntity player) {
+        itemStack.decrementUnlessCreative(1, player);
+        int amount = this.getFoodValue(itemStack);
+        this.heal(amount);
+        if (this.getHealth() > this.getMaxHealth()) {
+            this.setHealth(this.getMaxHealth());
+        }
+    }
+
+    // --- Hunger ------------------------------------------------------------------------------------------
+    public void handFeed(ItemStack itemStack, PlayerEntity player) {
+        itemStack.decrementUnlessCreative(1, player);
+        int amount = this.getFoodValue(itemStack);
+        this.setHunger(this.getHunger() + amount);
+        int maxFood = this.getLowMaxFood();
+        if (this.isFavouriteFood(itemStack)) {
+            maxFood = this.getMaxFood();
+        }
+        if (this.getHunger() > maxFood) {
+            this.setHunger(maxFood);
+        }
+    }
+
+    // --- Taming ------------------------------------------------------------------------------------------
+    private void tryTame(PlayerEntity player) {
+        if (this.random.nextInt(3) == 0) {
+            this.setOwner(player);
+            this.navigation.stop();
+            this.setTarget(null);
+            this.getWorld().sendEntityStatus(this, (byte)7);
+        } else {
+            this.getWorld().sendEntityStatus(this, (byte)6);
+        }
+    }
+
+    @Override
+    public void onDeath(DamageSource damageSource) {
+        World var3 = this.getWorld();
+        if (var3 instanceof ServerWorld serverWorld) {
+            if (serverWorld.getGameRules().getBoolean(GameRules.SHOW_DEATH_MESSAGES)) {
+                LivingEntity var4 = this.getOwner();
+                if (var4 instanceof ServerPlayerEntity serverPlayerEntity) {
+                    serverPlayerEntity.sendMessage(this.getDamageTracker().getDeathMessage());
+                }
+            }
+        }
+        super.onDeath(damageSource);
+    }
+
+    @Override
+    public void handleStatus(byte status) {
+        if (status == 7) {
+            this.showEmoteParticle(true);
+        } else if (status == 6) {
+            this.showEmoteParticle(false);
+        } else {
+            super.handleStatus(status);
+        }
+    }
+
+    protected void showEmoteParticle(boolean positive) {
+        ParticleEffect particleEffect = ParticleTypes.HEART;
+        if (!positive) {
+            particleEffect = ParticleTypes.SMOKE;
+        }
+        for(int i = 0; i < 7; ++i) {
+            double d = this.random.nextGaussian() * 0.02;
+            double e = this.random.nextGaussian() * 0.02;
+            double f = this.random.nextGaussian() * 0.02;
+            this.getWorld().addParticle(particleEffect, this.getParticleX(1.0), this.getRandomBodyY() + 0.5, this.getParticleZ(1.0), d, e, f);
+        }
+    }
+
+    // --- Unused ------------------------------------------------------------------------------------------
+    @Override
+    public boolean isBreedingItem(ItemStack stack) {
+        return false;
     }
 
 
@@ -298,10 +427,7 @@ public abstract class CoreAnimalEntity extends TameableEntity {
     public boolean isFather() {
         return this.getFatherTicks() > 0;
     }
-
-    public boolean isMated() {
-        return !this.getMateUUID().isEmpty();
-    }
+    
 
     // --- Gender ------------------------------------------------------------------------------------------
     public int getGender() {
@@ -320,6 +446,7 @@ public abstract class CoreAnimalEntity extends TameableEntity {
     public void setHomePos(BlockPos pHomePos) {
         this.dataTracker.set(HOME_POS, pHomePos);
     }
+
 
     // --- Hunger ------------------------------------------------------------------------------------------
     public int getHungerTicks() {
@@ -341,12 +468,59 @@ public abstract class CoreAnimalEntity extends TameableEntity {
         }
     }
 
+    public int getLowMaxFood() {
+        return Math.round(this.getMaxFood() * 0.8F);
+    }
+
+    public boolean isFull() {
+        return this.getHunger() >= this.getMaxFood() * 0.8F;
+    }
+
     public boolean isHungry() {
-        return this.getHunger() < this.getMaxFood() * 0.8F;
+        return this.getHunger() < this.getMaxFood() * 0.4F;
     }
 
     public boolean isStarving() {
         return this.getHunger() < this.getMaxFood() * 0.2F;
+    }
+
+    public boolean isValidFood(ItemStack itemStack) {
+        return itemStack.isIn(this.getGeneralDiet());
+    }
+
+    public boolean isFavouriteFood(ItemStack itemStack) {
+        return itemStack.isIn(this.getSpecificDiet());
+    }
+
+    public int getFoodValue(ItemStack stack) {
+        int value = 0;
+        if (stack.isIn(CoreTags.LARGE_FOODS)) {
+            value = 6;
+        } else if (stack.isIn(CoreTags.MEDIUM_FOODS)) {
+            value = 4;
+        } else if (stack.isIn(CoreTags.SMALL_FOODS)) {
+            value = 2;
+        }
+        if (stack.isIn(this.getSpecificDiet())) {
+            value = value * 2;
+        }
+        return value;
+    }
+
+    public boolean canEatNutritionally(ItemStack itemStack) {
+        if (this.isFull()) {
+            return false;
+        } else {
+            if (this.isFavouriteFood(itemStack)) {
+                return true;
+            } else return this.isHungry() && this.isValidFood(itemStack);
+        }
+    }
+
+    // --- Leash ------------------------------------------------------------------------------------------
+    @Override
+    public Vec3d getLeashOffset() {
+        return new Vec3d(0.0, 0.6F * this.getStandingEyeHeight(), this.getWidth() * 0.4F);
     }
 
     // --- Pregnancy ------------------------------------------------------------------------------------------
@@ -362,12 +536,49 @@ public abstract class CoreAnimalEntity extends TameableEntity {
         return this.getPregnancyTicks() > 0;
     }
 
+
     // --- Size ------------------------------------------------------------------------------------------
     public float getGenderMaxSize() {
         if (this.getGender() == 0) {
             return this.getMaleMaxSize();
         } else {
             return this.getFemaleMaxSize();
+        }
+    }
+
+    // --- Taming ------------------------------------------------------------------------------------------
+    @Nullable
+    @Override
+    public UUID getOwnerUuid() {
+        return Optional.of(this.dataTracker.get(OWNER_UUID)).get().orElse(null);
+    }
+
+    public void setOwnerUuid(@Nullable UUID uuid) {
+        this.dataTracker.set(OWNER_UUID, Optional.ofNullable(uuid));
+    }
+
+    public void setOwner(PlayerEntity player) {
+        this.setTamed(true);
+        this.setOwnerUuid(player.getUuid());
+        if (player instanceof ServerPlayerEntity serverPlayerEntity) {
+            Criteria.TAME_ANIMAL.trigger(serverPlayerEntity, this);
+        }
+    }
+
+    public boolean isOwner(LivingEntity entity) {
+        return entity == this.getOwner();
+    }
+
+    public boolean isTamed() {
+        return (this.dataTracker.get(TAMEABLE_FLAGS) & 4) != 0;
+    }
+
+    public void setTamed(boolean tamed) {
+        byte b = this.dataTracker.get(TAMEABLE_FLAGS);
+        if (tamed) {
+            this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b | 4));
+        } else {
+            this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b & -5));
         }
     }
 
@@ -388,6 +599,11 @@ public abstract class CoreAnimalEntity extends TameableEntity {
         this.dataTracker.set(MATE_UUID, uuid);
     }
 
+    public boolean isMated() {
+        return !this.getMateUUID().isEmpty();
+    }
+
+
     // --- Variants ------------------------------------------------------------------------------------------
     public String getVariant() {
         return dataTracker.get(VARIANT);
@@ -407,61 +623,21 @@ public abstract class CoreAnimalEntity extends TameableEntity {
 
 
 
+
+
     // === OVERRIDES =======================================================================================================================================================================
 
     // --- Age ------------------------------------------------------------------------------------------
-    public int getAdultDays() {
-        return 1;
-    }
+    public abstract int getAdultDays();
 
     // --- Attributes ------------------------------------------------------------------------------------------
-    public void updateAttributes(int age) { }
+    public abstract void updateAttributes(int age);
 
-    // -- Breeding ------------------------------------------------------------------------------------------
-    public boolean isMonogamous() {
-        return false;
-    }
-
-    // --- Diet ------------------------------------------------------------------------------------------
-    public int getMaxFood() {
-        return 10;
-    }
-
-    public TagKey<Item> getGeneralDiet() {
-        return CoreTags.ALL_FOODS;
-    }
-
-    public TagKey<Item> getSpecificDiet() {
-        return CoreTags.ALL_FOODS;
-    }
-
-    // --- General ------------------------------------------------------------------------------------------
+    // --- Breeding ------------------------------------------------------------------------------------------
+    @Nullable
     @Override
-    public int getLimitPerChunk() {
-        return 8;
-    }
+    public abstract PassiveEntity createChild(ServerWorld world, PassiveEntity entity);
 
-    // --- Home Pos ------------------------------------------------------------------------------------------
-    public boolean isMigratory() {
-        return false;
-    }
-
-    public Block getNestingBlock() {
-        return null;
-    }
-
-    // --- Leash ------------------------------------------------------------------------------------------
-    @Override
-    public boolean canBeLeashed() {
-        return true;
-    }
-
-    @Override
-    public Vec3d getLeashOffset() {
-        return new Vec3d(0.0, 0.6F * this.getStandingEyeHeight(), this.getWidth() * 0.4F);
-    }
-
-    // --- Offspring ------------------------------------------------------------------------------------------
     public int getMaxOffspring() {
         return 1;
     }
@@ -474,65 +650,61 @@ public abstract class CoreAnimalEntity extends TameableEntity {
         return false;
     }
 
+    // --- General ------------------------------------------------------------------------------------------
+    @Override
+    public abstract int getLimitPerChunk();
+
+    // --- Home Pos ------------------------------------------------------------------------------------------
+    public abstract boolean isMigratory();
+
+    public abstract Block getHomeBlockType();
+
+    // --- Hunger ------------------------------------------------------------------------------------------
+    public abstract int getMaxFood();
+
+    public abstract TagKey<Item> getGeneralDiet();
+
+    public abstract TagKey<Item> getSpecificDiet();
+
+    // --- Leash ------------------------------------------------------------------------------------------
+    @Override
+    public abstract boolean canBeLeashed();
+
     // --- Pregnancy ------------------------------------------------------------------------------------------
-    public int getGestationTicks() {
-        return 120;
-    }
+    public abstract int getGestationTicks();
 
     // --- Roaming ------------------------------------------------------------------------------------------
-    public int getMaxRoamDistance() {
-        return 1;
-    }
+    public abstract int getMaxRoamDistance();
 
     // --- Size ------------------------------------------------------------------------------------------
-    public float getMinSize() {
-        return 0.25f;
-    }
+    public abstract float getMinSize();
 
-    public float getMaleMaxSize() {
-        return 1;
-    }
+    public abstract float getMaleMaxSize();
 
-    public float getFemaleMaxSize() {
-        return 1;
-    }
+    public abstract float getFemaleMaxSize();
 
     // --- Sounds ------------------------------------------------------------------------------------------
     @Override
-    protected void playStepSound(BlockPos pos, BlockState state) {
-        this.playSound(SoundEvents.ENTITY_WOLF_STEP, 0.15F, 1.0F);
-    }
+    protected abstract void playStepSound(BlockPos pos, BlockState state);
 
     @Override
-    protected SoundEvent getAmbientSound() {
-        return SoundEvents.ENTITY_WOLF_AMBIENT;
-    }
+    protected abstract SoundEvent getAmbientSound();
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource source) {
-        return SoundEvents.ENTITY_WOLF_HURT;
-    }
+    protected abstract SoundEvent getHurtSound(DamageSource source);
 
     @Override
-    protected SoundEvent getDeathSound() {
-        return SoundEvents.ENTITY_WOLF_DEATH;
-    }
+    protected abstract SoundEvent getDeathSound();
 
     @Override
-    protected float getSoundVolume() {
-        return 1.0F;
-    }
+    protected abstract float getSoundVolume();
 
     // --- Variants ------------------------------------------------------------------------------------------
-    public String calculateInheritedVariant(String parent1, String parent2) {
-        return "";
-    }
+    public abstract String calculateInheritedVariant(String parent1, String parent2);
 
-    public String calculateWildVariant() {
-        return "";
-    }
+    public abstract String calculateWildVariant();
 
-
+    
 
     // === DATA PROCESSING =======================================================================================================================================================================
 
@@ -550,6 +722,8 @@ public abstract class CoreAnimalEntity extends TameableEntity {
         MATE_VARIANT = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         MOTHER_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         MOTHER_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
+        OWNER_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
+        TAMEABLE_FLAGS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.BYTE);
         PREGNANCY_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         VARIANT = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
 
@@ -571,7 +745,9 @@ public abstract class CoreAnimalEntity extends TameableEntity {
         builder.add(MATE_VARIANT, "");
         builder.add(MOTHER_TICKS, 0);
         builder.add(MOTHER_UUID, "");
+        builder.add(OWNER_UUID, Optional.empty());
         builder.add(PREGNANCY_TICKS, 0);
+        builder.add(TAMEABLE_FLAGS, (byte)0);
         builder.add(VARIANT, "");
 
     }
@@ -592,6 +768,9 @@ public abstract class CoreAnimalEntity extends TameableEntity {
         nbt.putString("MateVariant", this.getMateVariant());
         nbt.putInt("MotherTicks", this.getMotherTicks());
         nbt.putString("MotherUUID", this.getMotherUUID());
+        if (this.getOwnerUuid() != null) {
+            nbt.putUuid("Owner", this.getOwnerUuid());
+        }
         nbt.putInt("PregnancyTicks", this.getPregnancyTicks());
         nbt.putString("Variant", this.getVariant());
 
@@ -610,8 +789,31 @@ public abstract class CoreAnimalEntity extends TameableEntity {
         this.setMateVariant(nbt.getString("MateVariant"));
         this.setMotherTicks(nbt.getInt("MotherTicks"));
         this.setMotherUUID(nbt.getString("MotherUUID"));
+        this.readTamingFromNBT(nbt);
         this.setPregnancyTicks(nbt.getInt("PregnancyTicks"));
         this.setVariant(nbt.getString("Variant"));
 
+    }
+
+    // --- Data Helper Methods ------------------------------------------------------------------------------------------
+    public void readTamingFromNBT(NbtCompound nbt) {
+        UUID uUID;
+        if (nbt.containsUuid("Owner")) {
+            uUID = nbt.getUuid("Owner");
+        } else {
+            String string = nbt.getString("Owner");
+            uUID = ServerConfigHandler.getPlayerUuidByName(this.getServer(), string);
+        }
+        if (uUID != null) {
+            try {
+                this.setOwnerUuid(uUID);
+                this.setTamed(true);
+            } catch (Throwable var4) {
+                this.setTamed(false);
+            }
+        } else {
+            this.setOwnerUuid(null);
+            this.setTamed(false);
+        }
     }
 }

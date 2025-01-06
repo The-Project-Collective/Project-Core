@@ -1,6 +1,6 @@
 package com.collective.projectcore.items;
 
-import com.collective.projectcore.entities.CoreAnimalEntity;
+import com.collective.projectcore.entities.base.CoreAnimalEntity;
 import dev.architectury.core.item.ArchitecturySpawnEggItem;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.component.DataComponentTypes;
