@@ -4,6 +4,7 @@ import com.collective.projectcore.blockentities.base.CoreBaseLockableContainerBl
 import com.collective.projectcore.entities.base.CoreAnimalEntity;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SidedInventory;
@@ -28,8 +29,8 @@ public class CoreFeederBlockEntity extends CoreBaseLockableContainerBlockEntity 
     public static final int INVENTORY_SIZE = 18;
     private DefaultedList<ItemStack> inventory;
 
-    public CoreFeederBlockEntity(BlockPos blockPos, BlockState blockState) {
-        super(null, blockPos, blockState);
+    public CoreFeederBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
+        super(blockEntityType, blockPos, blockState);
         this.inventory = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
     }
 
