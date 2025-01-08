@@ -74,6 +74,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
         this.hasGender = hasGender;
         this.hasHunger = hasHunger;
         this.canBeTamed = canBeTamed;
+        this.hasVariants = hasVariants;
     }
 
     // === CHARACTERISTICS CONTROL =======================================================================================================================================================================
