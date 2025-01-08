@@ -330,13 +330,17 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     // --- Taming ------------------------------------------------------------------------------------------
     private void tryTame(PlayerEntity player) {
         if (this.random.nextInt(3) == 0) {
-            this.setOwner(player);
-            this.navigation.stop();
-            this.setTarget(null);
-            this.getWorld().sendEntityStatus(this, (byte)7);
+            this.tame(player);
         } else {
             this.getWorld().sendEntityStatus(this, (byte)6);
         }
+    }
+
+    public void tame(PlayerEntity player) {
+        this.setOwner(player);
+        this.navigation.stop();
+        this.setTarget(null);
+        this.getWorld().sendEntityStatus(this, (byte)7);
     }
 
     @Override
@@ -719,6 +723,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     public abstract int getMinOffspring();
 
     public abstract boolean rareOffspring();
+
+    public abstract boolean isMonogamous();
 
     // --- General ------------------------------------------------------------------------------------------
     @Override
