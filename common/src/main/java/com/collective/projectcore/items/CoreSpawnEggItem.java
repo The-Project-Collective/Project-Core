@@ -56,13 +56,16 @@ public class CoreSpawnEggItem extends ArchitecturySpawnEggItem {
                         baby.setAgeTicks(baby.getAdultDays() * 24000);
                         baby.setAttributes(0);
                     }
+                    if (baby.doesBreed() && ((CoreAnimalEntity) entity).isAdult()) {
+                        baby.setMotherUUID(entity.getUuidAsString());
+                    }
                     if (baby.hasGender()) {
                         baby.setGender(random.nextInt(2));
                     } else {
                         baby.setGender(2);
                     }
-                    if (baby.doesBreed() && ((CoreAnimalEntity) entity).isAdult()) {
-                        baby.setMotherUUID(entity.getUuidAsString());
+                    if (baby.hasHunger()) {
+                        baby.setHunger(baby.getMaxFood() / 4);
                     }
                     if (baby.hasVariants()) {
                         baby.setVariant(baby.calculateWildVariant());

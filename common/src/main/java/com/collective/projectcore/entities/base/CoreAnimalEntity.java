@@ -12,6 +12,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.mob.Angerable;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,8 +28,10 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.TimeHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -36,10 +39,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable {
+public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable, Tameable {
 
     private static final TrackedData<Float> AGE_SCALE;
     private static final TrackedData<Integer> AGE_TICKS;
+    private static final TrackedData<Integer> ANGER_TIME;
     private static final TrackedData<Integer> BREEDING_TICKS;
     private static final TrackedData<Integer> FATHER_TICKS;
     private static final TrackedData<Integer> GENDER;
@@ -55,7 +59,11 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
     protected static final TrackedData<Byte> TAMEABLE_FLAGS;
     private static final TrackedData<String> VARIANT;
 
+    private static final UniformIntProvider ANGER_TIME_RANGE;
+    private UUID angryAt;
+
     protected boolean doesAge;
+    protected boolean getsAngry;
     protected boolean doesBreed;
     protected boolean hasGender;
     protected boolean hasHunger;
@@ -67,13 +75,15 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
     private boolean childFlag = false;
 
     protected CoreAnimalEntity(EntityType<? extends AnimalEntity> entityType, World world,
-                               boolean doesAge, boolean doesBreed, boolean hasGender, boolean hasHunger, boolean canBeTamed, boolean hasVariants) {
+                               boolean doesAge, boolean getsAngry, boolean doesBreed, boolean hasGender, boolean hasHunger, boolean canBeTamed, boolean hasVariants) {
         super(entityType, world);
         this.doesAge = doesAge;
+        this.getsAngry = getsAngry;
         this.doesBreed = doesBreed;
         this.hasGender = hasGender;
         this.hasHunger = hasHunger;
         this.canBeTamed = canBeTamed;
+        this.hasVariants = hasVariants;
     }
 
     // === CHARACTERISTICS CONTROL =======================================================================================================================================================================
@@ -81,6 +91,10 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
     // --- Boolean Checks ------------------------------------------------------------------------------------------
     public boolean doesAge() {
         return doesAge;
+    }
+
+    public boolean getsAngry() {
+        return getsAngry;
     }
 
     public boolean doesBreed() {
@@ -105,7 +119,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
 
     // === TICK HANDLING =======================================================================================================================================================================
 
-    // --- Main Ticker ------------------------------------------------------------------------------------------
+    // --- Main Tickers ------------------------------------------------------------------------------------------
     @Override
     protected void mobTick(ServerWorld world) {
         super.mobTick(world);
@@ -125,6 +139,14 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
             if (this.hasHunger()) {
                 hungerHandler();
             }
+        }
+    }
+
+    @Override
+    public void tickMovement() {
+        super.tickMovement();
+        if (!this.getWorld().isClient && this.getsAngry()) {
+            this.tickAngerLogic((ServerWorld)this.getWorld(), true);
         }
     }
 
@@ -208,9 +230,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack itemStack = player.getStackInHand(hand);
-        if (this.isValidFood(itemStack)) {
+        if (this.isValidFood(itemStack) && !this.hasAngerTime()) {
             if (this.getHunger() >= this.getMaxFood() && this.isFavouriteFood(itemStack)) {
-                if (this.canBeTamed) {
+                if (this.canBeTamed()) {
                     if (this.isTamed()) {
                         if (this.getHealth() < this.getMaxHealth()) {
                             this.handHeal(itemStack, player);
@@ -406,6 +428,33 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
 
     public boolean isAdult() {
         return this.getAgeDays() >= this.getAdultDays();
+    }
+
+    // --- Anger ------------------------------------------------------------------------------------------
+    @Override
+    public int getAngerTime() {
+        return this.dataTracker.get(ANGER_TIME);
+    }
+
+    @Override
+    public void setAngerTime(int angerTime) {
+        this.dataTracker.set(ANGER_TIME, angerTime);
+    }
+
+    @Override
+    public void chooseRandomAngerTime() {
+        this.setAngerTime(ANGER_TIME_RANGE.get(this.random));
+    }
+
+    @Override
+    @Nullable
+    public UUID getAngryAt() {
+        return this.angryAt;
+    }
+
+    @Override
+    public void setAngryAt(@Nullable UUID angryAt) {
+        this.angryAt = angryAt;
     }
 
     // --- Attributes ------------------------------------------------------------------------------------------
@@ -733,6 +782,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
     static {
         AGE_SCALE = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.FLOAT);
         AGE_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        ANGER_TIME = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        ANGER_TIME_RANGE = TimeHelper.betweenSeconds(20, 39);
         BREEDING_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         FATHER_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         GENDER = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -756,6 +807,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
         super.initDataTracker(builder);
         builder.add(AGE_SCALE, 0f);
         builder.add(AGE_TICKS, 0);
+        builder.add(ANGER_TIME, 0);
         builder.add(BREEDING_TICKS, 0);
         builder.add(FATHER_TICKS, 0);
         builder.add(GENDER, 0);
@@ -778,6 +830,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putInt("AgeTicks", this.getAgeTicks());
+        this.writeAngerToNbt(nbt);
         nbt.putInt("BreedingTicks", this.getBreedingTicks());
         nbt.putInt("FatherTicks", this.getFatherTicks());
         nbt.putInt("Gender", this.getGender());
@@ -802,6 +855,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.setAgeTicks(nbt.getInt("AgeTicks"));
+        this.readAngerFromNbt(this.getWorld(), nbt);
         this.setBreedingTicks(nbt.getInt("BreedingTicks"));
         this.setFatherTicks(nbt.getInt("FatherTicks"));
         this.setGender(nbt.getInt("Gender"));
