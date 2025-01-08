@@ -439,8 +439,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         float step = (maxSize - this.getMinSize()) / (this.getAdultDays() + 1);
         if (this.getAgeTicks() >= this.getAdultDays() * 24000) {
             this.dataTracker.set(AGE_SCALE, this.getMinSize() + (step * this.getAdultDays()));
+        } else {
+            this.dataTracker.set(AGE_SCALE, this.getMinSize() + ((step * this.getAgeDays())));
         }
-        this.dataTracker.set(AGE_SCALE, this.getMinSize() + ((step * this.getAgeDays())));
     }
 
     public float getAgeScaleData() {
