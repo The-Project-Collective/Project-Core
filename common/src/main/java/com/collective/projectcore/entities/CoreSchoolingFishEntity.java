@@ -21,8 +21,8 @@ public abstract class CoreSchoolingFishEntity extends CoreFishEntity {
     private CoreSchoolingFishEntity leader;
     private int groupSize = 1;
 
-    protected CoreSchoolingFishEntity(EntityType<? extends AnimalEntity> entityType, World world, boolean doesAge, boolean doesBreed, boolean hasGender, boolean hasHunger, boolean canBeTamed, boolean hasVariants, boolean canBeBucketed) {
-        super(entityType, world, doesAge, doesBreed, hasGender, hasHunger, canBeTamed, hasVariants, canBeBucketed);
+    protected CoreSchoolingFishEntity(EntityType<? extends AnimalEntity> entityType, World world, boolean doesAge, boolean getsAngry, boolean doesBreed, boolean hasGender, boolean hasHunger, boolean canBeTamed, boolean hasVariants, boolean canBeBucketed) {
+        super(entityType, world, doesAge, getsAngry, doesBreed, hasGender, hasHunger, canBeTamed, hasVariants, canBeBucketed);
     }
 
     // === TICK HANDLING =======================================================================================================================================================================
