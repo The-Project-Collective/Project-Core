@@ -1,6 +1,7 @@
 package com.collective.projectcore.entities.base;
 
 import com.collective.projectcore.groups.tags.CoreTags;
+import com.collective.projectcore.items.CoreItems;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -18,6 +19,7 @@ import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
@@ -26,6 +28,7 @@ import net.minecraft.server.ServerConfigHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TimeHelper;
@@ -254,6 +257,31 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
                     this.handFeed(itemStack, player);
                 }
             }
+        }
+        if (player.getMainHandStack().getItem().equals(CoreItems.DEV_TOOL)) {
+            player.sendMessage(Text.literal("----------------------"), false);
+            player.sendMessage(Text.literal("Gender: "+this.getGender()), false);
+            player.sendMessage(Text.literal("Variant: "+this.getVariant()), false);
+            player.sendMessage(Text.literal("Age: "+this.getAgeDays()), false);
+            player.sendMessage(Text.literal("Health: "+this.getHealth()), false);
+            player.sendMessage(Text.literal("UUID: "+this.getUuidAsString()), false);
+            player.sendMessage(Text.literal("Mother UUID: "+this.getMotherUUID()), false);
+            player.sendMessage(Text.literal("Mate UUID: "+this.getMateUUID()), false);
+            player.sendMessage(Text.literal("Breeding Ticks: "+this.getBreedingTicks()), false);
+            player.sendMessage(Text.literal("Pregnancy Ticks: "+this.getPregnancyTicks()), false);
+            player.sendMessage(Text.literal("----------------------"), false);
+        }
+        if (player.getMainHandStack().getItem().equals(Items.STICK)) {
+            this.setAgeTicks(this.getAgeTicks() + 24000);
+            player.sendMessage(Text.literal("New Age: "+this.getAgeDays()), false);
+        }
+        if (player.getMainHandStack().getItem().equals(Items.REDSTONE)) {
+            this.setBreedingTicks(0);
+            player.sendMessage(Text.literal("New Breeding Ticks: "+this.getBreedingTicks()), false);
+        }
+        if (player.getMainHandStack().getItem().equals(Items.GLOWSTONE)) {
+            this.setPregnancyTicks(1);
+            player.sendMessage(Text.literal("New Pregnancy Ticks: "+this.getPregnancyTicks()), false);
         }
         return super.interactMob(player, hand);
     }
