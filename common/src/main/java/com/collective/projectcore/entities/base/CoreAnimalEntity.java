@@ -233,55 +233,57 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack itemStack = player.getStackInHand(hand);
-        if (this.isValidFood(itemStack) && !this.hasAngerTime()) {
-            if (this.getHunger() >= this.getMaxFood() && this.isFavouriteFood(itemStack)) {
-                if (this.canBeTamed()) {
-                    if (this.isTamed()) {
+        if (hand == Hand.MAIN_HAND && !player.getWorld().isClient()) {
+            if (this.isValidFood(itemStack) && !this.hasAngerTime()) {
+                if (this.getHunger() >= this.getMaxFood() && this.isFavouriteFood(itemStack)) {
+                    if (this.canBeTamed()) {
+                        if (this.isTamed()) {
+                            if (this.getHealth() < this.getMaxHealth()) {
+                                this.handHeal(itemStack, player);
+                                return ActionResult.SUCCESS;
+                            }
+                        } else if (!this.getWorld().isClient) {
+                            itemStack.decrementUnlessCreative(1, player);
+                            this.tryTame(player);
+                            return ActionResult.SUCCESS_SERVER;
+                        }
+                    } else {
                         if (this.getHealth() < this.getMaxHealth()) {
                             this.handHeal(itemStack, player);
                             return ActionResult.SUCCESS;
                         }
-                    } else if (!this.getWorld().isClient) {
-                        itemStack.decrementUnlessCreative(1, player);
-                        this.tryTame(player);
-                        return ActionResult.SUCCESS_SERVER;
                     }
                 } else {
-                    if (this.getHealth() < this.getMaxHealth()) {
-                        this.handHeal(itemStack, player);
-                        return ActionResult.SUCCESS;
+                    if (this.canEatNutritionally(itemStack)) {
+                        this.handFeed(itemStack, player);
                     }
                 }
-            } else {
-                if (this.canEatNutritionally(itemStack)) {
-                    this.handFeed(itemStack, player);
-                }
             }
-        }
-        if (player.getMainHandStack().getItem().equals(CoreItems.DEV_TOOL)) {
-            player.sendMessage(Text.literal("----------------------"), false);
-            player.sendMessage(Text.literal("Gender: "+this.getGender()), false);
-            player.sendMessage(Text.literal("Variant: "+this.getVariant()), false);
-            player.sendMessage(Text.literal("Age: "+this.getAgeDays()), false);
-            player.sendMessage(Text.literal("Health: "+this.getHealth()), false);
-            player.sendMessage(Text.literal("UUID: "+this.getUuidAsString()), false);
-            player.sendMessage(Text.literal("Mother UUID: "+this.getMotherUUID()), false);
-            player.sendMessage(Text.literal("Mate UUID: "+this.getMateUUID()), false);
-            player.sendMessage(Text.literal("Breeding Ticks: "+this.getBreedingTicks()), false);
-            player.sendMessage(Text.literal("Pregnancy Ticks: "+this.getPregnancyTicks()), false);
-            player.sendMessage(Text.literal("----------------------"), false);
-        }
-        if (player.getMainHandStack().getItem().equals(Items.STICK)) {
-            this.setAgeTicks(this.getAgeTicks() + 24000);
-            player.sendMessage(Text.literal("New Age: "+this.getAgeDays()), false);
-        }
-        if (player.getMainHandStack().getItem().equals(Items.REDSTONE)) {
-            this.setBreedingTicks(0);
-            player.sendMessage(Text.literal("New Breeding Ticks: "+this.getBreedingTicks()), false);
-        }
-        if (player.getMainHandStack().getItem().equals(Items.GLOWSTONE)) {
-            this.setPregnancyTicks(1);
-            player.sendMessage(Text.literal("New Pregnancy Ticks: "+this.getPregnancyTicks()), false);
+            if (player.getMainHandStack().getItem().equals(CoreItems.DEV_TOOL.get())) {
+                player.sendMessage(Text.literal("----------------------"), false);
+                player.sendMessage(Text.literal("Gender: " + this.getGender()), false);
+                player.sendMessage(Text.literal("Variant: " + this.getVariant()), false);
+                player.sendMessage(Text.literal("Age: " + this.getAgeDays()), false);
+                player.sendMessage(Text.literal("Health: " + this.getHealth()), false);
+                player.sendMessage(Text.literal("UUID: " + this.getUuidAsString()), false);
+                player.sendMessage(Text.literal("Mother UUID: " + this.getMotherUUID()), false);
+                player.sendMessage(Text.literal("Mate UUID: " + this.getMateUUID()), false);
+                player.sendMessage(Text.literal("Breeding Ticks: " + this.getBreedingTicks()), false);
+                player.sendMessage(Text.literal("Pregnancy Ticks: " + this.getPregnancyTicks()), false);
+                player.sendMessage(Text.literal("----------------------"), false);
+            }
+            if (player.getMainHandStack().getItem().equals(Items.STICK)) {
+                this.setAgeTicks(this.getAgeTicks() + 24000);
+                player.sendMessage(Text.literal("New Age: " + this.getAgeDays()), false);
+            }
+            if (player.getMainHandStack().getItem().equals(Items.REDSTONE)) {
+                this.setBreedingTicks(0);
+                player.sendMessage(Text.literal("New Breeding Ticks: " + this.getBreedingTicks()), false);
+            }
+            if (player.getMainHandStack().getItem().equals(Items.GLOWSTONE_DUST)) {
+                this.setPregnancyTicks(1);
+                player.sendMessage(Text.literal("New Pregnancy Ticks: " + this.getPregnancyTicks()), false);
+            }
         }
         return super.interactMob(player, hand);
     }
