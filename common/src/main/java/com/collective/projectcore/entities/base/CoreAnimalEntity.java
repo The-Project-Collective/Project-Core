@@ -211,7 +211,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Tameable 
         ItemStack itemStack = player.getStackInHand(hand);
         if (this.isValidFood(itemStack)) {
             if (this.getHunger() >= this.getMaxFood() && this.isFavouriteFood(itemStack)) {
-                if (this.canBeTamed) {
+                if (this.canBeTamed()) {
                     if (this.isTamed()) {
                         if (this.getHealth() < this.getMaxHealth()) {
                             this.handHeal(itemStack, player);
