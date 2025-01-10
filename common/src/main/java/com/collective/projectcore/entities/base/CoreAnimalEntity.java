@@ -21,6 +21,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.TagKey;
@@ -39,6 +40,8 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,9 +53,11 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private static final TrackedData<Integer> BREEDING_TICKS;
     private static final TrackedData<Integer> FATHER_TICKS;
     private static final TrackedData<Integer> GENDER;
+    private static final TrackedData<Integer> GROUP_SIZE;
     private static final TrackedData<BlockPos> HOME_POS;
     private static final TrackedData<Integer> HUNGER;
     private static final TrackedData<Integer> HUNGER_TICKS;
+    private static final TrackedData<String> LEADER;
     private static final TrackedData<String> MATE_UUID;
     private static final TrackedData<String> MATE_VARIANT;
     private static final TrackedData<Integer> MOTHER_TICKS;
@@ -65,11 +70,14 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private static final UniformIntProvider ANGER_TIME_RANGE;
     private UUID angryAt;
 
+    private List<String> pack;
+
     protected boolean doesAge;
     protected boolean getsAngry;
     protected boolean doesBreed;
     protected boolean hasGender;
     protected boolean hasHunger;
+    protected boolean hasAPack;
     protected boolean canBeTamed;
     protected boolean hasVariants;
 
@@ -78,13 +86,14 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private boolean childFlag = false;
 
     protected CoreAnimalEntity(EntityType<? extends AnimalEntity> entityType, World world,
-                               boolean doesAge, boolean getsAngry, boolean doesBreed, boolean hasGender, boolean hasHunger, boolean canBeTamed, boolean hasVariants) {
+                               boolean doesAge, boolean getsAngry, boolean doesBreed, boolean hasGender, boolean hasHunger, boolean hasAPack, boolean canBeTamed, boolean hasVariants) {
         super(entityType, world);
         this.doesAge = doesAge;
         this.getsAngry = getsAngry;
         this.doesBreed = doesBreed;
         this.hasGender = hasGender;
         this.hasHunger = hasHunger;
+        this.hasAPack = hasAPack;
         this.canBeTamed = canBeTamed;
         this.hasVariants = hasVariants;
     }
@@ -110,6 +119,10 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     public boolean hasHunger() {
         return hasHunger;
+    }
+
+    public boolean hasAPack() {
+        return hasAPack;
     }
 
     public boolean canBeTamed() {
@@ -291,14 +304,17 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     // --- Breeding ------------------------------------------------------------------------------------------
     @Override
     public boolean canBreedWith(AnimalEntity other) {
+        boolean flag = false;
         if (other instanceof CoreAnimalEntity coreAnimalEntity) {
             if (this.getClass().equals(coreAnimalEntity.getClass())) {
                 if (this.getGender() != coreAnimalEntity.getGender() && !this.isMother() && !this.isFather() && !coreAnimalEntity.isMother() && !coreAnimalEntity.isFather()) {
                     if (this.getBreedingTicks() <= 0 && coreAnimalEntity.getBreedingTicks() <= 0) {
-                        if (this.getMateUUID().equals(coreAnimalEntity.getUuidAsString()) && coreAnimalEntity.getMateUUID().equals(this.getUuidAsString())) {
-                            return !this.isPregnant() && !coreAnimalEntity.isPregnant();
-                        } else if (!this.isMated() && !coreAnimalEntity.isMated()) {
-                            return !this.isPregnant() && !coreAnimalEntity.isPregnant();
+                        if ((this.hasAPack() && this.getLeader().equals(coreAnimalEntity.getLeader())) || !this.hasAPack()) {
+                            if (this.getMateUUID().equals(coreAnimalEntity.getUuidAsString()) && coreAnimalEntity.getMateUUID().equals(this.getUuidAsString())) {
+                                return !this.isPregnant() && !coreAnimalEntity.isPregnant();
+                            } else if (!this.isMated() && !coreAnimalEntity.isMated()) {
+                                return !this.isPregnant() && !coreAnimalEntity.isPregnant();
+                            }
                         }
                     }
                 }
@@ -634,6 +650,23 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         return new Vec3d(0.0, 0.6F * this.getStandingEyeHeight(), this.getWidth() * 0.4F);
     }
 
+    // --- Pack Mechanics ------------------------------------------------------------------------------------------
+    public List<String> getPack() {
+        return this.pack;
+    }
+
+    public void setPack(List<String> newPack) {
+        this.pack = newPack;
+    }
+
+    public String getLeader() {
+        return this.dataTracker.get(LEADER);
+    }
+
+    public void setLeader(String isLeader) {
+        this.dataTracker.set(LEADER, isLeader);
+    }
+
     // --- Pregnancy ------------------------------------------------------------------------------------------
     public int getPregnancyTicks() {
         return this.dataTracker.get(PREGNANCY_TICKS);
@@ -777,6 +810,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     @Override
     public abstract boolean canBeLeashed();
 
+    // --- Pack Mechanics ------------------------------------------------------------------------------------------
+    public abstract int getMaxGroupSize();
+
     // --- Pregnancy ------------------------------------------------------------------------------------------
     public abstract int getGestationTicks();
 
@@ -824,9 +860,11 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         BREEDING_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         FATHER_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         GENDER = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        GROUP_SIZE = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         HOME_POS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
         HUNGER = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         HUNGER_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        LEADER = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         MATE_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         MATE_VARIANT = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         MOTHER_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -848,9 +886,11 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         builder.add(BREEDING_TICKS, 0);
         builder.add(FATHER_TICKS, 0);
         builder.add(GENDER, 0);
+        builder.add(GROUP_SIZE, 0);
         builder.add(HOME_POS, new BlockPos(BlockPos.ZERO));
         builder.add(HUNGER, 0);
         builder.add(HUNGER_TICKS, 0);
+        builder.add(LEADER, "");
         builder.add(MATE_UUID, "");
         builder.add(MATE_VARIANT, "");
         builder.add(MOTHER_TICKS, 0);
@@ -876,6 +916,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         nbt.putInt("HomePosZ", this.getHomePos().getZ());
         nbt.putInt("Hunger", this.getHunger());
         nbt.putInt("HungerTicks", this.getHungerTicks());
+        nbt.putString("Leader", this.getLeader());
         nbt.putString("MateUUID", this.getMateUUID());
         nbt.putString("MateVariant", this.getMateVariant());
         nbt.putInt("MotherTicks", this.getMotherTicks());
@@ -883,6 +924,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         if (this.getOwnerUuid() != null) {
             nbt.putUuid("Owner", this.getOwnerUuid());
         }
+        this.writePackToNBT(nbt);
         nbt.putInt("PregnancyTicks", this.getPregnancyTicks());
         nbt.putString("Variant", this.getVariant());
 
@@ -899,11 +941,13 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         this.setHomePos(new BlockPos(nbt.getInt("HomePosX"), nbt.getInt("HomePosY"), nbt.getInt("HomePosZ")));
         this.setHunger(nbt.getInt("Hunger"));
         this.setHungerTicks(nbt.getInt("HungerTicks"));
+        this.setLeader(nbt.getString("Leader"));
         this.setMateUUID(nbt.getString("MateUUID"));
         this.setMateVariant(nbt.getString("MateVariant"));
         this.setMotherTicks(nbt.getInt("MotherTicks"));
         this.setMotherUUID(nbt.getString("MotherUUID"));
         this.readTamingFromNBT(nbt);
+        this.readPackFromNBT(nbt);
         this.setPregnancyTicks(nbt.getInt("PregnancyTicks"));
         this.setVariant(nbt.getString("Variant"));
 
@@ -928,6 +972,33 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         } else {
             this.setOwnerUuid(null);
             this.setTamed(false);
+        }
+    }
+
+    public void writePackToNBT(NbtCompound nbt) {
+        NbtList tagList = new NbtList();
+        for(int i = 0; i < this.getPack().size(); i++) {
+            String s = this.getPack().get(i);
+            if(s != null) {
+                NbtCompound tag = new NbtCompound();
+                tag.putString("PackMember" + i, s);
+                tagList.add(tag);
+            }
+        }
+        nbt.put("Pack", tagList);
+    }
+
+    public void readPackFromNBT(NbtCompound nbt) {
+        NbtList tagList = nbt.getList("Pack", NbtList.STRING_TYPE);
+        List<String> newPack = new ArrayList<>();
+        for(int i = 0; i < tagList.size(); i++)
+        {
+            NbtCompound tag = tagList.getCompound(i);
+            String s = tag.getString("PackMember" + i);
+            newPack.add(i, s);
+        }
+        if (!newPack.isEmpty()) {
+            this.setPack(newPack);
         }
     }
 }
