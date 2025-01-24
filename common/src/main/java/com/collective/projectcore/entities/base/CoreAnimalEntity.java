@@ -63,6 +63,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private static final TrackedData<Integer> MOTHER_TICKS;
     private static final TrackedData<String> MOTHER_UUID;
     protected static final TrackedData<Optional<UUID>> OWNER_UUID;
+    private static final TrackedData<String> PACK;
     private static final TrackedData<Integer> PREGNANCY_TICKS;
     protected static final TrackedData<Byte> TAMEABLE_FLAGS;
     private static final TrackedData<String> VARIANT;
@@ -652,11 +653,18 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     // --- Pack Mechanics ------------------------------------------------------------------------------------------
     public List<String> getPack() {
-        return this.pack;
+        String totalPack = this.dataTracker.get(PACK);
+        return List.of(totalPack.split("\\."));
     }
 
     public void setPack(List<String> newPack) {
-        this.pack = newPack;
+        StringBuilder finalPack = new StringBuilder();
+        for (String packMember : newPack) {
+            finalPack.append(".");
+            finalPack.append(packMember);
+        }
+        finalPack.deleteCharAt(0);
+        this.dataTracker.set(PACK, finalPack.toString());
     }
 
     public String getLeader() {
@@ -871,6 +879,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         MOTHER_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         OWNER_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
         TAMEABLE_FLAGS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.BYTE);
+        PACK = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         PREGNANCY_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         VARIANT = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
 
