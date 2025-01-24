@@ -22,6 +22,9 @@ public class CoreAnimalLeaderCombineGroupsGoal extends Goal {
 
     @Override
     public boolean canStart() {
+        if (this.animal.getPack() == null) {
+            return false;
+        }
         if (this.animal.isBaby() || this.animal.isChild() || !this.animal.getUuidAsString().equals(this.animal.getLeader()) || this.animal.getPack().size() >= this.animal.getMaxGroupSize()) {
             return false;
         }
@@ -41,6 +44,9 @@ public class CoreAnimalLeaderCombineGroupsGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
+        if (this.animal.getPack() == null) {
+            return false;
+        }
         if (this.animal.isBaby() || this.animal.isChild() || !this.animal.getUuidAsString().equals(this.animal.getLeader()) || this.animal.getPack().size() >= this.animal.getMaxGroupSize()) {
             return false;
         }

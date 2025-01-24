@@ -19,11 +19,17 @@ public class CoreAnimalCheckGroupLeaderGoal extends Goal {
 
     @Override
     public boolean canStart() {
+        if (this.animal.getPack() == null) {
+            return false;
+        }
         return this.animal.isAdult() || this.animal.isJuvenile();
     }
 
     @Override
     public boolean shouldContinue() {
+        if (this.animal.getPack() == null) {
+            return false;
+        }
         return this.animal.isAdult() || this.animal.isJuvenile();
     }
 
