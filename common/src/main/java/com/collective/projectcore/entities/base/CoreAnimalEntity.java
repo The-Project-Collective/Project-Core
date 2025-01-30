@@ -66,8 +66,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private static final UniformIntProvider ANGER_TIME_RANGE;
     private UUID angryAt;
 
-    private List<String> pack;
-
     protected boolean doesAge;
     protected boolean getsAngry;
     protected boolean doesBreed;
@@ -81,8 +79,11 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private boolean juviFlag = false;
     private boolean childFlag = false;
 
+    private int counter = 0;
+
     protected CoreAnimalEntity(EntityType<? extends AnimalEntity> entityType, World world,
-                               boolean doesAge, boolean getsAngry, boolean doesBreed, boolean hasGender, boolean hasHunger, boolean hasAPack, boolean canBeTamed, boolean hasVariants) {
+                               boolean doesAge, boolean getsAngry, boolean doesBreed, boolean hasGender,
+                               boolean hasHunger, boolean hasAPack, boolean canBeTamed, boolean hasVariants) {
         super(entityType, world);
         this.doesAge = doesAge;
         this.getsAngry = getsAngry;
@@ -160,6 +161,12 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     @Override
     public void tickMovement() {
         super.tickMovement();
+        if (counter < 20) {
+            counter++;
+        } else {
+            calculateDimensions();
+            counter = 0;
+        }
         if (!this.getWorld().isClient && this.getsAngry()) {
             this.tickAngerLogic((ServerWorld)this.getWorld(), true);
         }
