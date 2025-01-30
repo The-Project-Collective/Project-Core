@@ -48,15 +48,21 @@ public class CoreAnimalCheckGroupGoal extends Goal {
         if (--this.delay <= 0) {
             this.delay = this.getTickCount(10);
             List<String> toRemove = new ArrayList<>();
+            if (this.animal.getPack().isEmpty()) {
+                return;
+            }
             for (String packMemberString : this.animal.getPack()) {
+                System.out.println("Pack Member: "+packMemberString);
                 CoreAnimalEntity packMember = (CoreAnimalEntity) getServerWorld(this.animal).getEntity(UUID.fromString(packMemberString));
                 if (packMember == null || !packMember.isAlive()) {
                     toRemove.add(packMemberString);
                 }
             }
-            List<String> newPack = this.animal.getPack();
-            newPack.removeAll(toRemove);
-            this.animal.setPack(newPack);
+            List<String> newPack = new ArrayList<>(this.animal.getPack());
+            if (!toRemove.isEmpty()) {
+                newPack.removeAll(toRemove);
+                this.animal.setPack(newPack);
+            }
         }
     }
 }

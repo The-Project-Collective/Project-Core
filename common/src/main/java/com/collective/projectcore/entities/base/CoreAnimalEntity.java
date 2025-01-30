@@ -40,10 +40,7 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable, Tameable {
 
@@ -156,6 +153,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
             if (this.hasHunger()) {
                 hungerHandler();
             }
+            if (this.hasAPack()) {
+                packHandler();
+            }
         }
     }
 
@@ -236,6 +236,19 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
                 }
             }
             this.setHungerTicks(this.random.nextInt(600) + 1000);
+        }
+    }
+
+    // --- Pack Ticker ------------------------------------------------------------------------------------------
+    public void packHandler() {
+        if (this.getPack().isEmpty()) {
+            this.setPack(List.of(this.getUuidAsString()));
+        } else {
+            if (this.getPack().size() == 1) {
+                if (this.getPack().getFirst().equals(" ") || this.getPack().getFirst().equals(".")) {
+                    this.setPack(List.of(this.getUuidAsString()));
+                }
+            }
         }
     }
 
@@ -653,18 +666,43 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     // --- Pack Mechanics ------------------------------------------------------------------------------------------
     public List<String> getPack() {
-        String totalPack = this.dataTracker.get(PACK);
-        return List.of(totalPack.split("\\."));
+        String totalPack = this.getPackString();
+        System.out.println("Raw Pack String: "+totalPack);
+        List<String> totalPackList = new ArrayList<>(List.of(totalPack.split("\\.")));
+        List<String> toRemove = new ArrayList<>();
+        for (String pack : totalPackList) {
+            if (!validateUUID(pack)) {
+                toRemove.add(pack);
+            }
+        }
+        if (!toRemove.isEmpty()) {
+            totalPackList.removeAll(toRemove);
+        }
+        HashSet<String> finalPack = new HashSet<>(totalPackList);
+        return finalPack.stream().toList();
     }
 
     public void setPack(List<String> newPack) {
+        HashSet<String> newPackChecked = new HashSet<>(newPack);
+        List<String> newPackList = newPackChecked.stream().toList();
         StringBuilder finalPack = new StringBuilder();
-        for (String packMember : newPack) {
+        for (String packMember : newPackList) {
             finalPack.append(".");
             finalPack.append(packMember);
         }
-        finalPack.deleteCharAt(0);
-        this.dataTracker.set(PACK, finalPack.toString());
+        this.setPackString(finalPack.toString());
+    }
+
+    public String getPackString() {
+        return this.dataTracker.get(PACK);
+    }
+
+    public void setPackString(String pack) {
+        this.dataTracker.set(PACK, pack);
+    }
+
+    public boolean validateUUID(String name) {
+        return !name.isEmpty() && !name.equals(" ") && !name.equals(".");
     }
 
     public String getLeader() {
@@ -905,6 +943,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         builder.add(MOTHER_TICKS, 0);
         builder.add(MOTHER_UUID, "");
         builder.add(OWNER_UUID, Optional.empty());
+        builder.add(PACK, "");
         builder.add(PREGNANCY_TICKS, 0);
         builder.add(TAMEABLE_FLAGS, (byte)0);
         builder.add(VARIANT, "");
@@ -933,7 +972,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         if (this.getOwnerUuid() != null) {
             nbt.putUuid("Owner", this.getOwnerUuid());
         }
-        this.writePackToNBT(nbt);
+        nbt.putString("Pack", this.getPackString());
         nbt.putInt("PregnancyTicks", this.getPregnancyTicks());
         nbt.putString("Variant", this.getVariant());
 
@@ -956,7 +995,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         this.setMotherTicks(nbt.getInt("MotherTicks"));
         this.setMotherUUID(nbt.getString("MotherUUID"));
         this.readTamingFromNBT(nbt);
-        this.readPackFromNBT(nbt);
+        this.setPackString(nbt.getString("Pack"));
         this.setPregnancyTicks(nbt.getInt("PregnancyTicks"));
         this.setVariant(nbt.getString("Variant"));
 
@@ -981,33 +1020,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         } else {
             this.setOwnerUuid(null);
             this.setTamed(false);
-        }
-    }
-
-    public void writePackToNBT(NbtCompound nbt) {
-        NbtList tagList = new NbtList();
-        for(int i = 0; i < this.getPack().size(); i++) {
-            String s = this.getPack().get(i);
-            if(s != null) {
-                NbtCompound tag = new NbtCompound();
-                tag.putString("PackMember" + i, s);
-                tagList.add(tag);
-            }
-        }
-        nbt.put("Pack", tagList);
-    }
-
-    public void readPackFromNBT(NbtCompound nbt) {
-        NbtList tagList = nbt.getList("Pack", NbtList.STRING_TYPE);
-        List<String> newPack = new ArrayList<>();
-        for(int i = 0; i < tagList.size(); i++)
-        {
-            NbtCompound tag = tagList.getCompound(i);
-            String s = tag.getString("PackMember" + i);
-            newPack.add(i, s);
-        }
-        if (!newPack.isEmpty()) {
-            this.setPack(newPack);
         }
     }
 }

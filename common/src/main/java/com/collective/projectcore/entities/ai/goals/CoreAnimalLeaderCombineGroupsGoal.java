@@ -3,6 +3,7 @@ package com.collective.projectcore.entities.ai.goals;
 import com.collective.projectcore.entities.base.CoreAnimalEntity;
 import net.minecraft.entity.ai.goal.Goal;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,15 +30,16 @@ public class CoreAnimalLeaderCombineGroupsGoal extends Goal {
             return false;
         }
         List<? extends CoreAnimalEntity> tempLeaderList = this.animal.getWorld().getNonSpectatingEntities(this.animal.getClass(), this.animal.getBoundingBox().expand(HORIZONTAL_CHECK_RANGE, VERTICAL_CHECK_RANGE, HORIZONTAL_CHECK_RANGE));
-        if (tempLeaderList.isEmpty()) {
+        if (tempLeaderList.isEmpty() || this.animal.getLeader() == null) {
             return false;
         }
         tempLeaderList.removeIf(animal -> animal.isBaby() ||
                 animal.isChild() ||
                 this.animal.getPack().contains(animal.getUuidAsString()) ||
+                animal.getLeader() == null ||
                 !animal.getLeader().equals(animal.getUuidAsString()) ||
                 animal.getPack().size() >= animal.getMaxGroupSize() ||
-                this.canCombinePacks(this.animal.getPack().size(), animal.getPack().size()));
+                !this.canCombinePacks(this.animal.getPack().size(), animal.getPack().size()));
         leaderList = tempLeaderList;
         return !leaderList.isEmpty();
     }
@@ -68,18 +70,22 @@ public class CoreAnimalLeaderCombineGroupsGoal extends Goal {
         if (--this.delay <= 0) {
             this.delay = this.getTickCount(10);
             for (CoreAnimalEntity otherLeader : leaderList) {
-                if (this.canCombinePacks(this.animal.getPack().size(), otherLeader.getPack().size())) {
-                    List<String> newPack = this.animal.getPack();
-                    newPack.addAll(otherLeader.getPack());
-                    this.animal.setPack(newPack);
-                    for (String pack1MemberString : this.animal.getPack()) {
-                        CoreAnimalEntity pack1Member = (CoreAnimalEntity) getServerWorld(this.animal).getEntity(UUID.fromString(pack1MemberString));
-                        if (pack1Member != null) {
-                            pack1Member.setPack(newPack);
+                if (otherLeader.getPack() != null) {
+                    if (this.canCombinePacks(this.animal.getPack().size(), otherLeader.getPack().size())) {
+                        List<String> newPack = new ArrayList<>(this.animal.getPack());
+                        if (newPack.isEmpty()) {
+                            return;
+                        }
+                        newPack.addAll(otherLeader.getPack());
+                        this.animal.setPack(newPack);
+                        for (String pack1MemberString : this.animal.getPack()) {
+                            CoreAnimalEntity pack1Member = (CoreAnimalEntity) getServerWorld(this.animal).getEntity(UUID.fromString(pack1MemberString));
+                            if (pack1Member != null) {
+                                pack1Member.setPack(newPack);
+                            }
                         }
                     }
                 }
-
             }
         }
     }
