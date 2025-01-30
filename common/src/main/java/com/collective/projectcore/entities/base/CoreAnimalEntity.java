@@ -5,9 +5,7 @@ import com.collective.projectcore.items.CoreItems;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.Tameable;
+import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -736,6 +734,43 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         }
     }
 
+    @Override
+    protected EntityDimensions getBaseDimensions(EntityPose pose) {
+        return super.getBaseDimensions(pose).scaled(this.getDimensionScaleWidth(), this.getDimensionScaleHeight());
+    }
+
+    public float getDimensionScaleHeight() {
+        float step = (this.calculateMaxHeight() - this.getMinHeight()) / ((this.getAdultDays() * 24000) + 1);
+        if (this.getAgeTicks() >= this.getAdultDays() * 24000) {
+            return this.getMinHeight() + ((step) * this.getAdultDays() * 24000);
+        }
+        return getMinHeight() + (step * this.getAgeTicks());
+    }
+
+    public float getDimensionScaleWidth() {
+        float step = (calculateMaxWidth() - this.getMinWidth()) / ((this.getAdultDays() * 24000) + 1);
+        if (this.getAgeTicks() >= this.getAdultDays() * 24000) {
+            return this.getMinWidth() + ((step) * this.getAdultDays() * 24000);
+        }
+        return getMinWidth() + (step * this.getAgeTicks());
+    }
+
+    public float calculateMaxHeight() {
+        if (this.getGender() == 0) {
+            return getMaxHeight();
+        } else {
+            return getMaxHeight() - getHeightDifference();
+        }
+    }
+
+    public float calculateMaxWidth() {
+        if (this.getGender() == 0) {
+            return getMaxWidth();
+        } else {
+            return getMaxWidth() - getWidthDifference();
+        }
+    }
+
     // --- Taming ------------------------------------------------------------------------------------------
     @Nullable
     @Override
@@ -871,6 +906,19 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     public abstract float getMaleMaxSize();
 
     public abstract float getFemaleMaxSize();
+
+    public abstract float getMinHeight();
+
+    public abstract float getMinWidth();
+
+    public abstract float getMaxHeight();
+
+    public abstract float getMaxWidth();
+
+    public abstract float getHeightDifference();
+
+    public abstract float getWidthDifference();
+
 
     // --- Sounds ------------------------------------------------------------------------------------------
     @Override
