@@ -43,7 +43,7 @@ public class CoreAnimalBreedGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return this.mate.isAlive() && this.timer < 60 && !this.mate.isPanicking();
+        return this.mate.isAlive() && this.timer < 60 && !this.mate.isPanicking() || this.mate.isAdult();
     }
 
     @Override

@@ -323,10 +323,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     // --- Breeding ------------------------------------------------------------------------------------------
     @Override
     public boolean canBreedWith(AnimalEntity other) {
-        boolean flag = false;
         if (other instanceof CoreAnimalEntity coreAnimalEntity) {
             if (this.getClass().equals(coreAnimalEntity.getClass())) {
-                if (this.getGender() != coreAnimalEntity.getGender() && !this.isMother() && !this.isFather() && !coreAnimalEntity.isMother() && !coreAnimalEntity.isFather()) {
+                if (this.getGender() != coreAnimalEntity.getGender() && !this.isMother() && !this.isFather() && !coreAnimalEntity.isMother() && !coreAnimalEntity.isFather() && this.isAdult() && coreAnimalEntity.isAdult()) {
                     if (this.getBreedingTicks() <= 0 && coreAnimalEntity.getBreedingTicks() <= 0) {
                         if ((this.hasAPack() && this.getLeader().equals(coreAnimalEntity.getLeader())) || !this.hasAPack()) {
                             if (this.getMateUUID().equals(coreAnimalEntity.getUuidAsString()) && coreAnimalEntity.getMateUUID().equals(this.getUuidAsString())) {

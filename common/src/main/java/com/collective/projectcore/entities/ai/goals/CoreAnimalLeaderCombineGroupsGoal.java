@@ -26,7 +26,7 @@ public class CoreAnimalLeaderCombineGroupsGoal extends Goal {
         if (this.animal.getPack() == null) {
             return false;
         }
-        if (this.animal.isBaby() || this.animal.isChild() || !this.animal.getUuidAsString().equals(this.animal.getLeader()) || this.animal.getPack().size() >= this.animal.getMaxGroupSize()) {
+        if (this.animal.isBaby() || this.animal.isChild() || !this.animal.getUuidAsString().equals(this.animal.getLeader()) || this.calculateAdultPackSize(this.animal.getPack()) >= this.animal.getMaxGroupSize()) {
             return false;
         }
         List<? extends CoreAnimalEntity> tempLeaderList = this.animal.getWorld().getNonSpectatingEntities(this.animal.getClass(), this.animal.getBoundingBox().expand(HORIZONTAL_CHECK_RANGE, VERTICAL_CHECK_RANGE, HORIZONTAL_CHECK_RANGE));
@@ -39,7 +39,7 @@ public class CoreAnimalLeaderCombineGroupsGoal extends Goal {
                 animal.getLeader() == null ||
                 !animal.getLeader().equals(animal.getUuidAsString()) ||
                 animal.getPack().size() >= animal.getMaxGroupSize() ||
-                !this.canCombinePacks(this.animal.getPack().size(), animal.getPack().size()));
+                !this.canCombinePacks(this.calculateAdultPackSize(this.animal.getPack()), this.calculateAdultPackSize(animal.getPack())));
         leaderList = tempLeaderList;
         return !leaderList.isEmpty();
     }
@@ -49,7 +49,7 @@ public class CoreAnimalLeaderCombineGroupsGoal extends Goal {
         if (this.animal.getPack() == null) {
             return false;
         }
-        if (this.animal.isBaby() || this.animal.isChild() || !this.animal.getUuidAsString().equals(this.animal.getLeader()) || this.animal.getPack().size() >= this.animal.getMaxGroupSize()) {
+        if (this.animal.isBaby() || this.animal.isChild() || !this.animal.getUuidAsString().equals(this.animal.getLeader()) || this.calculateAdultPackSize(this.animal.getPack()) >= this.animal.getMaxGroupSize()) {
             return false;
         }
         return !leaderList.isEmpty();
@@ -71,7 +71,7 @@ public class CoreAnimalLeaderCombineGroupsGoal extends Goal {
             this.delay = this.getTickCount(10);
             for (CoreAnimalEntity otherLeader : leaderList) {
                 if (otherLeader.getPack() != null) {
-                    if (this.canCombinePacks(this.animal.getPack().size(), otherLeader.getPack().size())) {
+                    if (this.canCombinePacks(this.calculateAdultPackSize(this.pack), this.calculateAdultPackSize(otherLeader.getPack()))) {
                         List<String> newPack = new ArrayList<>(this.animal.getPack());
                         if (newPack.isEmpty()) {
                             return;
@@ -92,5 +92,18 @@ public class CoreAnimalLeaderCombineGroupsGoal extends Goal {
 
     public boolean canCombinePacks(int packSize1, int packSize2) {
         return (packSize1 + packSize2) <= this.animal.getMaxGroupSize();
+    }
+
+    public int calculateAdultPackSize(List<String> adultPack) {
+        List<CoreAnimalEntity> adultPackEntities = new ArrayList<>();
+        for (String packMember: adultPack) {
+            adultPackEntities.add((CoreAnimalEntity) getServerWorld(this.animal).getEntity(UUID.fromString(packMember)));
+        }
+        if (!adultPackEntities.isEmpty()) {
+            adultPackEntities.removeIf(packMember -> packMember == null || !packMember.isAlive() || !packMember.isAdult());
+            return adultPackEntities.size();
+        } else {
+            return this.animal.getPack().size();
+        }
     }
 }
