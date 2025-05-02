@@ -15,9 +15,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 public class CoreSpawnEggItem extends ArchitecturySpawnEggItem {
 
@@ -70,7 +68,16 @@ public class CoreSpawnEggItem extends ArchitecturySpawnEggItem {
                     if (baby.hasVariants()) {
                         baby.setVariant(baby.calculateWildVariant());
                     }
-
+                    if (baby.hasAPack()) {
+                        List<String> motherPack = new ArrayList<>(((CoreAnimalEntity) entity).getPack());
+                        motherPack.add(baby.getUuidAsString());
+                        for (String packMember : motherPack) {
+                            CoreAnimalEntity packMemberEntity = (CoreAnimalEntity) ((ServerWorld) entity.getWorld()).getEntity(UUID.fromString(packMember));
+                            if (packMemberEntity != null) {
+                                packMemberEntity.setPack(motherPack);
+                            }
+                        }
+                    }
                     baby.refreshPositionAndAngles(pos.getX(), pos.getY(), pos.getZ(), 0.0F, 0.0F);
                     world.spawnEntityAndPassengers(baby);
                     baby.setCustomName(stack.get(DataComponentTypes.CUSTOM_NAME));
