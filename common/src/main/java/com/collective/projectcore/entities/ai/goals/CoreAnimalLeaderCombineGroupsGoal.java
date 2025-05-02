@@ -12,8 +12,6 @@ public class CoreAnimalLeaderCombineGroupsGoal extends Goal {
     public static final int HORIZONTAL_CHECK_RANGE = 32;
     public static final int VERTICAL_CHECK_RANGE = 10;
     private final CoreAnimalEntity animal;
-    private String leader;
-    private List<String> pack;
     private List<? extends CoreAnimalEntity> leaderList;
     private int delay;
 
@@ -61,17 +59,12 @@ public class CoreAnimalLeaderCombineGroupsGoal extends Goal {
     }
 
     @Override
-    public void stop() {
-        this.leader = null;
-    }
-
-    @Override
     public void tick() {
         if (--this.delay <= 0) {
             this.delay = this.getTickCount(10);
             for (CoreAnimalEntity otherLeader : leaderList) {
                 if (otherLeader.getPack() != null) {
-                    if (this.canCombinePacks(this.calculateAdultPackSize(this.pack), this.calculateAdultPackSize(otherLeader.getPack()))) {
+                    if (this.canCombinePacks(this.calculateAdultPackSize(this.animal.getPack()), this.calculateAdultPackSize(otherLeader.getPack()))) {
                         List<String> newPack = new ArrayList<>(this.animal.getPack());
                         if (newPack.isEmpty()) {
                             return;

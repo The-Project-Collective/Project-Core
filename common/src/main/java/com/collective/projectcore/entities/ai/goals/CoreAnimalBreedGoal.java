@@ -34,7 +34,7 @@ public class CoreAnimalBreedGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        if (this.animal.isPregnant() || this.animal.isMother() || this.animal.isFather() || !this.animal.isAdult()) {
+        if (this.animal.isPregnant() || this.animal.isParent() || !this.animal.isAdult() || this.animal.getBreedingTicks() > 0) {
             return false;
         }
         this.mate = this.findMate();

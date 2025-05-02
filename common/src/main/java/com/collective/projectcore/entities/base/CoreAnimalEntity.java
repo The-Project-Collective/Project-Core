@@ -19,7 +19,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.TagKey;
@@ -46,7 +45,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private static final TrackedData<Integer> AGE_TICKS;
     private static final TrackedData<Integer> ANGER_TIME;
     private static final TrackedData<Integer> BREEDING_TICKS;
-    private static final TrackedData<Integer> FATHER_TICKS;
     private static final TrackedData<Integer> GENDER;
     private static final TrackedData<Integer> GROUP_SIZE;
     private static final TrackedData<BlockPos> HOME_POS;
@@ -55,8 +53,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private static final TrackedData<String> LEADER;
     private static final TrackedData<String> MATE_UUID;
     private static final TrackedData<String> MATE_VARIANT;
-    private static final TrackedData<Integer> MOTHER_TICKS;
     private static final TrackedData<String> MOTHER_UUID;
+    private static final TrackedData<String> OFFSPRING;
     protected static final TrackedData<Optional<UUID>> OWNER_UUID;
     private static final TrackedData<String> PACK;
     private static final TrackedData<Integer> PREGNANCY_TICKS;
@@ -142,10 +140,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
             }
             if (this.doesBreed() && this.isAdult()) {
                 breedingHandler();
-                if (this.getGender() == 0) {
-                    fatherHandler();
-                } else {
-                    motherHandler();
+                if (this.getGender() == 1) {
                     pregnancyHandler();
                 }
             }
@@ -196,27 +191,11 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     // --- Breeding Tickers ------------------------------------------------------------------------------------------
     public void breedingHandler() {
         if (this.isAdult() && !this.isPregnant() && this.isFull()) {
-            if (!this.isBabyMother() && !this.isChildMother()) {
+            if (!this.isParent()) {
                 if (this.getBreedingTicks() > 0) {
                     this.setBreedingTicks(this.getBreedingTicks() - 1);
                 }
             }
-        }
-    }
-
-    public void fatherHandler() {
-        if (this.isFather()) {
-            this.setFatherTicks(this.getFatherTicks() - 1);
-        } else {
-            this.setFatherTicks(0);
-        }
-    }
-
-    public void motherHandler() {
-        if (this.isBabyMother() || this.isChildMother()) {
-            this.setMotherTicks(this.getMotherTicks() - 1);
-        } else {
-            this.setMotherTicks(0);
         }
     }
 
@@ -325,7 +304,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     public boolean canBreedWith(AnimalEntity other) {
         if (other instanceof CoreAnimalEntity coreAnimalEntity) {
             if (this.getClass().equals(coreAnimalEntity.getClass())) {
-                if (this.getGender() != coreAnimalEntity.getGender() && !this.isMother() && !this.isFather() && !coreAnimalEntity.isMother() && !coreAnimalEntity.isFather() && this.isAdult() && coreAnimalEntity.isAdult()) {
+                if (this.getGender() != coreAnimalEntity.getGender() && !this.isParent() && !coreAnimalEntity.isParent() && this.isAdult() && coreAnimalEntity.isAdult()) {
                     if (this.getBreedingTicks() <= 0 && coreAnimalEntity.getBreedingTicks() <= 0) {
                         if ((this.hasAPack() && this.getLeader().equals(coreAnimalEntity.getLeader())) || !this.hasAPack()) {
                             if (this.getMateUUID().equals(coreAnimalEntity.getUuidAsString()) && coreAnimalEntity.getMateUUID().equals(this.getUuidAsString())) {
@@ -355,12 +334,10 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
                     this.setPregnancyTicks(this.getGestationTicks());
                     this.setBreedingTicks(this.random.nextInt(12000) + 12000);
                     mate.setBreedingTicks(this.random.nextInt(6000) + 6000);
-                    mate.setFatherTicks(this.getGestationTicks() + (int)((this.getAdultDays() * 24000) * 0.6));
                 } else if (mate.getGender() == 1) {
-                    mate.setPregnancyTicks(300);
+                    mate.setPregnancyTicks(this.getGestationTicks());
                     mate.setBreedingTicks(this.random.nextInt(12000) + 12000);
                     this.setBreedingTicks(this.random.nextInt(6000) + 6000);
-                    this.setFatherTicks(this.getGestationTicks() + (int)((this.getAdultDays() * 24000) * 0.6));
                 }
             }
             world.sendEntityStatus(this, (byte)18);
@@ -544,36 +521,43 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         this.dataTracker.set(BREEDING_TICKS, ticks);
     }
 
-    public int getFatherTicks() {
-        return this.dataTracker.get(FATHER_TICKS);
+    public List<String> getOffspring() {
+        String totalOffspring = this.getOffspringString();
+        List<String> totalOffspringList = new ArrayList<>(List.of(totalOffspring.split("\\.")));
+        List<String> toRemove = new ArrayList<>();
+        for (String offspring : totalOffspringList) {
+            if (!validateUUID(offspring)) {
+                toRemove.add(offspring);
+            }
+        }
+        if (!toRemove.isEmpty()) {
+            totalOffspringList.removeAll(toRemove);
+        }
+        HashSet<String> finalPack = new HashSet<>(totalOffspringList);
+        return finalPack.stream().toList();
     }
 
-    public void setFatherTicks(int ticks) {
-        this.dataTracker.set(FATHER_TICKS, ticks);
+    public void setOffspring(List<String> newOffspring) {
+        HashSet<String> newOffspringChecked = new HashSet<>(newOffspring);
+        List<String> newOffspringList = newOffspringChecked.stream().toList();
+        StringBuilder finalOffspring = new StringBuilder();
+        for (String offspring : newOffspringList) {
+            finalOffspring.append(".");
+            finalOffspring.append(offspring);
+        }
+        this.setPackString(finalOffspring.toString());
     }
 
-    public int getMotherTicks() {
-        return this.dataTracker.get(MOTHER_TICKS);
+    public String getOffspringString() {
+        return this.dataTracker.get(OFFSPRING);
     }
 
-    public void setMotherTicks(int ticks) {
-        this.dataTracker.set(MOTHER_TICKS, ticks);
+    public void setOffspringString(String offspring) {
+        this.dataTracker.set(OFFSPRING, offspring);
     }
 
-    public boolean isChildMother() {
-        return this.getMotherTicks() > 0 && this.getMotherTicks() <= ((this.getAdultDays() * 24000) * 0.3);
-    }
-
-    public boolean isBabyMother() {
-        return this.getMotherTicks() > ((this.getAdultDays() * 24000) * 0.3) && this.getMotherTicks() <= ((this.getAdultDays() * 24000) * 0.6);
-    }
-
-    public boolean isMother() {
-        return this.getMotherTicks() > 0;
-    }
-
-    public boolean isFather() {
-        return this.getFatherTicks() > 0;
+    public boolean isParent() {
+        return !this.getOffspring().isEmpty();
     }
     
 
@@ -877,6 +861,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     public abstract boolean isMonogamous();
 
+    public abstract boolean willParent();
+
     // --- General ------------------------------------------------------------------------------------------
     @Override
     public abstract int getLimitPerChunk();
@@ -958,7 +944,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         ANGER_TIME = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         ANGER_TIME_RANGE = TimeHelper.betweenSeconds(20, 39);
         BREEDING_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
-        FATHER_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         GENDER = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         GROUP_SIZE = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         HOME_POS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
@@ -967,8 +952,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         LEADER = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         MATE_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         MATE_VARIANT = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
-        MOTHER_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         MOTHER_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
+        OFFSPRING = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         OWNER_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
         TAMEABLE_FLAGS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.BYTE);
         PACK = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
@@ -985,7 +970,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         builder.add(AGE_TICKS, 0);
         builder.add(ANGER_TIME, 0);
         builder.add(BREEDING_TICKS, 0);
-        builder.add(FATHER_TICKS, 0);
         builder.add(GENDER, 0);
         builder.add(GROUP_SIZE, 0);
         builder.add(HOME_POS, new BlockPos(BlockPos.ZERO));
@@ -994,8 +978,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         builder.add(LEADER, "");
         builder.add(MATE_UUID, "");
         builder.add(MATE_VARIANT, "");
-        builder.add(MOTHER_TICKS, 0);
         builder.add(MOTHER_UUID, "");
+        builder.add(OFFSPRING, "");
         builder.add(OWNER_UUID, Optional.empty());
         builder.add(PACK, "");
         builder.add(PREGNANCY_TICKS, 0);
@@ -1011,7 +995,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         nbt.putInt("AgeTicks", this.getAgeTicks());
         this.writeAngerToNbt(nbt);
         nbt.putInt("BreedingTicks", this.getBreedingTicks());
-        nbt.putInt("FatherTicks", this.getFatherTicks());
         nbt.putInt("Gender", this.getGender());
         nbt.putInt("HomePosX", this.getHomePos().getX());
         nbt.putInt("HomePosY", this.getHomePos().getY());
@@ -1021,8 +1004,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         nbt.putString("Leader", this.getLeader());
         nbt.putString("MateUUID", this.getMateUUID());
         nbt.putString("MateVariant", this.getMateVariant());
-        nbt.putInt("MotherTicks", this.getMotherTicks());
         nbt.putString("MotherUUID", this.getMotherUUID());
+        nbt.putString("Offspring", this.getOffspringString());
         if (this.getOwnerUuid() != null) {
             nbt.putUuid("Owner", this.getOwnerUuid());
         }
@@ -1038,7 +1021,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         this.setAgeTicks(nbt.getInt("AgeTicks"));
         this.readAngerFromNbt(this.getWorld(), nbt);
         this.setBreedingTicks(nbt.getInt("BreedingTicks"));
-        this.setFatherTicks(nbt.getInt("FatherTicks"));
         this.setGender(nbt.getInt("Gender"));
         this.setHomePos(new BlockPos(nbt.getInt("HomePosX"), nbt.getInt("HomePosY"), nbt.getInt("HomePosZ")));
         this.setHunger(nbt.getInt("Hunger"));
@@ -1046,8 +1028,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         this.setLeader(nbt.getString("Leader"));
         this.setMateUUID(nbt.getString("MateUUID"));
         this.setMateVariant(nbt.getString("MateVariant"));
-        this.setMotherTicks(nbt.getInt("MotherTicks"));
         this.setMotherUUID(nbt.getString("MotherUUID"));
+        this.setOffspringString(nbt.getString("Offspring"));
         this.readTamingFromNBT(nbt);
         this.setPackString(nbt.getString("Pack"));
         this.setPregnancyTicks(nbt.getInt("PregnancyTicks"));

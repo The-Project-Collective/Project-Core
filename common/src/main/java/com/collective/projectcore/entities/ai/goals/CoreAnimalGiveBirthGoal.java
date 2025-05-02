@@ -13,9 +13,7 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
 
@@ -62,6 +60,7 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
     private void giveBirth(CoreAnimalEntity female) {
         if (!female.isTouchingWater()) {
             int offspring = (random.nextInt(female.getMaxOffspring() - female.getMinOffspring()) + female.getMinOffspring());
+            List<String> offspringList = new ArrayList<>();
             if (female.rareOffspring()) {
                 offspring = female.getMaxOffspring() - 1;
                 if (random.nextInt(50) == 0) {
@@ -84,6 +83,16 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
                         }
                     }
                     wildlifeEntityBaby.setMotherUUID(female.getUuidAsString());
+                    if (wildlifeEntityBaby.hasAPack()) {
+                        List<String> motherPack = new ArrayList<>(female.getPack());
+                        motherPack.add(wildlifeEntityBaby.getUuidAsString());
+                        for (String packMember : motherPack) {
+                            CoreAnimalEntity packMemberEntity = (CoreAnimalEntity) ((ServerWorld) female.getWorld()).getEntity(UUID.fromString(packMember));
+                            if (packMemberEntity != null) {
+                                packMemberEntity.setPack(motherPack);
+                            }
+                        }
+                    }
                     wildlifeEntityBaby.setHunger(wildlifeEntityBaby.getMaxFood() / 2);
                     //wildlifeEntityBaby.setEnrichment(wildlifeEntityBaby.getMaxEnrichment());
                     wildlifeEntityBaby.setHungerTicks(1600);
@@ -102,22 +111,28 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
                     if (getServerWorld(female).getGameRules().getBoolean(GameRules.DO_MOB_LOOT)) {
                         female.getWorld().spawnEntity(new ExperienceOrbEntity(female.getWorld(), female.getX(), female.getY(), female.getZ(), female.getRandom().nextInt(7) + 1));
                     }
+                    offspringList.add(wildlifeEntityBaby.getUuidAsString());
                 }
-                female.setPregnancyTicks(0);
-                female.setMotherTicks((int) ((female.getAdultDays() * 24000) * 0.6));
+            }
+            female.setPregnancyTicks(0);
                 /*if (female instanceof ZooTerrestrialEntity terrestrialFemale) {
                     terrestrialFemale.setTiredTicks(0);
                 }*/
-                if (getServerWorld(female).getEntity(UUID.fromString(female.getMateUUID())) instanceof CoreAnimalEntity male) {
-                    if (male.isAlive()) {
-                        if (!male.isMonogamous()) {
-                            male.setMateUUID("");
-                        }
+            if (female.willParent() && !offspringList.isEmpty()) {
+                female.setOffspring(offspringList);
+            }
+            if (getServerWorld(female).getEntity(UUID.fromString(female.getMateUUID())) instanceof CoreAnimalEntity male) {
+                if (male.isAlive()) {
+                    if (male.willParent() && !offspringList.isEmpty()) {
+                        male.setOffspring(offspringList);
+                    }
+                    if (!male.isMonogamous()) {
+                        male.setMateUUID("");
                     }
                 }
-                if (!female.isMonogamous()) {
-                    female.setMateUUID("");
-                }
+            }
+            if (!female.isMonogamous()) {
+                female.setMateUUID("");
             }
         }
     }
