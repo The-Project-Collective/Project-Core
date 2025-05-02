@@ -49,7 +49,7 @@ public class CoreAnimalLeaderShrinkGroupGoal extends Goal {
             CoreAnimalEntity youngestMember = null;
             for (String packMember : currentPack) {
                 CoreAnimalEntity packMemberEntity = (CoreAnimalEntity) getServerWorld(this.animal).getEntity(UUID.fromString(packMember));
-                if (packMemberEntity != null) {
+                if (packMemberEntity != null && packMemberEntity.isAdult()) {
                     if (youngestAge == 0 || packMemberEntity.getAgeTicks() < youngestAge) {
                         youngestAge = packMemberEntity.getAgeTicks();
                         youngestMember = packMemberEntity;
