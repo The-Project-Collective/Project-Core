@@ -281,6 +281,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
                 player.sendMessage(Text.literal("Mate UUID: " + this.getMateUUID()), false);
                 player.sendMessage(Text.literal("Breeding Ticks: " + this.getBreedingTicks()), false);
                 player.sendMessage(Text.literal("Pregnancy Ticks: " + this.getPregnancyTicks()), false);
+                player.sendMessage(Text.literal("Parent?: " + this.isParent()), false);
+                player.sendMessage(Text.literal("Offspring: " + this.getOffspring().size() + " | " + this.getOffspringString()), false);
                 player.sendMessage(Text.literal("----------------------"), false);
             }
             if (player.getMainHandStack().getItem().equals(Items.STICK)) {
@@ -533,8 +535,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         if (!toRemove.isEmpty()) {
             totalOffspringList.removeAll(toRemove);
         }
-        HashSet<String> finalPack = new HashSet<>(totalOffspringList);
-        return finalPack.stream().toList();
+        HashSet<String> finalOffspring = new HashSet<>(totalOffspringList);
+        return finalOffspring.stream().toList();
     }
 
     public void setOffspring(List<String> newOffspring) {
@@ -545,7 +547,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
             finalOffspring.append(".");
             finalOffspring.append(offspring);
         }
-        this.setPackString(finalOffspring.toString());
+        this.setOffspringString(finalOffspring.toString());
     }
 
     public String getOffspringString() {

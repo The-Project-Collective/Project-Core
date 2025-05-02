@@ -43,6 +43,12 @@ public class CoreAnimalBreedGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
+        if (this.animal.isPregnant() || this.animal.isParent() || !this.animal.isAdult() || this.animal.getBreedingTicks() > 0) {
+            return false;
+        }
+        if (this.mate.isPregnant() || this.mate.isParent() || !this.mate.isAdult() || this.mate.getBreedingTicks() > 0) {
+            return false;
+        }
         return this.mate.isAlive() && this.timer < 60 && !this.mate.isPanicking() || this.mate.isAdult();
     }
 
