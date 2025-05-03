@@ -46,20 +46,20 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private static final TrackedData<Integer> ANGER_TIME;
     private static final TrackedData<Integer> BREEDING_TICKS;
     private static final TrackedData<Integer> GENDER;
+    private static final TrackedData<String> GENOME;
     private static final TrackedData<Integer> GROUP_SIZE;
     private static final TrackedData<BlockPos> HOME_POS;
     private static final TrackedData<Integer> HUNGER;
     private static final TrackedData<Integer> HUNGER_TICKS;
     private static final TrackedData<String> LEADER;
+    private static final TrackedData<String> MATE_GENOME;
     private static final TrackedData<String> MATE_UUID;
-    private static final TrackedData<String> MATE_VARIANT;
     private static final TrackedData<String> MOTHER_UUID;
     private static final TrackedData<String> OFFSPRING;
     protected static final TrackedData<Optional<UUID>> OWNER_UUID;
     private static final TrackedData<String> PACK;
     private static final TrackedData<Integer> PREGNANCY_TICKS;
     protected static final TrackedData<Byte> TAMEABLE_FLAGS;
-    private static final TrackedData<String> VARIANT;
 
     private static final UniformIntProvider ANGER_TIME_RANGE;
     private UUID angryAt;
@@ -71,7 +71,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     protected boolean hasHunger;
     protected boolean hasAPack;
     protected boolean canBeTamed;
-    protected boolean hasVariants;
+    protected boolean hasGenetics;
 
     private boolean adultFlag = false;
     private boolean juviFlag = false;
@@ -81,7 +81,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     protected CoreAnimalEntity(EntityType<? extends AnimalEntity> entityType, World world,
                                boolean doesAge, boolean getsAngry, boolean doesBreed, boolean hasGender,
-                               boolean hasHunger, boolean hasAPack, boolean canBeTamed, boolean hasVariants) {
+                               boolean hasHunger, boolean hasAPack, boolean canBeTamed, boolean hasGenetics) {
         super(entityType, world);
         this.doesAge = doesAge;
         this.getsAngry = getsAngry;
@@ -90,7 +90,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         this.hasHunger = hasHunger;
         this.hasAPack = hasAPack;
         this.canBeTamed = canBeTamed;
-        this.hasVariants = hasVariants;
+        this.hasGenetics = hasGenetics;
     }
 
     // === CHARACTERISTICS CONTROL =======================================================================================================================================================================
@@ -124,8 +124,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         return canBeTamed;
     }
 
-    public boolean hasVariants() {
-        return hasVariants;
+    public boolean hasGenetics() {
+        return hasGenetics;
     }
 
     // === TICK HANDLING =======================================================================================================================================================================
@@ -273,7 +273,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
             if (player.getMainHandStack().getItem().equals(CoreItems.DEV_TOOL.get())) {
                 player.sendMessage(Text.literal("----------------------"), false);
                 player.sendMessage(Text.literal("Gender: " + this.getGender()), false);
-                player.sendMessage(Text.literal("Variant: " + this.getVariant()), false);
+                player.sendMessage(Text.literal("Genome: " + this.getGenome()), false);
                 player.sendMessage(Text.literal("Age: " + this.getAgeDays()), false);
                 player.sendMessage(Text.literal("Health: " + this.getHealth()), false);
                 player.sendMessage(Text.literal("UUID: " + this.getUuidAsString()), false);
@@ -330,13 +330,13 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
                 mate.setMateUUID(this.getUuidAsString());
             }
             if (this.getUuidAsString().equals(mate.getMateUUID())) {
-                this.setMateVariant(mate.getVariant());
-                mate.setMateVariant(this.getVariant());
                 if (this.getGender() == 1) {
+                    this.setMateGenome(mate.getGenome());
                     this.setPregnancyTicks(this.getGestationTicks());
                     this.setBreedingTicks(this.random.nextInt(12000) + 12000);
                     mate.setBreedingTicks(this.random.nextInt(6000) + 6000);
                 } else if (mate.getGender() == 1) {
+                    mate.setMateGenome(this.getGenome());
                     mate.setPregnancyTicks(this.getGestationTicks());
                     mate.setBreedingTicks(this.random.nextInt(12000) + 12000);
                     this.setBreedingTicks(this.random.nextInt(6000) + 6000);
@@ -571,6 +571,24 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     public void setGender(int gender) {
         this.dataTracker.set(GENDER, gender);
     }
+
+    // --- Genome ------------------------------------------------------------------------------------------
+    public String getGenome() {
+        return this.dataTracker.get(GENOME);
+    }
+
+    public void setGenome(String genome) {
+        this.dataTracker.set(GENOME, genome);
+    }
+
+    public String getMateGenome() {
+        return this.dataTracker.get(MATE_GENOME);
+    }
+
+    public void setMateGenome(String genome) {
+        this.dataTracker.set(MATE_GENOME, genome);
+    }
+
 
     // --- Home Pos ------------------------------------------------------------------------------------------
     public BlockPos getHomePos() {
@@ -821,26 +839,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     }
 
 
-    // --- Variants ------------------------------------------------------------------------------------------
-    public String getVariant() {
-        return dataTracker.get(VARIANT);
-    }
-
-    public void setVariant(String variant) {
-        dataTracker.set(VARIANT, variant);
-    }
-
-    public String getMateVariant() {
-        return this.dataTracker.get(MATE_VARIANT);
-    }
-
-    public void setMateVariant(String variant) {
-        this.dataTracker.set(MATE_VARIANT, variant);
-    }
-
-
-
-
 
     // === OVERRIDES =======================================================================================================================================================================
 
@@ -868,6 +866,11 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     // --- General ------------------------------------------------------------------------------------------
     @Override
     public abstract int getLimitPerChunk();
+
+    // --- Genome ------------------------------------------------------------------------------------------
+    public abstract String calculateInheritedGenome(String parent1, String parent2);
+
+    public abstract String calculateWildGenome();
 
     // --- Home Pos ------------------------------------------------------------------------------------------
     public abstract boolean isMigratory();
@@ -930,11 +933,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     @Override
     protected abstract float getSoundVolume();
 
-    // --- Variants ------------------------------------------------------------------------------------------
-    public abstract String calculateInheritedVariant(String parent1, String parent2);
-
-    public abstract String calculateWildVariant();
-
     
 
     // === DATA PROCESSING =======================================================================================================================================================================
@@ -947,20 +945,20 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         ANGER_TIME_RANGE = TimeHelper.betweenSeconds(20, 39);
         BREEDING_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         GENDER = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        GENOME = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         GROUP_SIZE = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         HOME_POS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
         HUNGER = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         HUNGER_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         LEADER = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
+        MATE_GENOME = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         MATE_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
-        MATE_VARIANT = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         MOTHER_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         OFFSPRING = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         OWNER_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
         TAMEABLE_FLAGS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.BYTE);
         PACK = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         PREGNANCY_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
-        VARIANT = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
 
     }
 
@@ -973,20 +971,20 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         builder.add(ANGER_TIME, 0);
         builder.add(BREEDING_TICKS, 0);
         builder.add(GENDER, 0);
+        builder.add(GENOME, "");
         builder.add(GROUP_SIZE, 0);
         builder.add(HOME_POS, new BlockPos(BlockPos.ZERO));
         builder.add(HUNGER, 0);
         builder.add(HUNGER_TICKS, 0);
         builder.add(LEADER, "");
+        builder.add(MATE_GENOME, "");
         builder.add(MATE_UUID, "");
-        builder.add(MATE_VARIANT, "");
         builder.add(MOTHER_UUID, "");
         builder.add(OFFSPRING, "");
         builder.add(OWNER_UUID, Optional.empty());
         builder.add(PACK, "");
         builder.add(PREGNANCY_TICKS, 0);
         builder.add(TAMEABLE_FLAGS, (byte)0);
-        builder.add(VARIANT, "");
 
     }
 
@@ -998,6 +996,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         this.writeAngerToNbt(nbt);
         nbt.putInt("BreedingTicks", this.getBreedingTicks());
         nbt.putInt("Gender", this.getGender());
+        nbt.putString("Genome", this.getGenome());
         nbt.putInt("HomePosX", this.getHomePos().getX());
         nbt.putInt("HomePosY", this.getHomePos().getY());
         nbt.putInt("HomePosZ", this.getHomePos().getZ());
@@ -1005,7 +1004,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         nbt.putInt("HungerTicks", this.getHungerTicks());
         nbt.putString("Leader", this.getLeader());
         nbt.putString("MateUUID", this.getMateUUID());
-        nbt.putString("MateVariant", this.getMateVariant());
         nbt.putString("MotherUUID", this.getMotherUUID());
         nbt.putString("Offspring", this.getOffspringString());
         if (this.getOwnerUuid() != null) {
@@ -1013,7 +1011,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         }
         nbt.putString("Pack", this.getPackString());
         nbt.putInt("PregnancyTicks", this.getPregnancyTicks());
-        nbt.putString("Variant", this.getVariant());
 
     }
 
@@ -1024,18 +1021,17 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         this.readAngerFromNbt(this.getWorld(), nbt);
         this.setBreedingTicks(nbt.getInt("BreedingTicks"));
         this.setGender(nbt.getInt("Gender"));
+        this.setGenome(nbt.getString("Genome"));
         this.setHomePos(new BlockPos(nbt.getInt("HomePosX"), nbt.getInt("HomePosY"), nbt.getInt("HomePosZ")));
         this.setHunger(nbt.getInt("Hunger"));
         this.setHungerTicks(nbt.getInt("HungerTicks"));
         this.setLeader(nbt.getString("Leader"));
         this.setMateUUID(nbt.getString("MateUUID"));
-        this.setMateVariant(nbt.getString("MateVariant"));
         this.setMotherUUID(nbt.getString("MotherUUID"));
         this.setOffspringString(nbt.getString("Offspring"));
         this.readTamingFromNBT(nbt);
         this.setPackString(nbt.getString("Pack"));
         this.setPregnancyTicks(nbt.getInt("PregnancyTicks"));
-        this.setVariant(nbt.getString("Variant"));
 
     }
 

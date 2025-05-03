@@ -8,7 +8,9 @@ import net.minecraft.resource.Resource;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 
+import java.awt.*;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -85,6 +87,34 @@ public interface CoreTextureContext {
                 }
             }
         }
+    }
+
+    default void stainLayer(NativeImage base, Color colour) {
+        for(int y = 0; y < base.getHeight(); ++y) {
+            for(int x = 0; x < base.getWidth(); ++x) {
+                int colourRGB = colour.getRGB();
+                int alpha = ColorHelper.getAlpha(base.getColorArgb(x, y));
+                Color base_colour = new Color(base.getColorArgb(x, y));
+                Color new_colour = new Color(this.multiply(base_colour.getRGB(), colourRGB, 1));
+
+                base.setColorArgb(x, y, this.stainViaLuminance(alpha, base_colour, new_colour));
+            }
+        }
+    }
+
+    default int stainViaLuminance(int alpha, Color colour1, Color colour2) {
+        int R = colour1.getRed();
+        int G = colour1.getGreen();
+        int B = colour1.getBlue();
+
+        // Standard Luminance Calculation:
+        float L = (float) ((0.2126*R) + (0.7152*G) + (0.0722*B));
+
+        int finalRed = (int) ((colour2.getRed() * L) / 255);
+        int finalGreen = (int) ((colour2.getGreen() * L) / 255);
+        int finalBlue = (int) ((colour2.getBlue() * L) / 255);
+
+        return ColorHelper.getArgb(alpha, finalRed, finalGreen, finalBlue);
     }
 
     /**
@@ -216,6 +246,8 @@ public interface CoreTextureContext {
         String name();
         String relativeTexturePath();
         String modID();
+        HashMap<String, String> textures();
+        HashMap<String, Color> colours();
         default Identifier identifier() {
             return Identifier.of(modID(), "textures/entity/"+relativeTexturePath());
         }

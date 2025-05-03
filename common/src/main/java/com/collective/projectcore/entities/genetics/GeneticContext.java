@@ -1,5 +1,7 @@
 package com.collective.projectcore.entities.genetics;
 
+import com.collective.projectcore.utils.UtilMethods;
+
 import java.util.List;
 import java.util.Random;
 
@@ -36,7 +38,7 @@ public interface GeneticContext {
     }
 
     /**
-     * Calculates a complete genome based on the genes supplies in genes().
+     * Calculates a complete genome based on the genes supplied in genes().
      *
      * @param wildOnly controls if the gene selection is limited to wild alleles, or completely random.
      * @return a complete genome.
@@ -73,7 +75,7 @@ public interface GeneticContext {
     default String getAlleles(String genome, int index) {
         String alleles;
         alleles = String.valueOf(genome.charAt(index)) + genome.charAt(index + haploidLengthMax());
-        return alleles;
+        return UtilMethods.sortStringUppercase(alleles);
     }
 
     /**
@@ -121,8 +123,7 @@ public interface GeneticContext {
      * @return whether the allele should mutate or not.
      */
     default boolean shouldMutate() {
-        int chance = random.nextInt(300);
-        return chance == 0;
+        return random.nextInt(300) == 0;
     }
 
     /**
@@ -162,5 +163,6 @@ public interface GeneticContext {
         boolean dominant();
         boolean partialDominant();
         boolean homozygousLethal();
+        List<String> lethalGenes();
     }
 }

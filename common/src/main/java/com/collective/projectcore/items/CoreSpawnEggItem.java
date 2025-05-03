@@ -65,8 +65,8 @@ public class CoreSpawnEggItem extends ArchitecturySpawnEggItem {
                     if (baby.hasHunger()) {
                         baby.setHunger(baby.getMaxFood() / 4);
                     }
-                    if (baby.hasVariants()) {
-                        baby.setVariant(baby.calculateWildVariant());
+                    if (baby.hasGenetics()) {
+                        baby.setGenome(baby.calculateWildGenome());
                     }
                     if (baby.hasAPack()) {
                         List<String> motherPack = new ArrayList<>(((CoreAnimalEntity) entity).getPack());

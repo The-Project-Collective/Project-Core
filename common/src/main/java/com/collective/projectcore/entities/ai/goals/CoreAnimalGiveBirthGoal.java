@@ -71,8 +71,8 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
                 female.getWorld().syncWorldEvent(2001, female.getSteppingPos(), Block.getRawIdFromState(female.getSteppingBlockState()));
                 PassiveEntity baby = female.createChild((ServerWorld) female.getWorld(), female);
                 if (baby instanceof CoreAnimalEntity wildlifeEntityBaby) {
-                    if (wildlifeEntityBaby.getVariant().isEmpty()) {
-                        wildlifeEntityBaby.setVariant(wildlifeEntityBaby.calculateInheritedVariant(female.getVariant(), female.getMateVariant()));
+                    if (wildlifeEntityBaby.getGenome().isEmpty()) {
+                        wildlifeEntityBaby.setGenome(wildlifeEntityBaby.calculateInheritedGenome(female.getGenome(), female.getMateGenome()));
                     }
                     wildlifeEntityBaby.setAgeTicks(0);
                     wildlifeEntityBaby.setGender(this.random.nextInt(2));
