@@ -74,7 +74,7 @@ public interface GeneticContext {
      */
     default String getAlleles(String genome, int index) {
         String alleles;
-        alleles = String.valueOf(genome.charAt(index)) + genome.charAt(index + haploidLengthMax());
+        alleles = String.valueOf(genome.charAt(index + 1)) + genome.charAt(index + haploidLengthMax());
         return UtilMethods.sortStringUppercase(alleles);
     }
 

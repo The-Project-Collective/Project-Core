@@ -125,7 +125,7 @@ public interface CoreTextureContext {
      * @param overlay image.
      * @param opacity of the overlay image.
      */
-    default void multiplyImages(NativeImage base, NativeImage overlay, int opacity) {
+    default void multiplyImages(NativeImage base, NativeImage overlay, float opacity) {
         for(int y = 0; y < base.getHeight(); ++y) {
             for (int x = 0; x < base.getWidth(); ++x) {
                 int base_colour = base.getColorArgb(x, y);
@@ -165,9 +165,9 @@ public interface CoreTextureContext {
      * @param opacity opacity / strength of the overlay colour.
      * @return the multiplied colour.
      */
-    default int multiply(int baseColour, int overlayColour, int opacity) {
-        float overlayOpacity = (float) opacity;
-        float baseOpacity = (float) 1.0 - overlayOpacity;
+    default int multiply(int baseColour, int overlayColour, float opacity) {
+        float overlayOpacity = opacity;
+        float baseOpacity = 1.0f - overlayOpacity;
         if (overlayOpacity == 0 || baseOpacity == 0 || overlayOpacity == 1 || baseOpacity == 1) {
             overlayOpacity = 1.0f;
             baseOpacity = 1.0f;
