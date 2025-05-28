@@ -132,7 +132,6 @@ public interface CoreTextureContext {
                 int overlay_colour = overlay.getColorArgb(x, y);
                 if (ColorHelper.getAlpha(overlay_colour) > 0) {
                     int overlay_alpha = ColorHelper.getAlpha(overlay_colour);
-                    System.out.println(overlay_alpha);
                     base.setColorArgb(x, y, multiply(base_colour, overlay_colour, overlay_alpha/255f, brightness));
                 }
             }
