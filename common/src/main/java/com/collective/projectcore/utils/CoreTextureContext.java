@@ -95,7 +95,7 @@ public interface CoreTextureContext {
                 int colourRGB = colour.getRGB();
                 int alpha = ColorHelper.getAlpha(base.getColorArgb(x, y));
                 Color base_colour = new Color(base.getColorArgb(x, y));
-                Color new_colour = new Color(this.multiply(base_colour.getRGB(), colourRGB, 1));
+                Color new_colour = new Color(this.multiply(base_colour.getRGB(), colourRGB, 1, 1));
 
                 base.setColorArgb(x, y, this.stainViaLuminance(alpha, base_colour, new_colour));
             }
@@ -123,16 +123,17 @@ public interface CoreTextureContext {
      *
      * @param base image
      * @param overlay image.
-     * @param opacity of the overlay image.
+     * @param brightness value to offset normal multiplying darkening.
      */
-    default void multiplyImages(NativeImage base, NativeImage overlay, float opacity) {
+    default void multiplyImages(NativeImage base, NativeImage overlay, float brightness) {
         for(int y = 0; y < base.getHeight(); ++y) {
             for (int x = 0; x < base.getWidth(); ++x) {
                 int base_colour = base.getColorArgb(x, y);
                 int overlay_colour = overlay.getColorArgb(x, y);
-                int overlay_alpha = (int) (ColorHelper.getAlpha(overlay_colour) * opacity);
                 if (ColorHelper.getAlpha(overlay_colour) > 0) {
-                    base.setColorArgb(x, y, multiply(base_colour, overlay_colour, overlay_alpha));
+                    int overlay_alpha = ColorHelper.getAlpha(overlay_colour);
+                    System.out.println(overlay_alpha);
+                    base.setColorArgb(x, y, multiply(base_colour, overlay_colour, overlay_alpha/255f, brightness));
                 }
             }
         }
@@ -144,16 +145,15 @@ public interface CoreTextureContext {
      *
      * @param base image.
      * @param overlay image.
-     * @param opacity of the overlay image.
      */
-    default void softLightImages(NativeImage base, NativeImage overlay, float opacity) {
+    default void softLightImages(NativeImage base, NativeImage overlay) {
         for(int y = 0; y < base.getHeight(); ++y) {
             for (int x = 0; x < base.getWidth(); ++x) {
                 int base_colour = base.getColorArgb(x, y);
                 int overlay_colour = overlay.getColorArgb(x, y);
-                int overlay_alpha = (int) (ColorHelper.getAlpha(overlay_colour) * opacity);
                 if (ColorHelper.getAlpha(overlay_colour) > 0) {
-                    base.setColorArgb(x, y, softLight(base_colour, overlay_colour, overlay_alpha));
+                    int overlay_alpha = ColorHelper.getAlpha(overlay_colour);
+                    base.setColorArgb(x, y, softLight(base_colour, overlay_colour, overlay_alpha/255f));
                 }
             }
         }
@@ -167,21 +167,21 @@ public interface CoreTextureContext {
      * @param opacity opacity / strength of the overlay colour.
      * @return the multiplied colour.
      */
-    default int multiply(int baseColour, int overlayColour, float opacity) {
-        float overlayOpacity = opacity;
-        float baseOpacity = 1.0f - overlayOpacity;
-        if (overlayOpacity == 0 || baseOpacity == 0 || overlayOpacity == 1 || baseOpacity == 1) {
-            overlayOpacity = 1.0f;
-            baseOpacity = 1.0f;
-        }
+    default int multiply(int baseColour, int overlayColour, float opacity, float brightness) {
         int a = ColorHelper.getAlpha(baseColour);
-        int r = ColorHelper.getRed((int)(baseColour * baseOpacity));
-        int g = ColorHelper.getGreen((int)(baseColour * baseOpacity));
-        int b = ColorHelper.getBlue((int)(baseColour * baseOpacity));
-        r = (int)((float)r * ColorHelper.getRed((int)(overlayColour * overlayOpacity))) / 255;
-        g = (int)((float)g * ColorHelper.getGreen((int)(overlayColour * overlayOpacity))) / 255;
-        b = (int)((float)b * ColorHelper.getBlue((int)(overlayColour * overlayOpacity))) / 255;
-        return ColorHelper.getArgb(a, r, g, b);
+        int r = ColorHelper.getRed(baseColour);
+        int g = ColorHelper.getGreen(baseColour);
+        int b = ColorHelper.getBlue(baseColour);
+        int ro = ColorHelper.getRed(overlayColour);
+        int go = ColorHelper.getGreen(overlayColour);
+        int bo = ColorHelper.getBlue(overlayColour);
+        int rf = (int) Math.min(255, ((float) (r * ro) / 255)  * brightness);
+        int gf = (int) Math.min(255, ((float) (g * go) / 255)  * brightness);
+        int bf = (int) Math.min(255, ((float) (b * bo) / 255)  * brightness);
+        rf = Math.round((1 - opacity) * r + opacity * rf);
+        gf = Math.round((1 - opacity) * g + opacity * gf);
+        bf = Math.round((1 - opacity) * b + opacity * bf);
+        return ColorHelper.getArgb(a, rf, gf, bf);
     }
 
     /**
@@ -193,24 +193,39 @@ public interface CoreTextureContext {
      * @return the soft lighted colour.
      */
     default int softLight(int baseColour, int overlayColour, float opacity) {
-        int screen = screen(baseColour, overlayColour, opacity);
-        float overlayOpacity = opacity;
-        float baseOpacity = 1.0f - overlayOpacity;
-        if (overlayOpacity == 0 || baseOpacity == 0 || overlayOpacity == 1 || baseOpacity == 1) {
-            overlayOpacity = 1.0f;
-            baseOpacity = 1.0f;
-        }
         int a = ColorHelper.getAlpha(baseColour);
-        int r = ColorHelper.getRed((int)(baseColour * baseOpacity));
-        int g = ColorHelper.getGreen((int)(baseColour * baseOpacity));
-        int b = ColorHelper.getBlue((int)(baseColour * baseOpacity));
-        int ro = ColorHelper.getRed((int)(overlayColour * overlayOpacity));
-        int go = ColorHelper.getGreen((int)(overlayColour * overlayOpacity));
-        int bo = ColorHelper.getBlue((int)(overlayColour * overlayOpacity));
-        r = (((255 - r) * ro + screen) / 255) * r;
-        g = (((255 - g) * go + screen) / 255) * g;
-        b = (((255 - b) * bo + screen) / 255) * b;
-        return ColorHelper.getArgb(a, r, g, b);
+        int r = ColorHelper.getRed(baseColour);
+        int g = ColorHelper.getGreen(baseColour);
+        int b = ColorHelper.getBlue(baseColour);
+        int ro = ColorHelper.getRed(overlayColour);
+        int go = ColorHelper.getGreen(overlayColour);
+        int bo = ColorHelper.getBlue(overlayColour);
+
+        int rf = blendSoftLightChannel(r, ro, opacity);
+        int gf = blendSoftLightChannel(g, go, opacity);
+        int bf = blendSoftLightChannel(b, bo, opacity);
+
+        return ColorHelper.getArgb(a, rf, gf, bf);
+    }
+
+    /**
+     * A helper method for calculating soft light blending an individual RGB channel.
+     * This method is only used in the softLight method.
+     *
+     * @param base initial colour.
+     * @param overlay overlay colour.
+     * @param opacity opacity / strength of the overlay colour.
+     * @return the soft lighted channel colour.
+     */
+    private int blendSoftLightChannel(int base, int overlay, float opacity) {
+        int blended;
+        if (overlay < 128) {
+            blended = (2 * base * overlay) / 255 + (base * base * (255 - 2 * overlay)) / (255 * 255);
+        } else {
+            blended = (int) (Math.sqrt(base / 255.0) * (2 * overlay - 255) + 2 * base * (255 - overlay) / 255.0);
+        }
+        blended = Math.min(255, Math.max(0, blended));
+        return Math.round((1 - opacity) * base + opacity * blended);
     }
 
     /**
@@ -221,24 +236,20 @@ public interface CoreTextureContext {
      * @param opacity opacity / strength of the overlay colour.
      * @return the screened colour.
      */
-    default int screen(int baseColour, int overlayColour, float opacity) {
-        float overlayOpacity = opacity;
-        float baseOpacity = 1.0f - overlayOpacity;
-        if (overlayOpacity == 0 || baseOpacity == 0 || overlayOpacity == 1 || baseOpacity == 1) {
-            overlayOpacity = 1.0f;
-            baseOpacity = 1.0f;
-        }
-        int a = ColorHelper.getAlpha(baseColour);
-        int r = ColorHelper.getRed((int)(baseColour * baseOpacity));
-        int g = ColorHelper.getGreen((int)(baseColour * baseOpacity));
-        int b = ColorHelper.getBlue((int)(baseColour * baseOpacity));
-        int ro = ColorHelper.getRed((int)(overlayColour * overlayOpacity));
-        int go = ColorHelper.getGreen((int)(overlayColour * overlayOpacity));
-        int bo = ColorHelper.getBlue((int)(overlayColour * overlayOpacity));
-        r = 255 - (((255 - ro) * (255 - r)) / 255);
-        g = 255 - (((255 - go) * (255 - g)) / 255);
-        b = 255 - (((255 - bo) * (255 - b)) / 255);
-        return ColorHelper.getArgb(a, r, g, b);
+    default int[] screen(int baseColour, int overlayColour, float opacity) {
+        int r = ColorHelper.getRed(baseColour);
+        int g = ColorHelper.getGreen(baseColour);
+        int b = ColorHelper.getBlue(baseColour);
+        int ro = ColorHelper.getRed(overlayColour);
+        int go = ColorHelper.getGreen(overlayColour);
+        int bo = ColorHelper.getBlue(overlayColour);
+        int rf = 255 - (((255 - ro) * (255 - r)) / 255);
+        int gf = 255 - (((255 - go) * (255 - g)) / 255);
+        int bf = 255 - (((255 - bo) * (255 - b)) / 255);
+        //rf = Math.round((1 - opacity) * r + opacity * rf);
+        //gf = Math.round((1 - opacity) * g + opacity * gf);
+        //bf = Math.round((1 - opacity) * b + opacity * bf);
+        return new int[]{rf, gf, bf};
     }
 
     /**

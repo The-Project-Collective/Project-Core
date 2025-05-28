@@ -675,7 +675,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     // --- Pack Mechanics ------------------------------------------------------------------------------------------
     public List<String> getPack() {
         String totalPack = this.getPackString();
-        System.out.println("Raw Pack String: "+totalPack);
         List<String> totalPackList = new ArrayList<>(List.of(totalPack.split("\\.")));
         List<String> toRemove = new ArrayList<>();
         for (String pack : totalPackList) {
