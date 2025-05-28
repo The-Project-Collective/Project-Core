@@ -130,8 +130,9 @@ public interface CoreTextureContext {
             for (int x = 0; x < base.getWidth(); ++x) {
                 int base_colour = base.getColorArgb(x, y);
                 int overlay_colour = overlay.getColorArgb(x, y);
+                int overlay_alpha = (int) (ColorHelper.getAlpha(overlay_colour) * opacity);
                 if (ColorHelper.getAlpha(overlay_colour) > 0) {
-                    base.setColorArgb(x, y, multiply(base_colour, overlay_colour, opacity));
+                    base.setColorArgb(x, y, multiply(base_colour, overlay_colour, overlay_alpha));
                 }
             }
         }
@@ -145,13 +146,14 @@ public interface CoreTextureContext {
      * @param overlay image.
      * @param opacity of the overlay image.
      */
-    default void softLightImages(NativeImage base, NativeImage overlay, int opacity) {
+    default void softLightImages(NativeImage base, NativeImage overlay, float opacity) {
         for(int y = 0; y < base.getHeight(); ++y) {
             for (int x = 0; x < base.getWidth(); ++x) {
                 int base_colour = base.getColorArgb(x, y);
                 int overlay_colour = overlay.getColorArgb(x, y);
+                int overlay_alpha = (int) (ColorHelper.getAlpha(overlay_colour) * opacity);
                 if (ColorHelper.getAlpha(overlay_colour) > 0) {
-                    base.setColorArgb(x, y, softLight(base_colour, overlay_colour, opacity));
+                    base.setColorArgb(x, y, softLight(base_colour, overlay_colour, overlay_alpha));
                 }
             }
         }
@@ -190,10 +192,10 @@ public interface CoreTextureContext {
      * @param opacity opacity / strength of the overlay colour.
      * @return the soft lighted colour.
      */
-    default int softLight(int baseColour, int overlayColour, int opacity) {
+    default int softLight(int baseColour, int overlayColour, float opacity) {
         int screen = screen(baseColour, overlayColour, opacity);
-        float overlayOpacity = (float) opacity;
-        float baseOpacity = (float) 1.0 - overlayOpacity;
+        float overlayOpacity = opacity;
+        float baseOpacity = 1.0f - overlayOpacity;
         if (overlayOpacity == 0 || baseOpacity == 0 || overlayOpacity == 1 || baseOpacity == 1) {
             overlayOpacity = 1.0f;
             baseOpacity = 1.0f;
@@ -219,9 +221,9 @@ public interface CoreTextureContext {
      * @param opacity opacity / strength of the overlay colour.
      * @return the screened colour.
      */
-    default int screen(int baseColour, int overlayColour, int opacity) {
-        float overlayOpacity = (float) opacity;
-        float baseOpacity = (float) 1.0 - overlayOpacity;
+    default int screen(int baseColour, int overlayColour, float opacity) {
+        float overlayOpacity = opacity;
+        float baseOpacity = 1.0f - overlayOpacity;
         if (overlayOpacity == 0 || baseOpacity == 0 || overlayOpacity == 1 || baseOpacity == 1) {
             overlayOpacity = 1.0f;
             baseOpacity = 1.0f;
