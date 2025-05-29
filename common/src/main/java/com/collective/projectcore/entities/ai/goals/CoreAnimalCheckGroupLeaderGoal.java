@@ -2,9 +2,7 @@ package com.collective.projectcore.entities.ai.goals;
 
 import com.collective.projectcore.entities.base.CoreAnimalEntity;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.server.world.ServerWorld;
 
-import java.util.List;
 import java.util.UUID;
 
 public class CoreAnimalCheckGroupLeaderGoal extends Goal {

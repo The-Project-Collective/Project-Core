@@ -37,7 +37,7 @@ public abstract class CoreAquaticAnimalEntity extends CoreAnimalEntity {
     /**
      * Controls the breathing for underwater animals.
      * Override this method and leave it empty for aquatic animals that live in water but breathe air.
-     * @param air
+     * @param air amount for the entity at that tick in time.
      */
     @SuppressWarnings("deprecation")
     protected void tickBreathing(int air) {

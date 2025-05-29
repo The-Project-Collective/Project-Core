@@ -8,8 +8,8 @@ import net.minecraft.util.Identifier;
 
 public class CoreTags {
 
-    private static final String PRIMEVAL_ID = "project_wildlife";
-    private static final String WILDLIFE_ID = "project_primeval";
+    private static final String PRIMEVAL_ID = "project_primeval";
+    private static final String WILDLIFE_ID = "project_wildlife";
 
 
     // === GENERAL DIETS ===
