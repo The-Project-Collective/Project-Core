@@ -4,7 +4,6 @@ import com.collective.projectcore.entities.base.CoreAnimalEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.World;
 
 import java.util.EnumSet;
 import java.util.List;

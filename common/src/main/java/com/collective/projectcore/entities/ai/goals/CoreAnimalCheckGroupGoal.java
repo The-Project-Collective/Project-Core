@@ -52,7 +52,6 @@ public class CoreAnimalCheckGroupGoal extends Goal {
                 return;
             }
             for (String packMemberString : this.animal.getPack()) {
-                System.out.println("Pack Member: "+packMemberString);
                 CoreAnimalEntity packMember = (CoreAnimalEntity) getServerWorld(this.animal).getEntity(UUID.fromString(packMemberString));
                 if (packMember == null || !packMember.isAlive()) {
                     toRemove.add(packMemberString);

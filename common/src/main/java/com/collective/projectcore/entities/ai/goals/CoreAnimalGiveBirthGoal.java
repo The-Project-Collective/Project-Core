@@ -1,7 +1,6 @@
 package com.collective.projectcore.entities.ai.goals;
 
 import com.collective.projectcore.entities.base.CoreAnimalEntity;
-import dev.architectury.event.events.common.TickEvent;
 import net.minecraft.block.Block;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ai.goal.MoveToTargetPosGoal;
@@ -71,8 +70,17 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
                 female.getWorld().syncWorldEvent(2001, female.getSteppingPos(), Block.getRawIdFromState(female.getSteppingBlockState()));
                 PassiveEntity baby = female.createChild((ServerWorld) female.getWorld(), female);
                 if (baby instanceof CoreAnimalEntity wildlifeEntityBaby) {
-                    if (wildlifeEntityBaby.getVariant().isEmpty()) {
-                        wildlifeEntityBaby.setVariant(wildlifeEntityBaby.calculateInheritedVariant(female.getVariant(), female.getMateVariant()));
+                    if (wildlifeEntityBaby.hasGenetics()) {
+                        if (wildlifeEntityBaby.getGenome().isEmpty()) {
+                            wildlifeEntityBaby.setGenome(wildlifeEntityBaby.calculateInheritedGenome(female.getGenome(), female.getMateGenome()));
+                        }
+                        if (wildlifeEntityBaby.getGenome() != null && !wildlifeEntityBaby.getGenome().isEmpty()) {
+                            if (!wildlifeEntityBaby.isGeneticallyViable(wildlifeEntityBaby.getGenome())) {
+                                continue;
+                            }
+                        } else {
+                            continue;
+                        }
                     }
                     wildlifeEntityBaby.setAgeTicks(0);
                     wildlifeEntityBaby.setGender(this.random.nextInt(2));
