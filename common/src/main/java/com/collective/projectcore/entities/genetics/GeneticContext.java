@@ -1,6 +1,6 @@
 package com.collective.projectcore.entities.genetics;
 
-import com.collective.projectcore.utils.UtilMethods;
+import com.collective.projectcore.util.UtilMethods;
 
 import java.util.List;
 import java.util.Random;

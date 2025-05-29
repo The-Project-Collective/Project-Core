@@ -1,4 +1,4 @@
-package com.collective.projectcore.utils;
+package com.collective.projectcore.util;
 
 import com.collective.projectcore.ProjectCore;
 import com.collective.projectcore.entities.base.CoreAnimalEntity;
@@ -89,6 +89,56 @@ public interface CoreTextureContext {
         }
     }
 
+    /**
+     * Combines images in respect to a weighting determined by the pixel alpha of the overlay.
+     * The overlay image will always be drawn on top of the base image.
+     *
+     * @param base image.
+     * @param overlay image.
+     */
+    default void combineWeightedImages(NativeImage base, NativeImage overlay) {
+        for(int y = 0; y < base.getHeight(); ++y) {
+            for(int x = 0; x < base.getWidth(); ++x) {
+                int image_colour = overlay.getColorArgb(x, y);
+                if (ColorHelper.getAlpha(image_colour) > 0) {
+                    if (ColorHelper.getAlpha(image_colour) >= 255) {
+                        base.setColorArgb(x, y, image_colour);
+                    } else {
+                        base.setColorArgb(x, y, this.combineWeighted(base.getColorArgb(x, y), image_colour, ColorHelper.getAlpha(image_colour)));
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Combines colours using a weighted average.
+     *
+     * @param baseColour of the base image.
+     * @param overlayColour of the overlay image.
+     * @param opacity weight of the overlay colour based on its alpha.
+     */
+    default int combineWeighted(int baseColour, int overlayColour, float opacity) {
+        float opacity1 = opacity/255;
+        int a = ColorHelper.getAlpha(baseColour);
+        int r = ColorHelper.getRed(baseColour);
+        int g = ColorHelper.getGreen(baseColour);
+        int b = ColorHelper.getBlue(baseColour);
+        int ro = ColorHelper.getRed(overlayColour);
+        int go = ColorHelper.getGreen(overlayColour);
+        int bo = ColorHelper.getBlue(overlayColour);
+        int rf = Math.round((r * (1-opacity1)) + (ro * opacity1));
+        int gf = Math.round((g * (1-opacity1)) + (go * opacity1));
+        int bf = Math.round((b * (1-opacity1)) + (bo * opacity1));
+        return ColorHelper.getArgb(a, rf, gf, bf);
+    }
+
+    /**
+     * Stains a layer a certain colour respecting shading.
+     *
+     * @param base image.
+     * @param colour stain.
+     */
     default void stainLayer(NativeImage base, Color colour) {
         for(int y = 0; y < base.getHeight(); ++y) {
             for(int x = 0; x < base.getWidth(); ++x) {
@@ -102,6 +152,14 @@ public interface CoreTextureContext {
         }
     }
 
+    /**
+     * Changes the colour of a pixel with respect to its luminance / brightness value.
+     *
+     * @param alpha of the image.
+     * @param colour1 base colour.
+     * @param colour2 new colour.
+     * @return the new colour calculated to respect luminance.
+     */
     default int stainViaLuminance(int alpha, Color colour1, Color colour2) {
         int R = colour1.getRed();
         int G = colour1.getGreen();

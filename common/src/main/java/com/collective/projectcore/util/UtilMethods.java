@@ -1,4 +1,4 @@
-package com.collective.projectcore.utils;
+package com.collective.projectcore.util;
 
 public class UtilMethods {
 
