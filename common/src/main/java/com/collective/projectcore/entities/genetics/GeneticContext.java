@@ -152,6 +152,30 @@ public interface GeneticContext {
     }
 
     /**
+     * Checks whether a gene at a certain index on the genome (combination of both alleles) is homozygous lethal.
+     *
+     * @param genome of the entity.
+     * @return whether the allele combination for that entity is lethal or not.
+     */
+    default boolean isHomozygousLethal(String genome) {
+        for (Gene gene : genes()) {
+            if (gene.homozygousLethal()) {
+                List<String> lethalGenes = gene.lethalGenes();
+                int geneIndex = genes().indexOf(gene);
+                for (String genes : lethalGenes) {
+                    StringBuilder builder = new StringBuilder();
+                    builder.append(genes);
+                    String genesR = builder.reverse().toString();
+                    if (this.getAlleles(genome, geneIndex).equals(genes) || this.getAlleles(genome, geneIndex).equals(genesR)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Implemented by gene records created in specific entity classes to be used by <code>GeneticContext</code>.
      * VERY IMPORTANT that they are added to the genes() list in the same order they should appear in the genome!!!
      * All alleles within a gene are case-sensitive - Uppercase are DOMINANT, lowercase are RECESSIVE.

@@ -589,7 +589,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         this.dataTracker.set(MATE_GENOME, genome);
     }
 
-
     // --- Home Pos ------------------------------------------------------------------------------------------
     public BlockPos getHomePos() {
         return this.dataTracker.get(HOME_POS);
@@ -867,9 +866,13 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     public abstract int getLimitPerChunk();
 
     // --- Genome ------------------------------------------------------------------------------------------
+    public abstract String calculateGenome();
+
     public abstract String calculateInheritedGenome(String parent1, String parent2);
 
     public abstract String calculateWildGenome();
+
+    public abstract boolean isGeneticallyViable(String genome);
 
     // --- Home Pos ------------------------------------------------------------------------------------------
     public abstract boolean isMigratory();
