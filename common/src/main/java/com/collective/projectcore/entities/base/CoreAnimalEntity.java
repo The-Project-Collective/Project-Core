@@ -6,6 +6,7 @@ import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
+import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -21,6 +22,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.ServerConfigHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -736,9 +738,17 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     // --- Size ------------------------------------------------------------------------------------------
     public float getGenderMaxSize() {
         if (this.getGender() == 0 || this.getGender() == 2) {
-            return this.getMaleMaxSize();
+            if (this.hasGenetics() && this.getGenome() != null && !this.getGenome().isEmpty()) {
+                return (float) this.calculateStats(this.getMaleMaxSize(), this.getGenome(), this.getSizeGeneIndex(), this.getSizeCoeff());
+            } else {
+                return this.getMaleMaxSize();
+            }
         } else {
-            return this.getFemaleMaxSize();
+            if (this.hasGenetics() && this.getGenome() != null && !this.getGenome().isEmpty()) {
+                return (float) this.calculateStats(this.getFemaleMaxSize(), this.getGenome(), this.getSizeGeneIndex(), this.getSizeCoeff());
+            } else {
+                return this.getFemaleMaxSize();
+            }
         }
     }
 
@@ -873,6 +883,16 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     public abstract String calculateWildGenome();
 
     public abstract boolean isGeneticallyViable(String genome);
+
+    public abstract double calculateStats(double statValue, String genome, int geneIndex, float coefficient);
+
+    public abstract int getSizeGeneIndex();
+
+    public abstract float getSizeCoeff();
+
+    public abstract int getAttributeGeneIndex(RegistryEntry<EntityAttribute> attribute);
+
+    public abstract float getAttributeCoeff(RegistryEntry<EntityAttribute> attribute);
 
     // --- Home Pos ------------------------------------------------------------------------------------------
     public abstract boolean isMigratory();

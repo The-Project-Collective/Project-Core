@@ -2,6 +2,7 @@ package com.collective.projectcore.entities.genetics;
 
 import com.collective.projectcore.util.UtilMethods;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -173,6 +174,40 @@ public interface GeneticContext {
             }
         }
         return false;
+    }
+
+    /**
+     * Adjusts the value of an entity stat based on that entity's genetics.
+     *
+     * @param statValue of that entity's specific stat.
+     * @param genome of the entity.
+     * @param geneIndex of the stat gene for that specific stat.
+     * @param coefficient of the stat change. E.g. each allele increases / decreases the stat by 0.1, or 0.2, etc.
+     * @return the adjusted stat value.
+     */
+    default double calculateStats(double statValue, String genome, int geneIndex, float coefficient) {
+        String alleles = this.getAlleles(genome, geneIndex);
+        List<String> alleleList = List.of(alleles.substring(0, 0), alleles.substring(1, 1));
+        List<Float> coeffList = new ArrayList<>();
+        for (String allele : alleleList) {
+            float coeff = switch (allele) {
+                case "A" -> 1 + (coefficient * 4);
+                case "B" -> 1 + (coefficient * 3);
+                case "C" -> 1 + (coefficient * 2);
+                case "D" -> 1 + coefficient;
+                case "d" -> 1 - coefficient;
+                case "c" -> 1 - (coefficient * 2);
+                case "b" -> 1 - (coefficient * 3);
+                case "a" -> 1 - (coefficient * 4);
+                default -> 1;
+            };
+            coeffList.add(coeff);
+        }
+        if (coeffList.size() == 2) {
+            return statValue * ((coeffList.getFirst() + coeffList.get(1)) / 2);
+        } else {
+            return statValue;
+        }
     }
 
     /**
