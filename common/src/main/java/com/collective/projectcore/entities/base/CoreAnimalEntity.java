@@ -47,6 +47,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private static final TrackedData<Integer> AGE_TICKS;
     private static final TrackedData<Integer> ANGER_TIME;
     private static final TrackedData<Integer> BREEDING_TICKS;
+    private static final TrackedData<Integer> ENRICHMENT;
+    private static final TrackedData<Integer> ENRICHMENT_COOLDOWN;
+    private static final TrackedData<Integer> ENRICHMENT_TICKS;
     private static final TrackedData<Integer> GENDER;
     private static final TrackedData<String> GENOME;
     private static final TrackedData<Integer> GROUP_SIZE;
@@ -69,6 +72,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     protected boolean doesAge;
     protected boolean getsAngry;
     protected boolean doesBreed;
+    protected boolean hasEnrichment;
     protected boolean hasGender;
     protected boolean hasHunger;
     protected boolean hasAPack;
@@ -82,12 +86,13 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private int counter = 0;
 
     protected CoreAnimalEntity(EntityType<? extends AnimalEntity> entityType, World world,
-                               boolean doesAge, boolean getsAngry, boolean doesBreed, boolean hasGender,
+                               boolean doesAge, boolean getsAngry, boolean doesBreed, boolean hasEnrichment, boolean hasGender,
                                boolean hasHunger, boolean hasAPack, boolean canBeTamed, boolean hasGenetics) {
         super(entityType, world);
         this.doesAge = doesAge;
         this.getsAngry = getsAngry;
         this.doesBreed = doesBreed;
+        this.hasEnrichment = hasEnrichment;
         this.hasGender = hasGender;
         this.hasHunger = hasHunger;
         this.hasAPack = hasAPack;
@@ -108,6 +113,10 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     public boolean doesBreed() {
         return doesBreed;
+    }
+
+    public boolean hasEnrichment() {
+        return hasEnrichment;
     }
 
     public boolean hasGender() {
@@ -152,6 +161,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
             if (this.hasAPack()) {
                 packHandler();
             }
+            if (this.hasEnrichment()) {
+                enrichmentHandler();
+            }
         }
     }
 
@@ -192,7 +204,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     // --- Breeding Tickers ------------------------------------------------------------------------------------------
     public void breedingHandler() {
-        if (this.isAdult() && !this.isPregnant() && this.isFull()) {
+        if (this.isAdult() && !this.isPregnant() && this.isFull() && this.isHappy()) {
             if (!this.isParent()) {
                 if (this.getBreedingTicks() > 0) {
                     this.setBreedingTicks(this.getBreedingTicks() - 1);
@@ -204,6 +216,19 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     public void pregnancyHandler() {
         if (this.getPregnancyTicks() > 1) {
             this.setPregnancyTicks(this.getPregnancyTicks() - 1);
+        }
+    }
+
+    // --- Enrichment Ticker ------------------------------------------------------------------------------------------
+    public void enrichmentHandler() {
+        if (this.getEnrichmentTicks() > 0) {
+            int enrichmentLoss = 1;
+            this.setEnrichmentTicks(this.getEnrichmentTicks() - enrichmentLoss);
+        } else if (this.getEnrichmentTicks() <= 0) {
+            if (this.getEnrichment() > 0) {
+                this.setEnrichment(this.getEnrichment() - 1);
+            }
+            this.setEnrichmentTicks(this.random.nextInt(600) + 1000);
         }
     }
 
@@ -563,7 +588,43 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     public boolean isParent() {
         return !this.getOffspring().isEmpty();
     }
-    
+
+    // --- Gender ------------------------------------------------------------------------------------------
+    public int getEnrichment() {
+        return this.dataTracker.get(ENRICHMENT);
+    }
+
+    public void setEnrichment(int enrichment) {
+        this.dataTracker.set(ENRICHMENT, enrichment);
+    }
+
+    public int getEnrichmentCooldown() {
+        return this.dataTracker.get(ENRICHMENT_COOLDOWN);
+    }
+
+    public void setEnrichmentCooldown(int enrichmentCooldown) {
+        this.dataTracker.set(ENRICHMENT_COOLDOWN, enrichmentCooldown);
+    }
+
+    public int getEnrichmentTicks() {
+        return this.dataTracker.get(ENRICHMENT_TICKS);
+    }
+
+    public void setEnrichmentTicks(int enrichmentTicks) {
+        this.dataTracker.set(ENRICHMENT_TICKS, enrichmentTicks);
+    }
+
+    public boolean isHappy() {
+        return this.getEnrichment() >= this.getMaxEnrichment() * 0.8F;
+    }
+
+    public boolean isGrumpy() {
+        return this.getEnrichment() < this.getMaxEnrichment() * 0.4F;
+    }
+
+    public boolean isAngry() {
+        return this.getEnrichment() < this.getMaxEnrichment() * 0.2F;
+    }
 
     // --- Gender ------------------------------------------------------------------------------------------
     public int getGender() {
@@ -871,6 +932,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     public abstract boolean willParent();
 
+    // --- Enrichment ------------------------------------------------------------------------------------------
+    public abstract int getMaxEnrichment();
+
     // --- General ------------------------------------------------------------------------------------------
     @Override
     public abstract int getLimitPerChunk();
@@ -966,6 +1030,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         ANGER_TIME = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         ANGER_TIME_RANGE = TimeHelper.betweenSeconds(20, 39);
         BREEDING_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        ENRICHMENT = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        ENRICHMENT_COOLDOWN = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        ENRICHMENT_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         GENDER = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         GENOME = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         GROUP_SIZE = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -992,6 +1059,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         builder.add(AGE_TICKS, 0);
         builder.add(ANGER_TIME, 0);
         builder.add(BREEDING_TICKS, 0);
+        builder.add(ENRICHMENT, 0);
+        builder.add(ENRICHMENT_COOLDOWN, 0);
+        builder.add(ENRICHMENT_TICKS, 0);
         builder.add(GENDER, 0);
         builder.add(GENOME, "");
         builder.add(GROUP_SIZE, 0);
@@ -1017,6 +1087,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         nbt.putInt("AgeTicks", this.getAgeTicks());
         this.writeAngerToNbt(nbt);
         nbt.putInt("BreedingTicks", this.getBreedingTicks());
+        nbt.putInt("Enrichment", this.getEnrichment());
+        nbt.putInt("EnrichmentCooldown", this.getEnrichmentCooldown());
+        nbt.putInt("EnrichmentTicks", this.getEnrichmentTicks());
         nbt.putInt("Gender", this.getGender());
         nbt.putString("Genome", this.getGenome());
         nbt.putInt("HomePosX", this.getHomePos().getX());
@@ -1042,6 +1115,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         this.setAgeTicks(nbt.getInt("AgeTicks"));
         this.readAngerFromNbt(this.getWorld(), nbt);
         this.setBreedingTicks(nbt.getInt("BreedingTicks"));
+        this.setEnrichment(nbt.getInt("Enrichment"));
+        this.setEnrichmentCooldown(nbt.getInt("EnrichmentCooldown"));
+        this.setEnrichmentTicks(nbt.getInt("EnrichmentTicks"));
         this.setGender(nbt.getInt("Gender"));
         this.setGenome(nbt.getString("Genome"));
         this.setHomePos(new BlockPos(nbt.getInt("HomePosX"), nbt.getInt("HomePosY"), nbt.getInt("HomePosZ")));
