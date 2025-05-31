@@ -1,6 +1,5 @@
 package com.collective.projectcore.entities;
 
-import com.collective.projectcore.entities.base.CoreAquaticAnimalEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Bucketable;
 import net.minecraft.entity.Entity;

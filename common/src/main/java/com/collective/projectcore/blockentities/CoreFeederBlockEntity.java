@@ -1,7 +1,7 @@
 package com.collective.projectcore.blockentities;
 
 import com.collective.projectcore.blockentities.base.CoreBaseLockableContainerBlockEntity;
-import com.collective.projectcore.entities.base.CoreAnimalEntity;
+import com.collective.projectcore.entities.CoreAnimalEntity;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;

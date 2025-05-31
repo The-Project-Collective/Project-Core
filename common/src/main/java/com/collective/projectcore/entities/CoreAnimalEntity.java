@@ -1,4 +1,4 @@
-package com.collective.projectcore.entities.base;
+package com.collective.projectcore.entities;
 
 import com.collective.projectcore.groups.tags.CoreTags;
 import com.collective.projectcore.items.CoreItems;

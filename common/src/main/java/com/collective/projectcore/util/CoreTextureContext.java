@@ -1,7 +1,7 @@
 package com.collective.projectcore.util;
 
 import com.collective.projectcore.ProjectCore;
-import com.collective.projectcore.entities.base.CoreAnimalEntity;
+import com.collective.projectcore.entities.CoreAnimalEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.resource.Resource;

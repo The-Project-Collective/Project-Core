@@ -1,4 +1,4 @@
-package com.collective.projectcore.entities.base;
+package com.collective.projectcore.entities;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;

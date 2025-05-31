@@ -1,7 +1,7 @@
 package com.collective.projectcore.entities.ai.goals;
 
 import com.collective.projectcore.blockentities.CoreFeederBlockEntity;
-import com.collective.projectcore.entities.base.CoreAnimalEntity;
+import com.collective.projectcore.entities.CoreAnimalEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.MoveToTargetPosGoal;
 import net.minecraft.entity.ai.pathing.PathNodeType;
