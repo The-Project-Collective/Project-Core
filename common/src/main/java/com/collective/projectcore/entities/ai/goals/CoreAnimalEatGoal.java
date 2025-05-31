@@ -21,15 +21,11 @@ public class CoreAnimalEatGoal extends MoveToTargetPosGoal {
     protected CoreFeederBlockEntity feeder;
     CoreAnimalEntity wildlifeEntity;
     CoreAnimalEntity mother;
-    int diet;
-    String specialDiet;
     private float oldWaterCost;
 
-    public CoreAnimalEatGoal(CoreAnimalEntity wildlifeEntity, int diet, String specialDiet, double pSpeedModifier, int pSearchRange) {
+    public CoreAnimalEatGoal(CoreAnimalEntity wildlifeEntity, double pSpeedModifier, int pSearchRange) {
         super(wildlifeEntity, pSpeedModifier, pSearchRange);
         this.wildlifeEntity = wildlifeEntity;
-        this.diet = diet;
-        this.specialDiet = specialDiet;
     }
 
     @Override

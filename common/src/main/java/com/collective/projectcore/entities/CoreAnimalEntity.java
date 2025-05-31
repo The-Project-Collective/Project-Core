@@ -939,6 +939,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     // --- Enrichment ------------------------------------------------------------------------------------------
     public abstract int getMaxEnrichment();
 
+    public abstract List<String> getPreferredEnrichment();
+
     // --- General ------------------------------------------------------------------------------------------
     @Override
     public abstract int getLimitPerChunk();
