@@ -40,8 +40,8 @@ public abstract class CoreFishEntity extends CoreAquaticAnimalEntity implements 
 
     protected boolean canBeBucketed;
 
-    protected CoreFishEntity(EntityType<? extends AnimalEntity> entityType, World world, boolean doesAge, boolean getsAngry, boolean doesBreed, boolean hasGender, boolean hasHunger, boolean hasAPack, boolean canBeTamed, boolean hasVariants, boolean canBeBucketed) {
-        super(entityType, world, doesAge, getsAngry, doesBreed, hasGender, hasHunger, hasAPack, canBeTamed, hasVariants);
+    protected CoreFishEntity(EntityType<? extends AnimalEntity> entityType, World world, boolean doesAge, boolean getsAngry, boolean doesBreed, boolean hasEnrichment, boolean hasGender, boolean hasHunger, boolean hasAPack, boolean canBeTamed, boolean hasVariants, boolean canBeBucketed) {
+        super(entityType, world, doesAge, getsAngry, doesBreed, hasEnrichment, hasGender, hasHunger, hasAPack, canBeTamed, hasVariants);
         this.moveControl = new CoreFishMoveControl(this);
         this.canBeBucketed = canBeBucketed;
     }

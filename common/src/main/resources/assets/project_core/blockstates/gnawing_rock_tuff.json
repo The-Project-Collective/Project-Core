@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "project_core:block/enrichment/gnawing_rocks/gnawing_rock_tuff",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "project_core:block/enrichment/gnawing_rocks/gnawing_rock_tuff"
+    },
+    "facing=south": {
+      "model": "project_core:block/enrichment/gnawing_rocks/gnawing_rock_tuff",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "project_core:block/enrichment/gnawing_rocks/gnawing_rock_tuff",
+      "y": 270
+    }
+  }
+}

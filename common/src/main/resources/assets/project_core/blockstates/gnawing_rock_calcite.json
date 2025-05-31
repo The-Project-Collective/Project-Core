@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "project_core:block/enrichment/gnawing_rocks/gnawing_rock_calcite",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "project_core:block/enrichment/gnawing_rocks/gnawing_rock_calcite"
+    },
+    "facing=south": {
+      "model": "project_core:block/enrichment/gnawing_rocks/gnawing_rock_calcite",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "project_core:block/enrichment/gnawing_rocks/gnawing_rock_calcite",
+      "y": 270
+    }
+  }
+}
