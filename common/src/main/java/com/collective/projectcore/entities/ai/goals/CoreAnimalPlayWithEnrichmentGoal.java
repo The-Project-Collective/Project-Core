@@ -3,6 +3,7 @@ package com.collective.projectcore.entities.ai.goals;
 import com.collective.projectcore.blocks.CoreEnrichmentBlock;
 import com.collective.projectcore.blocks.enrichment.GnawingRockEnrichmentBlock;
 import com.collective.projectcore.entities.CoreAnimalEntity;
+import com.collective.projectcore.groups.tags.CoreTags;
 import net.minecraft.entity.ai.goal.MoveToTargetPosGoal;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -59,11 +60,7 @@ public class CoreAnimalPlayWithEnrichmentGoal extends MoveToTargetPosGoal {
     public void tick() {
         super.tick();
         if (hasReached()) {
-            int enrichAmount = 2;
-            boolean isPreferred = enrichmentBlock instanceof GnawingRockEnrichmentBlock && coreAnimalEntity.getPreferredEnrichment().contains("gnawing_rock"); // Add future enrichment types to this list.
-            if (isPreferred) {
-                enrichAmount = 4;
-            }
+            int enrichAmount = 5;
             coreAnimalEntity.setEnrichment(coreAnimalEntity.getEnrichment() + enrichAmount);
             coreAnimalEntity.getWorld().playSound(null, coreAnimalEntity.getSteppingPos(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.NEUTRAL, 1.0F, coreAnimalEntity.getPitch());
             coreAnimalEntity.setEnrichmentCooldown(random.nextInt(600) + 1000);
@@ -72,8 +69,8 @@ public class CoreAnimalPlayWithEnrichmentGoal extends MoveToTargetPosGoal {
 
     @Override
     protected boolean isTargetPos(WorldView pLevel, @NotNull BlockPos pPos) {
-        if (pLevel.getBlockState(pPos).getBlock() instanceof CoreEnrichmentBlock enrichBlock) {
-            enrichmentBlock = enrichBlock;
+        if (pLevel.getBlockState(pPos).getBlock() instanceof CoreEnrichmentBlock && pLevel.getBlockState(pPos).isIn(coreAnimalEntity.getAllowedEnrichment())) {
+            enrichmentBlock = (CoreEnrichmentBlock) pLevel.getBlockState(pPos).getBlock();
             return true;
         }
         return false;
