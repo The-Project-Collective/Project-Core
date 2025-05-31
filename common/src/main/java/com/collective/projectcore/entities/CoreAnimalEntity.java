@@ -230,6 +230,10 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
             }
             this.setEnrichmentTicks(this.random.nextInt(600) + 1000);
         }
+        if (this.getEnrichmentCooldown() > 0) {
+            int enrichmentCooldownLoss = 1;
+            this.setEnrichmentCooldown(this.getEnrichmentCooldown() - enrichmentCooldownLoss);
+        }
     }
 
     // --- Hunger Ticker ------------------------------------------------------------------------------------------
