@@ -42,7 +42,8 @@ public class CoreAnimalParentCheckOffspringGoal extends Goal {
     @Override
     public void tick() {
         if (--this.delay <= 0) {
-            List<String> offspringList = this.animal.getOffspring();
+            this.delay = this.getTickCount(10);
+            List<String> offspringList =  new ArrayList<>(this.animal.getOffspring());
             List<String> toRemove = new ArrayList<>();
             for (String offspring : offspringList) {
                 CoreAnimalEntity offspringEntity = (CoreAnimalEntity) getServerWorld(this.animal).getEntity(UUID.fromString(offspring));

@@ -25,24 +25,20 @@ public class CoreAnimalPlayWithEnrichmentGoal extends MoveToTargetPosGoal {
 
     @Override
     public boolean canStart() {
-        if (coreAnimalEntity.getEnrichment() >= coreAnimalEntity.getMaxEnrichment()) {
+        if (!coreAnimalEntity.isHappy()) {
             return false;
         } else if (coreAnimalEntity.getEnrichmentCooldown() > 0) {
             return false;
         } else {
-            if (this.cooldown > 0) {
-                --this.cooldown;
-                return false;
-            } else {
-                this.cooldown = this.getInterval(this.mob);
-                return this.findTargetPos();
-            }
+            return this.findTargetPos();
         }
     }
 
     @Override
     public boolean shouldContinue() {
         if (coreAnimalEntity.getEnrichment() >= coreAnimalEntity.getMaxEnrichment()) {
+            return false;
+        } else if (coreAnimalEntity.getEnrichmentCooldown() > 0) {
             return false;
         } else {
             return super.shouldContinue();

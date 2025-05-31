@@ -57,6 +57,10 @@ public class CoreSpawnEggItem extends ArchitecturySpawnEggItem {
                     if (baby.doesBreed() && ((CoreAnimalEntity) entity).isAdult()) {
                         baby.setMotherUUID(entity.getUuidAsString());
                     }
+                    if (baby.hasEnrichment()) {
+                        baby.setEnrichment(baby.getMaxEnrichment());
+                        baby.setEnrichmentTicks(random.nextInt(600) + 1000);
+                    }
                     if (baby.hasGender()) {
                         baby.setGender(random.nextInt(2));
                     } else {

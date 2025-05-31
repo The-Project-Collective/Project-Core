@@ -162,7 +162,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
                 packHandler();
             }
             if (this.hasEnrichment()) {
-                enrichmentHandler();
+                if (!this.isBaby() && !this.isChild()) {
+                    enrichmentHandler();
+                }
             }
         }
     }
