@@ -1,7 +1,7 @@
-package com.collective.projectcore.blocks;
+package com.collective.projectcore.blocks.machines;
 
 import com.collective.projectcore.blockentities.CoreFeederBlockEntity;
-import com.collective.projectcore.blocks.base.CoreBaseBlockWithEntity;
+import com.collective.projectcore.blocks.CoreBlockWithEntity;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.block.*;
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public abstract class CoreFeederBlock extends CoreBaseBlockWithEntity {
+public abstract class CoreFeederBlock extends CoreBlockWithEntity {
 
     public static final EnumProperty<Direction> FACING = HorizontalFacingBlock.FACING;
 
