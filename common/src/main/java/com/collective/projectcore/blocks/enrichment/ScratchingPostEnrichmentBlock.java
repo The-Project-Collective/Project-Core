@@ -85,7 +85,7 @@ public class ScratchingPostEnrichmentBlock extends CoreEnrichmentBlock {
         if (!world.isClient()) {
             BlockState otherState = world.getBlockState(otherPos);
             if (otherState.isOf(this) && otherState.get(UPPER) != state.get(UPPER)) {
-                world.breakBlock(otherPos, true, player);
+                world.breakBlock(otherPos, !player.isCreative(), player);
             }
         }
         return super.onBreak(world, pos, state, player);
