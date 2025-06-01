@@ -1,0 +1,50 @@
+{
+  "variants": {
+    "facing=east,powered=false": {
+      "model": "project_core:block/enrichment/bubble_machine/bubble_machine",
+      "y": 90
+    },
+    "facing=east,powered=true": {
+      "model": "project_core:block/enrichment/bubble_machine/bubble_machine_powered",
+      "y": 90
+    },
+    "facing=north,powered=false": {
+      "model": "project_core:block/enrichment/bubble_machine/bubble_machine"
+    },
+    "facing=north,powered=true": {
+      "model": "project_core:block/enrichment/bubble_machine/bubble_machine_powered"
+    },
+    "facing=south,powered=false": {
+      "model": "project_core:block/enrichment/bubble_machine/bubble_machine",
+      "y": 180
+    },
+    "facing=south,powered=true": {
+      "model": "project_core:block/enrichment/bubble_machine/bubble_machine_powered",
+      "y": 180
+    },
+    "facing=west,powered=false": {
+      "model": "project_core:block/enrichment/bubble_machine/bubble_machine",
+      "y": 270
+    },
+    "facing=west,powered=true": {
+      "model": "project_core:block/enrichment/bubble_machine/bubble_machine_powered",
+      "y": 270
+    },
+    "facing=up,powered=false": {
+      "model": "project_core:block/enrichment/bubble_machine/bubble_machine",
+      "x": 270
+    },
+    "facing=up,powered=true": {
+      "model": "project_core:block/enrichment/bubble_machine/bubble_machine_powered",
+      "x": 270
+    },
+    "facing=down,powered=false": {
+      "model": "project_core:block/enrichment/bubble_machine/bubble_machine",
+      "x": 90
+    },
+    "facing=down,powered=true": {
+      "model": "project_core:block/enrichment/bubble_machine/bubble_machine_powered",
+      "x": 90
+    }
+  }
+}

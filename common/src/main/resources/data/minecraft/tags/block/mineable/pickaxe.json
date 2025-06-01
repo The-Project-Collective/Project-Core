@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
+    "project_core:bubble_machine",
     "project_core:gnawing_rock_andesite",
     "project_core:gnawing_rock_blackstone",
     "project_core:gnawing_rock_calcite",

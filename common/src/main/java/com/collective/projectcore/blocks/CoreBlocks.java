@@ -1,6 +1,7 @@
 package com.collective.projectcore.blocks;
 
 import com.collective.projectcore.ProjectCore;
+import com.collective.projectcore.blocks.enrichment.BubbleMachineEnrichmentBlock;
 import com.collective.projectcore.blocks.enrichment.GnawingRockEnrichmentBlock;
 import com.collective.projectcore.blocks.enrichment.ScratchingPostEnrichmentBlock;
 import com.collective.projectcore.groups.CoreTabGroups;
@@ -54,6 +55,9 @@ public class CoreBlocks {
     public static final RegistrySupplier<Block> SCRATCHING_POST_PALE_OAK = registerBlock("scratching_post_pale_oak", () -> new ScratchingPostEnrichmentBlock(AbstractBlock.Settings.copy(Blocks.PALE_OAK_LOG).mapColor(MapColor.GRAY).registryKey(getBlockRegistryKey("scratching_post_pale_oak")).nonOpaque()), "husbandry");
     public static final RegistrySupplier<Block> SCRATCHING_POST_SPRUCE = registerBlock("scratching_post_spruce", () -> new ScratchingPostEnrichmentBlock(AbstractBlock.Settings.copy(Blocks.SPRUCE_LOG).mapColor(MapColor.SPRUCE_BROWN).registryKey(getBlockRegistryKey("scratching_post_spruce")).nonOpaque()), "husbandry");
     public static final RegistrySupplier<Block> SCRATCHING_POST_WARPED = registerBlock("scratching_post_warped", () -> new ScratchingPostEnrichmentBlock(AbstractBlock.Settings.copy(Blocks.WARPED_STEM).mapColor(MapColor.BLUE).registryKey(getBlockRegistryKey("scratching_post_warped")).nonOpaque()), "husbandry");
+
+    // --- Scratching Log ---
+    public static final RegistrySupplier<Block> BUBBLE_MACHINE = registerBlock("bubble_machine", () -> new BubbleMachineEnrichmentBlock(AbstractBlock.Settings.copy(Blocks.SMOOTH_STONE).mapColor(MapColor.LIGHT_GRAY).registryKey(getBlockRegistryKey("bubble_machine")).nonOpaque()), "husbandry");
 
 
 

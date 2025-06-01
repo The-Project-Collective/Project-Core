@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_core:block/enrichment/bubble_machine/bubble_machine"
+  }
+}
