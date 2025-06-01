@@ -1,0 +1,7 @@
+{
+  "parent": "project_core:block/enrichment/template_scratching_post_upper",
+  "textures": {
+    "log": "minecraft:block/oak_log",
+    "wool": "project_core:block/wool_greyscale"
+  }
+}

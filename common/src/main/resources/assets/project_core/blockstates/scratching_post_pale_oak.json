@@ -1,0 +1,37 @@
+{
+  "variants": {
+    "colour=white,upper=false":   { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+    "colour=light_gray,upper=false":  { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+    "colour=gray,upper=false": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+    "colour=black,upper=false": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+    "colour=brown,upper=false": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+    "colour=red,upper=false": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+    "colour=orange,upper=false": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+    "colour=yellow,upper=false": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+    "colour=lime,upper=false": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+    "colour=green,upper=false": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+    "colour=cyan,upper=false": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+    "colour=light_blue,upper=false": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+    "colour=blue,upper=false": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+    "colour=purple,upper=false": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+    "colour=magenta,upper=false": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+    "colour=pink,upper=false": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_lower" },
+
+    "colour=white,upper=true":   { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper" },
+    "colour=light_gray,upper=true":  { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper" },
+    "colour=gray,upper=true": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper" },
+    "colour=black,upper=true": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper" },
+    "colour=brown,upper=true": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper" },
+    "colour=red,upper=true": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper" },
+    "colour=orange,upper=true": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper" },
+    "colour=yellow,upper=true": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper" },
+    "colour=lime,upper=true": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper" },
+    "colour=green,upper=true": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper" },
+    "colour=cyan,upper=true": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper" },
+    "colour=light_blue,upper=true": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper" },
+    "colour=blue,upper=true": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper" },
+    "colour=purple,upper=true": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper" },
+    "colour=magenta,upper=true": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper" },
+    "colour=pink,upper=true": { "model": "project_core:block/enrichment/scratching_posts/scratching_post_pale_oak_upper"}
+  }
+}

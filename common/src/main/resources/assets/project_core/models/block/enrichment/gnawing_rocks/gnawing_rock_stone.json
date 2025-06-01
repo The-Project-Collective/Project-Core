@@ -1,5 +1,5 @@
 {
-  "parent": "project_core:block/enrichment/gnawing_rocks/gnawing_rock_template",
+  "parent": "project_core:block/enrichment/template_gnawing_rock",
   "textures": {
     "texture": "minecraft:block/stone"
   }
