@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "#project_core:enrichment/gnawing_rocks",
+    "#project_core:enrichment/scratching_posts"
+  ]
+}
