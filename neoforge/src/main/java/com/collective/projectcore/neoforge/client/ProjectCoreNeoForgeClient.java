@@ -1,19 +1,16 @@
 package com.collective.projectcore.neoforge.client;
 
-import com.collective.projectcore.ProjectCore;
-import com.collective.projectcore.blocks.CoreBlock;
 import com.collective.projectcore.blocks.CoreBlocks;
 import com.collective.projectcore.util.UtilMethods;
 import net.minecraft.client.MinecraftClient;
-import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
 
-@Mod(value = ProjectCore.MOD_ID, dist = Dist.CLIENT)
+//@Mod(value = ProjectCore.MOD_ID, dist = Dist.CLIENT)
 public class ProjectCoreNeoForgeClient {
 
     public ProjectCoreNeoForgeClient(IEventBus modBus) {
         modBus.register(this);
+        this.registerColourProviders();
     }
 
     @SuppressWarnings("deprecation")
