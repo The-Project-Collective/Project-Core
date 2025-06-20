@@ -129,14 +129,16 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
             if (female.willParent() && !offspringList.isEmpty()) {
                 female.setOffspring(offspringList);
             }
-            if (getServerWorld(female).getEntity(UUID.fromString(female.getMateUUID())) != null) {
-                if (getServerWorld(female).getEntity(UUID.fromString(female.getMateUUID())) instanceof CoreAnimalEntity male) {
-                    if (male.isAlive()) {
-                        if (male.willParent() && !offspringList.isEmpty()) {
-                            male.setOffspring(offspringList);
-                        }
-                        if (!male.isMonogamous()) {
-                            male.setMateUUID("");
+            if (female.validateUUID(female.getMateUUID())) {
+                if (getServerWorld(female).getEntity(UUID.fromString(female.getMateUUID())) != null) {
+                    if (getServerWorld(female).getEntity(UUID.fromString(female.getMateUUID())) instanceof CoreAnimalEntity male) {
+                        if (male.isAlive()) {
+                            if (male.willParent() && !offspringList.isEmpty()) {
+                                male.setOffspring(offspringList);
+                            }
+                            if (!male.isMonogamous()) {
+                                male.setMateUUID("");
+                            }
                         }
                     }
                 }
