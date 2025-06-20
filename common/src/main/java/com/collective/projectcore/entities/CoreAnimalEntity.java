@@ -276,7 +276,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     // --- General ------------------------------------------------------------------------------------------
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
-        ItemStack itemStack = player.getStackInHand(hand);
+        ItemStack itemStack = player.getMainHandStack();
         if (hand == Hand.MAIN_HAND && !player.getWorld().isClient()) {
             if (this.isValidFood(itemStack) && !this.hasAngerTime()) {
                 if (this.getHunger() >= this.getMaxFood() && this.isFavouriteFood(itemStack)) {
@@ -300,20 +300,17 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
                 } else {
                     if (this.canEatNutritionally(itemStack)) {
                         this.handFeed(itemStack, player);
+                        return ActionResult.SUCCESS;
                     }
                 }
             }
             if (player.getMainHandStack().getItem().equals(CoreItems.DEV_TOOL.get())) {
                 player.sendMessage(Text.literal("----------------------"), false);
-                player.sendMessage(Text.literal("Gender: " + this.getGender()), false);
                 player.sendMessage(Text.literal("Genome: " + this.getGenome()), false);
+                player.sendMessage(Text.literal("Gender: " + switch (this.getGender()) { case 1 -> "Female"; default -> "Male"; }), false);
                 player.sendMessage(Text.literal("Age: " + this.getAgeDays()), false);
-                player.sendMessage(Text.literal("Health: " + this.getHealth()), false);
-                player.sendMessage(Text.literal("UUID: " + this.getUuidAsString()), false);
-                player.sendMessage(Text.literal("Mother UUID: " + this.getMotherUUID()), false);
-                player.sendMessage(Text.literal("Mate UUID: " + this.getMateUUID()), false);
-                player.sendMessage(Text.literal("Breeding Ticks: " + this.getBreedingTicks()), false);
-                player.sendMessage(Text.literal("Pregnancy Ticks: " + this.getPregnancyTicks()), false);
+                player.sendMessage(Text.literal("Enrichment / Ticks / Cooldown: " + this.getEnrichment() + " | " + this.getEnrichmentTicks() + " | " + this.getEnrichmentCooldown()), false);
+                player.sendMessage(Text.literal("Hunger / Ticks: " + this.getHunger() + " | " + this.getHungerTicks()), false);
                 player.sendMessage(Text.literal("Parent?: " + this.isParent()), false);
                 player.sendMessage(Text.literal("Offspring: " + this.getOffspring().size() + " | " + this.getOffspringString()), false);
                 player.sendMessage(Text.literal("----------------------"), false);

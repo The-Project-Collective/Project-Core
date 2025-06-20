@@ -32,15 +32,19 @@
   "group.project_core.husbandry_blocks": "Project Blocks: Husbandry",
 
 
-  "tag.item.project_core.diets.general.all_foods": "All Foods Tag",
-  "tag.item.project_core.diets.general.carnivore_foods": "Carnivore Foods Tag",
-  "tag.item.project_core.diets.general.herbivore_foods": "Herbivore Foods Tag",
-  "tag.item.project_core.diets.general.insectivore_foods": "Insectivore Foods Tag",
-  "tag.item.project_core.diets.general.omnivore_foods": "Omnivore Foods Tag",
-  "tag.item.project_core.diets.general.piscivore_foods": "Piscivore Foods Tag",
+  "tag.item.project_core.diets.general.all_foods": "All Foods",
+  "tag.item.project_core.diets.general.carnivore_foods": "Carnivore Foods",
+  "tag.item.project_core.diets.general.herbivore_foods": "Herbivore Foods",
+  "tag.item.project_core.diets.general.insectivore_foods": "Insectivore Foods",
+  "tag.item.project_core.diets.general.omnivore_foods": "Omnivore Foods",
+  "tag.item.project_core.diets.general.piscivore_foods": "Piscivore Foods",
 
   "tag.item.project_core.diets.values.large_foods": "Large Foods",
   "tag.item.project_core.diets.values.medium_foods": "Medium Foods",
-  "tag.item.project_core.diets.values.small_foods": "Small Foods"
+  "tag.item.project_core.diets.values.small_foods": "Small Foods",
+
+  "tag.block.project_core.enrichment.all_enrichment": "All Enrichment",
+  "tag.block.project_core.enrichment.gnawing_rocks": "Gnawing Rocks",
+  "tag.block.project_core.enrichment.scratching_posts": "Scratching Posts"
 
 }

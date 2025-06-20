@@ -83,6 +83,7 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
                         }
                     }
                     wildlifeEntityBaby.setAgeTicks(0);
+                    wildlifeEntityBaby.setAttributes(3);
                     wildlifeEntityBaby.setGender(this.random.nextInt(2));
                     if (!wildlifeEntityBaby.isMigratory()) {
                         if (Objects.equals(wildlifeEntityBaby.getWorld().getBlockState(wildlifeEntityBaby.getSteppingPos()).getBlock(), wildlifeEntityBaby.getHomeBlockType())) {
@@ -101,7 +102,7 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
                             }
                         }
                     }
-                    wildlifeEntityBaby.setHunger(wildlifeEntityBaby.getMaxFood() / 2);
+                    wildlifeEntityBaby.setHunger(wildlifeEntityBaby.getMaxFood() / 4);
                     wildlifeEntityBaby.setEnrichment(wildlifeEntityBaby.getMaxEnrichment());
                     wildlifeEntityBaby.setHungerTicks(1600);
                     wildlifeEntityBaby.setEnrichmentTicks(random.nextInt(600) + 1000);
@@ -128,13 +129,15 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
             if (female.willParent() && !offspringList.isEmpty()) {
                 female.setOffspring(offspringList);
             }
-            if (getServerWorld(female).getEntity(UUID.fromString(female.getMateUUID())) instanceof CoreAnimalEntity male) {
-                if (male.isAlive()) {
-                    if (male.willParent() && !offspringList.isEmpty()) {
-                        male.setOffspring(offspringList);
-                    }
-                    if (!male.isMonogamous()) {
-                        male.setMateUUID("");
+            if (getServerWorld(female).getEntity(UUID.fromString(female.getMateUUID())) != null) {
+                if (getServerWorld(female).getEntity(UUID.fromString(female.getMateUUID())) instanceof CoreAnimalEntity male) {
+                    if (male.isAlive()) {
+                        if (male.willParent() && !offspringList.isEmpty()) {
+                            male.setOffspring(offspringList);
+                        }
+                        if (!male.isMonogamous()) {
+                            male.setMateUUID("");
+                        }
                     }
                 }
             }

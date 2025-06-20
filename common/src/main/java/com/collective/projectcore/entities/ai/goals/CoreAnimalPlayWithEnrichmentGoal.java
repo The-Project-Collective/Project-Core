@@ -62,6 +62,9 @@ public class CoreAnimalPlayWithEnrichmentGoal extends MoveToTargetPosGoal {
         if (hasReached()) {
             int enrichAmount = 5;
             coreAnimalEntity.setEnrichment(coreAnimalEntity.getEnrichment() + enrichAmount);
+            if (coreAnimalEntity.getEnrichment() > coreAnimalEntity.getMaxEnrichment()) {
+                coreAnimalEntity.setEnrichment(coreAnimalEntity.getMaxEnrichment());
+            }
             coreAnimalEntity.getWorld().playSound(null, coreAnimalEntity.getSteppingPos(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.NEUTRAL, 1.0F, coreAnimalEntity.getPitch());
             coreAnimalEntity.setEnrichmentCooldown(random.nextInt(600) + 1000);
         }
