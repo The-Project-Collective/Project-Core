@@ -539,8 +539,11 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     public void setAttributes(int age) {
         this.updateAttributes(age);
         this.setHealth((float) this.getAttributeBaseValue(EntityAttributes.MAX_HEALTH));
-        if (this.getHomePos() != BlockPos.ZERO) {
+        if (!this.getHomePos().equals(BlockPos.ORIGIN) && !this.getHomePos().equals(BlockPos.ZERO) && this.getWorld().getBlockState(this.getHomePos()).getBlock().equals(this.getHomeBlockType())) {
             this.setPositionTarget(this.getHomePos(), this.getMaxRoamDistance());
+        } else {
+            this.setHomePos(new BlockPos(BlockPos.ZERO));
+            this.setPositionTarget(new BlockPos(BlockPos.ZERO), -1);
         }
     }
 
@@ -691,7 +694,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     }
 
     public boolean isHungry() {
-        return this.getHunger() < this.getMaxFood() * 0.4F;
+        return this.getHunger() < this.getMaxFood() * 0.5F;
     }
 
     public boolean isStarving() {
