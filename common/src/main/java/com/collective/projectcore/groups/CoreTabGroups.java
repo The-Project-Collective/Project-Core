@@ -1,6 +1,7 @@
 package com.collective.projectcore.groups;
 
 import com.collective.projectcore.ProjectCore;
+import com.collective.projectcore.blocks.CoreBlocks;
 import com.collective.projectcore.items.CoreItems;
 import dev.architectury.registry.CreativeTabRegistry;
 import dev.architectury.registry.registries.DeferredRegister;
@@ -20,5 +21,8 @@ public class CoreTabGroups {
             .create(Text.translatable("group.project_core.core_blocks"), () -> new ItemStack(Blocks.DIAMOND_BLOCK)));
     public static final RegistrySupplier<ItemGroup> CORE_ITEMS = TAB_GROUPS.register("core_items", () -> CreativeTabRegistry
             .create(Text.translatable("group.project_core.core_items"), () -> new ItemStack(CoreItems.DEV_TOOL.get())));
+
+    public static final RegistrySupplier<ItemGroup> HUSBANDRY_BLOCKS = TAB_GROUPS.register("husbandry_blocks", () -> CreativeTabRegistry
+            .create(Text.translatable("group.project_core.husbandry_blocks"), () -> new ItemStack(CoreBlocks.GNAWING_ROCK_STONE.get())));
 
 }

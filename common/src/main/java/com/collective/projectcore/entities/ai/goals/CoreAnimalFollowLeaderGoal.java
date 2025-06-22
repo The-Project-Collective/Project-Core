@@ -1,6 +1,6 @@
 package com.collective.projectcore.entities.ai.goals;
 
-import com.collective.projectcore.entities.base.CoreAnimalEntity;
+import com.collective.projectcore.entities.CoreAnimalEntity;
 import net.minecraft.entity.ai.control.LookControl;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.BirdNavigation;

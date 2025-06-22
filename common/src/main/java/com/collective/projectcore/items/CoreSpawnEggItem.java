@@ -1,6 +1,6 @@
 package com.collective.projectcore.items;
 
-import com.collective.projectcore.entities.base.CoreAnimalEntity;
+import com.collective.projectcore.entities.CoreAnimalEntity;
 import dev.architectury.core.item.ArchitecturySpawnEggItem;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.component.DataComponentTypes;
@@ -56,6 +56,10 @@ public class CoreSpawnEggItem extends ArchitecturySpawnEggItem {
                     }
                     if (baby.doesBreed() && ((CoreAnimalEntity) entity).isAdult()) {
                         baby.setMotherUUID(entity.getUuidAsString());
+                    }
+                    if (baby.hasEnrichment()) {
+                        baby.setEnrichment(baby.getMaxEnrichment());
+                        baby.setEnrichmentTicks(random.nextInt(600) + 1000);
                     }
                     if (baby.hasGender()) {
                         baby.setGender(random.nextInt(2));

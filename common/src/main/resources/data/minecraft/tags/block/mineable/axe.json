@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "values": [
+    "project_core:scratching_post_acacia",
+    "project_core:scratching_post_birch",
+    "project_core:scratching_post_cherry",
+    "project_core:scratching_post_crimson",
+    "project_core:scratching_post_dark_oak",
+    "project_core:scratching_post_jungle",
+    "project_core:scratching_post_mangrove",
+    "project_core:scratching_post_oak",
+    "project_core:scratching_post_pale_oak",
+    "project_core:scratching_post_spruce",
+    "project_core:scratching_post_warped"
+  ]
+}

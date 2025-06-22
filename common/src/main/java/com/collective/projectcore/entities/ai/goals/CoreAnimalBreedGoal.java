@@ -1,6 +1,6 @@
 package com.collective.projectcore.entities.ai.goals;
 
-import com.collective.projectcore.entities.base.CoreAnimalEntity;
+import com.collective.projectcore.entities.CoreAnimalEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.server.world.ServerWorld;
@@ -33,7 +33,7 @@ public class CoreAnimalBreedGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        if (this.animal.isPregnant() || this.animal.isParent() || !this.animal.isAdult() || this.animal.getBreedingTicks() > 0) {
+        if (this.animal.isPregnant() || this.animal.isParent() || !this.animal.isAdult() || this.animal.getBreedingTicks() > 0 || !this.animal.isFull() || !this.animal.isHappy()) {
             return false;
         }
         this.mate = this.findMate();
@@ -42,10 +42,10 @@ public class CoreAnimalBreedGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        if (this.animal.isPregnant() || this.animal.isParent() || !this.animal.isAdult() || this.animal.getBreedingTicks() > 0) {
+        if (this.animal.isPregnant() || this.animal.isParent() || !this.animal.isAdult() || this.animal.getBreedingTicks() > 0 || !this.animal.isFull() || !this.animal.isHappy()) {
             return false;
         }
-        if (this.mate.isPregnant() || this.mate.isParent() || !this.mate.isAdult() || this.mate.getBreedingTicks() > 0) {
+        if (this.mate.isPregnant() || this.mate.isParent() || !this.mate.isAdult() || this.mate.getBreedingTicks() > 0 || !this.mate.isFull() || !this.mate.isHappy()) {
             return false;
         }
         return this.mate.isAlive() && this.timer < 60 && !this.mate.isPanicking() || this.mate.isAdult();

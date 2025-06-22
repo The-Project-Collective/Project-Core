@@ -1,7 +1,7 @@
 package com.collective.projectcore.blockentities;
 
 import com.collective.projectcore.blockentities.base.CoreBaseLockableContainerBlockEntity;
-import com.collective.projectcore.entities.base.CoreAnimalEntity;
+import com.collective.projectcore.entities.CoreAnimalEntity;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
@@ -87,7 +87,7 @@ public class CoreFeederBlockEntity extends CoreBaseLockableContainerBlockEntity 
     }
 
     public void eatFood(CoreAnimalEntity entity, ItemStack stack, int maxFood) {
-        boolean flag = false;
+        boolean flag;
         boolean flag2 = true;
         while (flag2) {
             if (!stack.isEmpty()) {
@@ -99,6 +99,8 @@ public class CoreFeederBlockEntity extends CoreBaseLockableContainerBlockEntity 
                         }
                         stack.decrement(1);
                         flag = true;
+                    } else {
+                        flag = false;
                     }
                     if (flag) {
                         entity.getWorld().playSound(null, entity.getSteppingPos(), SoundEvents.ENTITY_GENERIC_EAT.value(), SoundCategory.NEUTRAL, 1.0F, entity.getPitch());

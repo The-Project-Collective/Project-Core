@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_core:block/enrichment/gnawing_rocks/gnawing_rock_stone"
+  }
+}

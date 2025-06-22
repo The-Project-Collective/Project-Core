@@ -1,6 +1,6 @@
 package com.collective.projectcore.entities.ai.goals;
 
-import com.collective.projectcore.entities.base.CoreAnimalEntity;
+import com.collective.projectcore.entities.CoreAnimalEntity;
 import net.minecraft.block.Block;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ai.goal.MoveToTargetPosGoal;
@@ -83,6 +83,7 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
                         }
                     }
                     wildlifeEntityBaby.setAgeTicks(0);
+                    wildlifeEntityBaby.setAttributes(3);
                     wildlifeEntityBaby.setGender(this.random.nextInt(2));
                     if (!wildlifeEntityBaby.isMigratory()) {
                         if (Objects.equals(wildlifeEntityBaby.getWorld().getBlockState(wildlifeEntityBaby.getSteppingPos()).getBlock(), wildlifeEntityBaby.getHomeBlockType())) {
@@ -101,14 +102,13 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
                             }
                         }
                     }
-                    wildlifeEntityBaby.setHunger(wildlifeEntityBaby.getMaxFood() / 2);
-                    //wildlifeEntityBaby.setEnrichment(wildlifeEntityBaby.getMaxEnrichment());
+                    wildlifeEntityBaby.setHunger(wildlifeEntityBaby.getMaxFood() / 4);
+                    wildlifeEntityBaby.setEnrichment(wildlifeEntityBaby.getMaxEnrichment());
                     wildlifeEntityBaby.setHungerTicks(1600);
-                    //wildlifeEntityBaby.setEnrichmentTicks(2000);
+                    wildlifeEntityBaby.setEnrichmentTicks(random.nextInt(600) + 1000);
                     /*if (wildlifeEntityBaby instanceof ZooTerrestrialEntity terrestrialBaby) {
                         terrestrialBaby.setTiredTicks(0);
                     }*/
-                    //wildlifeEntityBaby.setNewBaby(true);
                     double offset = (0.1 * (random.nextInt(4) + 1));
                     wildlifeEntityBaby.refreshPositionAndAngles(female.getX() + offset, female.getY(), female.getZ() + offset, 0.0F, 0.0F);
                     if (female.getOwner() != null && wildlifeEntityBaby.canBeTamed()) {
@@ -129,13 +129,17 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
             if (female.willParent() && !offspringList.isEmpty()) {
                 female.setOffspring(offspringList);
             }
-            if (getServerWorld(female).getEntity(UUID.fromString(female.getMateUUID())) instanceof CoreAnimalEntity male) {
-                if (male.isAlive()) {
-                    if (male.willParent() && !offspringList.isEmpty()) {
-                        male.setOffspring(offspringList);
-                    }
-                    if (!male.isMonogamous()) {
-                        male.setMateUUID("");
+            if (female.validateUUID(female.getMateUUID())) {
+                if (getServerWorld(female).getEntity(UUID.fromString(female.getMateUUID())) != null) {
+                    if (getServerWorld(female).getEntity(UUID.fromString(female.getMateUUID())) instanceof CoreAnimalEntity male) {
+                        if (male.isAlive()) {
+                            if (male.willParent() && !offspringList.isEmpty()) {
+                                male.setOffspring(offspringList);
+                            }
+                            if (!male.isMonogamous()) {
+                                male.setMateUUID("");
+                            }
+                        }
                     }
                 }
             }

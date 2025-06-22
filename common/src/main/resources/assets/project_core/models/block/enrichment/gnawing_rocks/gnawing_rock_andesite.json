@@ -1,0 +1,6 @@
+{
+  "parent": "project_core:block/enrichment/template_gnawing_rock",
+  "textures": {
+    "texture": "minecraft:block/andesite"
+  }
+}

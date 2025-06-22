@@ -1,5 +1,10 @@
 package com.collective.projectcore.util;
 
+import com.collective.projectcore.blocks.enrichment.ScratchingPostEnrichmentBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.BlockRenderView;
+
 public class UtilMethods {
 
     public static String sortStringUppercase(String string) {
@@ -14,5 +19,12 @@ public class UtilMethods {
             }
         }
         return upper+ newstr.toString();
+    }
+
+    public static int getBlockColour(BlockState state, BlockRenderView world, BlockPos pos, int tintIndex) {
+        if (tintIndex == 0 && state.contains(ScratchingPostEnrichmentBlock.COLOUR)) {
+            return state.get(ScratchingPostEnrichmentBlock.COLOUR).getFireworkColor();
+        }
+        return -1;
     }
 }

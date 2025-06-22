@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "project_core:bubble_machine",
+    "project_core:gnawing_rock_andesite",
+    "project_core:gnawing_rock_blackstone",
+    "project_core:gnawing_rock_calcite",
+    "project_core:gnawing_rock_cobbled_deepslate",
+    "project_core:gnawing_rock_cobblestone",
+    "project_core:gnawing_rock_deepslate",
+    "project_core:gnawing_rock_diorite",
+    "project_core:gnawing_rock_dripstone",
+    "project_core:gnawing_rock_granite",
+    "project_core:gnawing_rock_sandstone",
+    "project_core:gnawing_rock_stone",
+    "project_core:gnawing_rock_tuff"
+  ]
+}
