@@ -1,9 +1,7 @@
 package com.collective.projectcore.entities.ai.goals;
 
 import com.collective.projectcore.blocks.CoreEnrichmentBlock;
-import com.collective.projectcore.blocks.enrichment.GnawingRockEnrichmentBlock;
 import com.collective.projectcore.entities.CoreAnimalEntity;
-import com.collective.projectcore.groups.tags.CoreTags;
 import net.minecraft.entity.ai.goal.MoveToTargetPosGoal;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -26,23 +24,19 @@ public class CoreAnimalPlayWithEnrichmentGoal extends MoveToTargetPosGoal {
 
     @Override
     public boolean canStart() {
-        if (!coreAnimalEntity.isHappy()) {
-            return false;
-        } else if (coreAnimalEntity.getEnrichmentCooldown() > 0) {
+        if (this.coreAnimalEntity.isHappy()) {
             return false;
         } else {
-            return this.findTargetPos();
+            return this.coreAnimalEntity.getEnrichmentCooldown() <= 0 && this.findTargetPos();
         }
     }
 
     @Override
     public boolean shouldContinue() {
-        if (coreAnimalEntity.getEnrichment() >= coreAnimalEntity.getMaxEnrichment()) {
-            return false;
-        } else if (coreAnimalEntity.getEnrichmentCooldown() > 0) {
+        if (this.coreAnimalEntity.getEnrichment() >= this.coreAnimalEntity.getMaxEnrichment()) {
             return false;
         } else {
-            return super.shouldContinue();
+            return this.coreAnimalEntity.getEnrichmentCooldown() <= 0 && super.shouldContinue();
         }
     }
 
@@ -59,28 +53,31 @@ public class CoreAnimalPlayWithEnrichmentGoal extends MoveToTargetPosGoal {
     @Override
     public void tick() {
         super.tick();
-        if (hasReached()) {
+        if (this.hasReached()) {
             int enrichAmount = 5;
-            coreAnimalEntity.setEnrichment(coreAnimalEntity.getEnrichment() + enrichAmount);
-            if (coreAnimalEntity.getEnrichment() > coreAnimalEntity.getMaxEnrichment()) {
-                coreAnimalEntity.setEnrichment(coreAnimalEntity.getMaxEnrichment());
+            this.coreAnimalEntity.setEnrichment(this.coreAnimalEntity.getEnrichment() + enrichAmount);
+            if (this.coreAnimalEntity.getEnrichment() > this.coreAnimalEntity.getMaxEnrichment()) {
+                this.coreAnimalEntity.setEnrichment(this.coreAnimalEntity.getMaxEnrichment());
             }
-            coreAnimalEntity.getWorld().playSound(null, coreAnimalEntity.getSteppingPos(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.NEUTRAL, 1.0F, coreAnimalEntity.getPitch());
-            coreAnimalEntity.setEnrichmentCooldown(random.nextInt(600) + 1000);
+
+            this.coreAnimalEntity.getWorld().playSound(null, this.coreAnimalEntity.getSteppingPos(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.NEUTRAL, 1.0F, this.coreAnimalEntity.getPitch());
+            this.coreAnimalEntity.setEnrichmentCooldown(this.random.nextInt(600) + 1000);
         }
+
     }
 
     @Override
     protected boolean isTargetPos(WorldView pLevel, @NotNull BlockPos pPos) {
-        if (pLevel.getBlockState(pPos).getBlock() instanceof CoreEnrichmentBlock && pLevel.getBlockState(pPos).isIn(coreAnimalEntity.getAllowedEnrichment())) {
-            enrichmentBlock = (CoreEnrichmentBlock) pLevel.getBlockState(pPos).getBlock();
+        if (pLevel.getBlockState(pPos).getBlock() instanceof CoreEnrichmentBlock && pLevel.getBlockState(pPos).isIn(this.coreAnimalEntity.getAllowedEnrichment())) {
+            this.enrichmentBlock = (CoreEnrichmentBlock)pLevel.getBlockState(pPos).getBlock();
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     @Override
     public double getDesiredDistanceToTarget() {
-        return 2.0D;
+        return 2.0;
     }
 }
