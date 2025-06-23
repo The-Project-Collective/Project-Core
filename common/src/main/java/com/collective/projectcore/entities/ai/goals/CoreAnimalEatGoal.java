@@ -104,6 +104,7 @@ public class CoreAnimalEatGoal extends Goal {
             this.wildlifeEntity.setPathfindingPenalty(PathNodeType.WATER, this.oldWaterCost);
             if (wildlifeEntity.firstFeed) {
                 wildlifeEntity.setTirednessTicks(0);
+                wildlifeEntity.firstFeed = false;
             }
         } else {
             super.stop();
