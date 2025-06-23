@@ -90,6 +90,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     private boolean cathermalSleeping = false;
 
+    private String timeOfDay = "";
+
     private int counter = 0;
 
     protected CoreAnimalEntity(EntityType<? extends AnimalEntity> entityType, World world,
