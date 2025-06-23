@@ -89,6 +89,9 @@ public class CoreSpawnEggItem extends ArchitecturySpawnEggItem {
                             }
                         }
                     }
+                    if (baby.getsTired()) {
+                        baby.setTirednessTicks(random.nextInt(600) + 2400);
+                    }
                     baby.refreshPositionAndAngles(pos.getX(), pos.getY(), pos.getZ(), 0.0F, 0.0F);
                     world.spawnEntityAndPassengers(baby);
                     baby.setCustomName(stack.get(DataComponentTypes.CUSTOM_NAME));

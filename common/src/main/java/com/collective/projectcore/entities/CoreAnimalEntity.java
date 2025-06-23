@@ -64,7 +64,10 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     protected static final TrackedData<Optional<UUID>> OWNER_UUID;
     private static final TrackedData<String> PACK;
     private static final TrackedData<Integer> PREGNANCY_TICKS;
+    private static final TrackedData<Integer> RESTING_TICKS;
+    private static final TrackedData<Boolean> SLEEPING;
     protected static final TrackedData<Byte> TAMEABLE_FLAGS;
+    private static final TrackedData<Integer> TIREDNESS_TICKS;
 
     private static final UniformIntProvider ANGER_TIME_RANGE;
     private UUID angryAt;
@@ -78,16 +81,24 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     protected boolean hasAPack;
     protected boolean canBeTamed;
     protected boolean hasGenetics;
+    protected boolean doesSleep;
+    protected boolean getsTired;
 
     private boolean adultFlag = false;
     private boolean juviFlag = false;
     private boolean childFlag = false;
 
+    private boolean cathermalSleeping = false;
+    public boolean firstFeed = false;
+
+    private String timeOfDay = "";
+
     private int counter = 0;
 
     protected CoreAnimalEntity(EntityType<? extends AnimalEntity> entityType, World world,
                                boolean doesAge, boolean getsAngry, boolean doesBreed, boolean hasEnrichment, boolean hasGender,
-                               boolean hasHunger, boolean hasAPack, boolean canBeTamed, boolean hasGenetics) {
+                               boolean hasHunger, boolean hasAPack, boolean canBeTamed, boolean hasGenetics, boolean doesSleep,
+                               boolean getsTired) {
         super(entityType, world);
         this.doesAge = doesAge;
         this.getsAngry = getsAngry;
@@ -98,6 +109,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         this.hasAPack = hasAPack;
         this.canBeTamed = canBeTamed;
         this.hasGenetics = hasGenetics;
+        this.doesSleep = doesSleep;
+        this.getsTired = getsTired;
     }
 
     // === CHARACTERISTICS CONTROL =======================================================================================================================================================================
@@ -139,6 +152,14 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         return hasGenetics;
     }
 
+    public boolean doesSleep() {
+        return doesSleep;
+    }
+
+    public boolean getsTired() {
+        return getsTired;
+    }
+
     // === TICK HANDLING =======================================================================================================================================================================
 
     // --- Main Tickers ------------------------------------------------------------------------------------------
@@ -165,6 +186,12 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
                 if (!this.isBaby() && !this.isChild()) {
                     enrichmentHandler();
                 }
+            }
+            if (this.doesSleep()) {
+                sleepingHandler();
+            }
+            if (this.getsTired()) {
+                tirednessHandler();
             }
         }
     }
@@ -206,7 +233,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     // --- Breeding Tickers ------------------------------------------------------------------------------------------
     public void breedingHandler() {
-        if (this.isAdult() && !this.isPregnant() && this.isFull() && this.isHappy()) {
+        if (this.isAdult() && !this.isPregnant() && this.isFull() && this.isHappy() && !this.isSleeping()) {
             if (!this.isParent()) {
                 if (this.getBreedingTicks() > 0) {
                     this.setBreedingTicks(this.getBreedingTicks() - 1);
@@ -266,6 +293,74 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
                     this.setPack(List.of(this.getUuidAsString()));
                 }
             }
+        }
+    }
+
+    // --- Sleeping Ticker ------------------------------------------------------------------------------------------
+    public void sleepingHandler() {
+        String newTimeOfDay = calculateTimeOfDayString();
+        if (!newTimeOfDay.equals(this.timeOfDay)) {
+            this.timeOfDay = newTimeOfDay;
+            if (!this.isStarving() && !this.isAngry()) {
+                if (this.getSleepSchedules().contains("crepuscular")) {
+                    if (!calculateTimeOfDayString().equals("crepuscular")) {
+                        if (this.getSleepSchedules().contains("diurnal")) {
+                            this.setSleeping(!calculateTimeOfDayString().equals("diurnal"));
+                        } else if (this.getSleepSchedules().contains("nocturnal")) {
+                            this.setSleeping(!calculateTimeOfDayString().equals("nocturnal"));
+                        } else {
+                            this.setSleeping(true);
+                        }
+                    } else {
+                        this.setSleeping(false);
+                    }
+                } else if (this.getSleepSchedules().contains("diurnal")) {
+                    this.setSleeping(!calculateTimeOfDayString().equals("diurnal"));
+                } else if (this.getSleepSchedules().contains("nocturnal")) {
+                    this.setSleeping(!calculateTimeOfDayString().equals("nocturnal"));
+                } else {
+                    this.setSleeping(false);
+                }
+            } else {
+                this.setSleeping(false);
+            }
+        }
+    }
+
+    // --- Tiredness Ticker ------------------------------------------------------------------------------------------
+    public void tirednessHandler() {
+        if (this.getTirednessTicks() < 0) {
+            this.setTirednessTicks(0);
+        }
+        if (!this.isSleeping()) {
+            if (!this.isTired() && !this.isResting()) {
+                this.setTirednessTicks(this.getTirednessTicks() - 1);
+            } else if (this.isTired() && !this.isResting()){
+                if (!this.isStarving() && !this.isAngry()) {
+                    if (this.getSleepSchedules().contains("cathermal") && this.random.nextInt(2) == 0) {
+                        this.setSleeping(true);
+                        this.cathermalSleeping = true;
+                    }
+                    this.setRestingTicks(random.nextInt(600) + 600);
+                    this.setTirednessTicks(random.nextInt(600) + 2400);
+
+                }
+            } else if (this.isResting()) {
+                this.setRestingTicks(this.getRestingTicks() - 1);
+            }
+        } else {
+            if (this.getSleepSchedules().contains("cathermal") && cathermalSleeping) {
+                if (this.isResting()) {
+                    this.setRestingTicks(this.getRestingTicks() - 1);
+                } else {
+                    this.setSleeping(false);
+                    cathermalSleeping = false;
+                }
+            } else {
+                this.setRestingTicks(0);
+            }
+            this.setTirednessTicks(random.nextInt(600) + 2400);
+
         }
     }
 
@@ -365,14 +460,17 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
                     this.setPregnancyTicks(this.getGestationTicks());
                     this.setBreedingTicks(this.random.nextInt(12000) + 12000);
                     mate.setBreedingTicks(this.random.nextInt(6000) + 6000);
+                    world.sendEntityStatus(this, (byte)18);
                 } else if (mate.getGender() == 1) {
                     mate.setMateGenome(this.getGenome());
                     mate.setPregnancyTicks(this.getGestationTicks());
                     mate.setBreedingTicks(this.random.nextInt(12000) + 12000);
                     this.setBreedingTicks(this.random.nextInt(6000) + 6000);
+                    world.sendEntityStatus(mate, (byte)18);
                 }
+                this.setTirednessTicks(0);
+                mate.setTirednessTicks(0);
             }
-            world.sendEntityStatus(this, (byte)18);
         }
     }
 
@@ -397,6 +495,20 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         }
         if (this.getHunger() > maxFood) {
             this.setHunger(maxFood);
+        }
+    }
+
+    // --- Sleeping ------------------------------------------------------------------------------------------
+    public String calculateTimeOfDayString() {
+        long dayTicks = this.getWorld().getTimeOfDay();
+        if ((0L < dayTicks && dayTicks < 2000L) || (11000L < dayTicks && dayTicks < 14000L) || (23000L < dayTicks && dayTicks < 24000L)) {
+            return "crepuscular";
+        } else if (1000L <= dayTicks && dayTicks < 12000L) {
+            return "diurnal";
+        } else if (13000L <= dayTicks && dayTicks < 24000L) {
+            return "nocturnal";
+        } else {
+            return "diurnal";
         }
     }
 
@@ -595,7 +707,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         return !this.getOffspring().isEmpty();
     }
 
-    // --- Gender ------------------------------------------------------------------------------------------
+    // --- Enrichment ------------------------------------------------------------------------------------------
     public int getEnrichment() {
         return this.dataTracker.get(ENRICHMENT);
     }
@@ -856,6 +968,16 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         }
     }
 
+    // --- Sleeping ------------------------------------------------------------------------------------------
+    @Override
+    public boolean isSleeping() {
+        return this.dataTracker.get(SLEEPING);
+    }
+
+    public void setSleeping(boolean sleeping) {
+        this.dataTracker.set(SLEEPING, sleeping);
+    }
+
     // --- Taming ------------------------------------------------------------------------------------------
     @Nullable
     @Override
@@ -890,6 +1012,35 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         } else {
             this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b & -5));
         }
+    }
+
+    // --- Tiredness ------------------------------------------------------------------------------------------
+    public int getTirednessTicks() {
+        return this.dataTracker.get(TIREDNESS_TICKS);
+    }
+
+    public void setTirednessTicks(int ticks) {
+        this.dataTracker.set(TIREDNESS_TICKS, ticks);
+    }
+
+    public int getRestingTicks() {
+        return this.dataTracker.get(RESTING_TICKS);
+    }
+
+    public void setRestingTicks(int ticks) {
+        this.dataTracker.set(RESTING_TICKS, ticks);
+    }
+
+    public boolean isTired() {
+        if (this.isResting()) {
+            return false;
+        } else {
+            return this.getTirednessTicks() <= 0;
+        }
+    }
+
+    public boolean isResting() {
+        return this.getRestingTicks() > 0;
     }
 
     // --- UUIDs ------------------------------------------------------------------------------------------
@@ -1010,6 +1161,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     public abstract float getWidthDifference();
 
+    // --- Sleeping ------------------------------------------------------------------------------------------
+    public abstract List<String> getSleepSchedules();
 
     // --- Sounds ------------------------------------------------------------------------------------------
     @Override
@@ -1053,9 +1206,12 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         MOTHER_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         OFFSPRING = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         OWNER_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
-        TAMEABLE_FLAGS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.BYTE);
         PACK = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         PREGNANCY_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        RESTING_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        SLEEPING = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+        TAMEABLE_FLAGS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.BYTE);
+        TIREDNESS_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
     }
 
@@ -1084,7 +1240,10 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         builder.add(OWNER_UUID, Optional.empty());
         builder.add(PACK, "");
         builder.add(PREGNANCY_TICKS, 0);
+        builder.add(RESTING_TICKS, 0);
+        builder.add(SLEEPING, false);
         builder.add(TAMEABLE_FLAGS, (byte)0);
+        builder.add(TIREDNESS_TICKS, 0);
 
     }
 
@@ -1114,6 +1273,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         }
         nbt.putString("Pack", this.getPackString());
         nbt.putInt("PregnancyTicks", this.getPregnancyTicks());
+        nbt.putInt("RestingTicks", this.getRestingTicks());
+        nbt.putBoolean("Sleeping", this.isSleeping());
+        nbt.putInt("TirednessTicks", this.getTirednessTicks());
 
     }
 
@@ -1138,6 +1300,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         this.readTamingFromNBT(nbt);
         this.setPackString(nbt.getString("Pack"));
         this.setPregnancyTicks(nbt.getInt("PregnancyTicks"));
+        this.setRestingTicks(nbt.getInt("RestingTicks"));
+        this.setSleeping(nbt.getBoolean("Sleeping"));
+        this.setTirednessTicks(nbt.getInt("TirednessTicks"));
 
     }
 

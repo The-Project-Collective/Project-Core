@@ -35,6 +35,12 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
     }
 
     @Override
+    public void start() {
+        wildlifeEntity.setRestingTicks(0);
+        super.start();
+    }
+
+    @Override
     public boolean shouldContinue() {
         if (!wildlifeEntity.isPregnant() || wildlifeEntity.getPregnancyTicks() > 1) {
             return false;
@@ -106,9 +112,7 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
                     wildlifeEntityBaby.setEnrichment(wildlifeEntityBaby.getMaxEnrichment());
                     wildlifeEntityBaby.setHungerTicks(1600);
                     wildlifeEntityBaby.setEnrichmentTicks(random.nextInt(600) + 1000);
-                    /*if (wildlifeEntityBaby instanceof ZooTerrestrialEntity terrestrialBaby) {
-                        terrestrialBaby.setTiredTicks(0);
-                    }*/
+                    wildlifeEntityBaby.firstFeed = true;
                     double offset = (0.1 * (random.nextInt(4) + 1));
                     wildlifeEntityBaby.refreshPositionAndAngles(female.getX() + offset, female.getY(), female.getZ() + offset, 0.0F, 0.0F);
                     if (female.getOwner() != null && wildlifeEntityBaby.canBeTamed()) {
@@ -123,9 +127,9 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
                 }
             }
             female.setPregnancyTicks(0);
-                /*if (female instanceof ZooTerrestrialEntity terrestrialFemale) {
-                    terrestrialFemale.setTiredTicks(0);
-                }*/
+            if (female.getsTired()) {
+                female.setTirednessTicks(0);
+            }
             if (female.willParent() && !offspringList.isEmpty()) {
                 female.setOffspring(offspringList);
             }

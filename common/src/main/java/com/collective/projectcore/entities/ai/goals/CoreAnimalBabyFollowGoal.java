@@ -29,7 +29,7 @@ public class CoreAnimalBabyFollowGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        if (this.animal.isJuvenile() || this.animal.isAdult()) {
+        if (this.animal.isJuvenile() || this.animal.isAdult() || this.animal.isSleeping()) {
             return false;
         } else {
             List<? extends CoreAnimalEntity> list = this.animal.getWorld().getNonSpectatingEntities(this.animal.getClass(), this.animal.getBoundingBox().expand(HORIZONTAL_CHECK_RANGE, VERTICAL_CHECK_RANGE, HORIZONTAL_CHECK_RANGE));
@@ -109,6 +109,9 @@ public class CoreAnimalBabyFollowGoal extends Goal {
     @Override
     public void start() {
         this.delay = 0;
+        if (this.animal.isResting()) {
+            this.animal.setRestingTicks(0);
+        }
     }
 
     @Override
