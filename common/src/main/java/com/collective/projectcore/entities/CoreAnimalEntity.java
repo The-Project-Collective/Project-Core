@@ -88,6 +88,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private boolean juviFlag = false;
     private boolean childFlag = false;
 
+    private boolean cathermalSleeping = false;
+
     private int counter = 0;
 
     protected CoreAnimalEntity(EntityType<? extends AnimalEntity> entityType, World world,
@@ -293,27 +295,69 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     // --- Sleeping Ticker ------------------------------------------------------------------------------------------
     public void sleepingHandler() {
-        if (!this.isStarving() && !this.isAngry()) {
-            this.setSleeping(!this.getSleepSchedules().contains(this.calculateTimeOfDayString()));
-        } else {
-            this.setSleeping(false);
+        String newTimeOfDay = calculateTimeOfDayString();
+        if (!newTimeOfDay.equals(this.timeOfDay)) {
+            this.timeOfDay = newTimeOfDay;
+            if (!this.isStarving() && !this.isAngry()) {
+                if (this.getSleepSchedules().contains("crepuscular")) {
+                    if (!calculateTimeOfDayString().equals("crepuscular")) {
+                        if (this.getSleepSchedules().contains("diurnal")) {
+                            this.setSleeping(!calculateTimeOfDayString().equals("diurnal"));
+                        } else if (this.getSleepSchedules().contains("nocturnal")) {
+                            this.setSleeping(!calculateTimeOfDayString().equals("nocturnal"));
+                        } else {
+                            this.setSleeping(true);
+                        }
+                    } else {
+                        this.setSleeping(false);
+                    }
+                } else if (this.getSleepSchedules().contains("diurnal")) {
+                    this.setSleeping(!calculateTimeOfDayString().equals("diurnal"));
+                } else if (this.getSleepSchedules().contains("nocturnal")) {
+                    this.setSleeping(!calculateTimeOfDayString().equals("nocturnal"));
+                } else {
+                    this.setSleeping(false);
+                }
+            } else {
+                this.setSleeping(false);
+            }
         }
     }
 
     // --- Tiredness Ticker ------------------------------------------------------------------------------------------
     public void tirednessHandler() {
+        if (this.getTirednessTicks() < 0) {
+            this.setTirednessTicks(0);
+        }
         if (!this.isSleeping()) {
             if (!this.isTired() && !this.isResting()) {
                 this.setTirednessTicks(this.getTirednessTicks() - 1);
             } else if (this.isTired() && !this.isResting()){
                 if (!this.isStarving() && !this.isAngry()) {
+                    if (this.getSleepSchedules().contains("cathermal") && this.random.nextInt(2) == 0) {
+                        this.setSleeping(true);
+                        this.cathermalSleeping = true;
+                    }
                     this.setRestingTicks(random.nextInt(600) + 600);
                     this.setTirednessTicks(random.nextInt(600) + 2400);
+
                 }
+            } else if (this.isResting()) {
+                this.setRestingTicks(this.getRestingTicks() - 1);
             }
         } else {
+            if (this.getSleepSchedules().contains("cathermal") && cathermalSleeping) {
+                if (this.isResting()) {
+                    this.setRestingTicks(this.getRestingTicks() - 1);
+                } else {
+                    this.setSleeping(false);
+                    cathermalSleeping = false;
+                }
+            } else {
+                this.setRestingTicks(0);
+            }
             this.setTirednessTicks(random.nextInt(600) + 2400);
-            this.setRestingTicks(0);
+
         }
     }
 
@@ -453,13 +497,13 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     // --- Sleeping ------------------------------------------------------------------------------------------
     public String calculateTimeOfDayString() {
-        long dayTicks = this.getWorld().getTime();
-        if (1000 <= dayTicks && dayTicks < 12000) {
-            return "diurnal";
-        } else if (13000 <= dayTicks && dayTicks < 24000) {
-            return "nocturnal";
-        } else if ((0 <= dayTicks && dayTicks <= 2000) || (11000 <= dayTicks && dayTicks <= 14000) || (23000 <= dayTicks && dayTicks <= 24000)) {
+        long dayTicks = this.getWorld().getTimeOfDay();
+        if ((0L < dayTicks && dayTicks < 2000L) || (11000L < dayTicks && dayTicks < 14000L) || (23000L < dayTicks && dayTicks < 24000L)) {
             return "crepuscular";
+        } else if (1000L <= dayTicks && dayTicks < 12000L) {
+            return "diurnal";
+        } else if (13000L <= dayTicks && dayTicks < 24000L) {
+            return "nocturnal";
         } else {
             return "diurnal";
         }
@@ -988,7 +1032,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         if (this.isResting()) {
             return false;
         } else {
-            return this.getTirednessTicks() == 0;
+            return this.getTirednessTicks() <= 0;
         }
     }
 
@@ -1114,7 +1158,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     public abstract float getWidthDifference();
 
-    // --- Size ------------------------------------------------------------------------------------------
+    // --- Sleeping ------------------------------------------------------------------------------------------
     public abstract List<String> getSleepSchedules();
 
     // --- Sounds ------------------------------------------------------------------------------------------
