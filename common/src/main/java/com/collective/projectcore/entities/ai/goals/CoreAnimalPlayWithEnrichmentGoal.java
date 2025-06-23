@@ -24,7 +24,7 @@ public class CoreAnimalPlayWithEnrichmentGoal extends MoveToTargetPosGoal {
 
     @Override
     public boolean canStart() {
-        if (this.coreAnimalEntity.isHappy()) {
+        if (this.coreAnimalEntity.isHappy() || this.coreAnimalEntity.isSleeping() || this.coreAnimalEntity.isResting() || this.coreAnimalEntity.isTired()) {
             return false;
         } else {
             return this.coreAnimalEntity.getEnrichmentCooldown() <= 0 && this.findTargetPos();
@@ -33,7 +33,7 @@ public class CoreAnimalPlayWithEnrichmentGoal extends MoveToTargetPosGoal {
 
     @Override
     public boolean shouldContinue() {
-        if (this.coreAnimalEntity.getEnrichment() >= this.coreAnimalEntity.getMaxEnrichment()) {
+        if (this.coreAnimalEntity.getEnrichment() >= this.coreAnimalEntity.getMaxEnrichment()  || this.coreAnimalEntity.isSleeping() || this.coreAnimalEntity.isResting() || this.coreAnimalEntity.isTired()) {
             return false;
         } else {
             return this.coreAnimalEntity.getEnrichmentCooldown() <= 0 && super.shouldContinue();

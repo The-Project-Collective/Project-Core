@@ -16,7 +16,7 @@ public class CoreAnimalAvoidEnemyPackGoal<T extends LivingEntity> extends FleeEn
     }
 
     public boolean canStart() {
-        if (super.canStart() && this.targetEntity instanceof CoreAnimalEntity) {
+        if (super.canStart() && this.targetEntity instanceof CoreAnimalEntity && !animal.isSleeping()) {
             return !this.isInPack((CoreAnimalEntity) this.targetEntity, this.animal.getPack());
         } else {
             return false;
@@ -25,6 +25,9 @@ public class CoreAnimalAvoidEnemyPackGoal<T extends LivingEntity> extends FleeEn
 
     public void start() {
         this.animal.setTarget(null);
+        if (this.animal.isResting()) {
+            this.animal.setRestingTicks(0);
+        }
         super.start();
     }
 

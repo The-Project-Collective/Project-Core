@@ -41,7 +41,7 @@ public class CoreAnimalFollowLeaderGoal extends Goal {
     }
 
     public boolean canStart() {
-        if (this.mob.isChild() || this.mob.isBaby() || this.mob.getLeader().equals(this.mob.getUuidAsString())) {
+        if (this.mob.isChild() || this.mob.isBaby() || this.mob.getLeader().equals(this.mob.getUuidAsString()) || this.mob.isSleeping() || this.mob.isTired() || this.mob.isResting()) {
             return false;
         }
         List<CoreAnimalEntity> list = this.mob.getWorld().getEntitiesByClass(CoreAnimalEntity.class, this.mob.getBoundingBox().expand(this.maxDistance), this.targetPredicate);

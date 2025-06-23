@@ -47,7 +47,7 @@ public class CoreAnimalEatGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        if (wildlifeEntity.isHungry() || wildlifeEntity.isStarving()) {
+        if ((wildlifeEntity.isHungry() && !wildlifeEntity.isSleeping()) || (wildlifeEntity.isHungry() && !wildlifeEntity.isResting()) || wildlifeEntity.isStarving()) {
             if (this.wildlifeEntity.isBaby()) {
                 mother = this.getMother(wildlifeEntity.getMotherUUID());
                 return true;
@@ -80,6 +80,9 @@ public class CoreAnimalEatGoal extends Goal {
 
     @Override
     public void start() {
+        if (this.wildlifeEntity.isResting() && this.wildlifeEntity.isStarving()) {
+            this.wildlifeEntity.setRestingTicks(0);
+        }
         if (this.wildlifeEntity.isBaby() || this.wildlifeEntity.isChild()) {
             this.oldWaterCost = this.wildlifeEntity.getPathfindingPenalty(PathNodeType.WATER);
             this.wildlifeEntity.setPathfindingPenalty(PathNodeType.WATER, 0.0F);
