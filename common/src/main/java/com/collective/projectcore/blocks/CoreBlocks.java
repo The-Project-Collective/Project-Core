@@ -56,7 +56,7 @@ public class CoreBlocks {
     public static final RegistrySupplier<Block> SCRATCHING_POST_SPRUCE = registerBlock("scratching_post_spruce", () -> new ScratchingPostEnrichmentBlock(AbstractBlock.Settings.copy(Blocks.SPRUCE_LOG).mapColor(MapColor.SPRUCE_BROWN).registryKey(getBlockRegistryKey("scratching_post_spruce")).nonOpaque()), "husbandry");
     public static final RegistrySupplier<Block> SCRATCHING_POST_WARPED = registerBlock("scratching_post_warped", () -> new ScratchingPostEnrichmentBlock(AbstractBlock.Settings.copy(Blocks.WARPED_STEM).mapColor(MapColor.BLUE).registryKey(getBlockRegistryKey("scratching_post_warped")).nonOpaque()), "husbandry");
 
-    // --- Scratching Log ---
+    // --- Other Enrichment ---
     public static final RegistrySupplier<Block> BUBBLE_MACHINE = registerBlock("bubble_machine", () -> new BubbleMachineEnrichmentBlock(AbstractBlock.Settings.copy(Blocks.SMOOTH_STONE).mapColor(MapColor.LIGHT_GRAY).registryKey(getBlockRegistryKey("bubble_machine")).nonOpaque()), "husbandry");
 
 
