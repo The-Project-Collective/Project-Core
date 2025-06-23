@@ -112,9 +112,7 @@ public class CoreAnimalGiveBirthGoal extends MoveToTargetPosGoal {
                     wildlifeEntityBaby.setEnrichment(wildlifeEntityBaby.getMaxEnrichment());
                     wildlifeEntityBaby.setHungerTicks(1600);
                     wildlifeEntityBaby.setEnrichmentTicks(random.nextInt(600) + 1000);
-                    if (wildlifeEntityBaby.getsTired()) {
-                        wildlifeEntityBaby.setTirednessTicks(0);
-                    }
+                    wildlifeEntityBaby.firstFeed = true;
                     double offset = (0.1 * (random.nextInt(4) + 1));
                     wildlifeEntityBaby.refreshPositionAndAngles(female.getX() + offset, female.getY(), female.getZ() + offset, 0.0F, 0.0F);
                     if (female.getOwner() != null && wildlifeEntityBaby.canBeTamed()) {

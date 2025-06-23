@@ -89,6 +89,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private boolean childFlag = false;
 
     private boolean cathermalSleeping = false;
+    public boolean firstFeed = false;
 
     private String timeOfDay = "";
 
