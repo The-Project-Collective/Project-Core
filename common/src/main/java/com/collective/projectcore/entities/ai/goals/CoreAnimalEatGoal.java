@@ -47,7 +47,7 @@ public class CoreAnimalEatGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        if ((wildlifeEntity.isHungry() && !wildlifeEntity.isSleeping()) || (wildlifeEntity.isHungry() && !wildlifeEntity.isResting()) || wildlifeEntity.isStarving()) {
+        if ((wildlifeEntity.isHungry() && !wildlifeEntity.isSleeping()) || (wildlifeEntity.isHungry() && !wildlifeEntity.isResting()) || wildlifeEntity.isStarving() || (!wildlifeEntity.isFull() && wildlifeEntity.isBaby())) {
             if (this.wildlifeEntity.isBaby()) {
                 mother = this.getMother(wildlifeEntity.getMotherUUID());
                 return true;
