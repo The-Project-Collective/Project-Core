@@ -45,6 +45,48 @@ public class CoreSpawnEggItem extends ArchitecturySpawnEggItem {
     }
 
     @Override
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        World world = context.getWorld();
+        if (world.isClient) {
+            return ActionResult.SUCCESS;
+        } else {
+            ItemStack itemStack = context.getStack();
+            BlockPos blockPos = context.getBlockPos();
+            Direction direction = context.getSide();
+            BlockState blockState = world.getBlockState(blockPos);
+            BlockEntity var8 = world.getBlockEntity(blockPos);
+            EntityType entityType;
+            if (var8 instanceof Spawner spawner) {
+                entityType = this.getEntityType(world.getRegistryManager(), itemStack);
+                spawner.setEntityType(entityType, world.getRandom());
+                world.updateListeners(blockPos, blockState, blockState, 3);
+                world.emitGameEvent(context.getPlayer(), GameEvent.BLOCK_CHANGE, blockPos);
+                itemStack.decrement(1);
+                return ActionResult.SUCCESS;
+            } else {
+                BlockPos blockPos2;
+                if (blockState.getCollisionShape(world, blockPos).isEmpty()) {
+                    blockPos2 = blockPos;
+                } else {
+                    blockPos2 = blockPos.offset(direction);
+                }
+
+                entityType = this.getEntityType(world.getRegistryManager(), itemStack);
+                Entity entity = entityType.spawnFromItemStack((ServerWorld)world, itemStack, context.getPlayer(), blockPos2, SpawnReason.SPAWN_ITEM_USE, true, !Objects.equals(blockPos, blockPos2) && direction == Direction.UP);
+                if (entity != null) {
+                    if (entity instanceof CoreAnimalEntity coreAnimalEntity && coreAnimalEntity.hasGenetics()) {
+                        coreAnimalEntity.setGenome(coreAnimalEntity.calculateGenome());
+                    }
+                    itemStack.decrement(1);
+                    world.emitGameEvent(context.getPlayer(), GameEvent.ENTITY_PLACE, blockPos);
+                }
+
+                return ActionResult.SUCCESS;
+            }
+        }
+    }
+
+    @Override
     public ActionResult use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
         BlockHitResult blockHitResult = raycast(world, user, RaycastContext.FluidHandling.SOURCE_ONLY);
