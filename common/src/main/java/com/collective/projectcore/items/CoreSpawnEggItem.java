@@ -3,17 +3,34 @@ package com.collective.projectcore.items;
 import com.collective.projectcore.entities.CoreAnimalEntity;
 import dev.architectury.core.item.ArchitecturySpawnEggItem;
 import dev.architectury.registry.registries.RegistrySupplier;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.FluidBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.Spawner;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.stat.Stats;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
+import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 
 import java.util.*;
 
@@ -25,6 +42,38 @@ public class CoreSpawnEggItem extends ArchitecturySpawnEggItem {
     public CoreSpawnEggItem(RegistrySupplier<? extends EntityType<? extends MobEntity>> entityType, MutableText scientific, Settings properties) {
         super(entityType, properties);
         this.scientificName = scientific;
+    }
+
+    @Override
+    public ActionResult use(World world, PlayerEntity user, Hand hand) {
+        ItemStack itemStack = user.getStackInHand(hand);
+        BlockHitResult blockHitResult = raycast(world, user, RaycastContext.FluidHandling.SOURCE_ONLY);
+        if (blockHitResult.getType() != HitResult.Type.BLOCK) {
+            return ActionResult.PASS;
+        } else if (world instanceof ServerWorld serverWorld) {
+            BlockPos blockPos = blockHitResult.getBlockPos();
+            if (!(world.getBlockState(blockPos).getBlock() instanceof FluidBlock)) {
+                return ActionResult.PASS;
+            } else if (world.canPlayerModifyAt(user, blockPos) && user.canPlaceOn(blockPos, blockHitResult.getSide(), itemStack)) {
+                EntityType<?> entityType = this.getEntityType(serverWorld.getRegistryManager(), itemStack);
+                Entity entity = entityType.spawnFromItemStack(serverWorld, itemStack, user, blockPos, SpawnReason.SPAWN_ITEM_USE, false, false);
+                if (entity == null) {
+                    return ActionResult.PASS;
+                } else {
+                    if (entity instanceof CoreAnimalEntity coreAnimalEntity && coreAnimalEntity.hasGenetics()) {
+                        coreAnimalEntity.setGenome(coreAnimalEntity.calculateGenome());
+                    }
+                    itemStack.decrementUnlessCreative(1, user);
+                    user.incrementStat(Stats.USED.getOrCreateStat(this));
+                    world.emitGameEvent(user, GameEvent.ENTITY_PLACE, entity.getPos());
+                    return ActionResult.SUCCESS;
+                }
+            } else {
+                return ActionResult.FAIL;
+            }
+        } else {
+            return ActionResult.SUCCESS;
+        }
     }
 
     @Override
