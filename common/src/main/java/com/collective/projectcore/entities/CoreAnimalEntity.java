@@ -327,6 +327,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     // --- Tiredness Ticker ------------------------------------------------------------------------------------------
     public void tirednessHandler() {
+        if (this.firstFeed) {
+            this.setTirednessTicks(0);
+        }
         if (this.getTirednessTicks() < 0) {
             this.setTirednessTicks(0);
         }
@@ -341,6 +344,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
                     }
                     this.setRestingTicks(random.nextInt(600) + 600);
                     this.setTirednessTicks(random.nextInt(600) + 2400);
+                    if (this.firstFeed) {
+                        this.firstFeed = false;
+                    }
 
                 }
             } else if (this.isResting()) {
