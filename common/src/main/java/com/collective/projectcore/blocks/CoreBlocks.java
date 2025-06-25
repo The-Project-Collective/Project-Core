@@ -64,7 +64,7 @@ public class CoreBlocks {
 
     // === UTILITY / MACHINES ===
 
-    public static final RegistrySupplier<Block> FEEDER = registerBlock("feeder", () -> new FeederBlock(AbstractBlock.Settings.copy(Blocks.STONE).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("feeder"))), "core");
+    public static final RegistrySupplier<Block> FEEDER = registerBlock("feeder", () -> new FeederBlock(AbstractBlock.Settings.copy(Blocks.STONE).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("feeder")).nonOpaque()), "husbandry");
 
 
 
