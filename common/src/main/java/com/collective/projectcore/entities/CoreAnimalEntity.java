@@ -27,7 +27,9 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.ServerConfigHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -298,37 +300,36 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     // --- Sleeping Ticker ------------------------------------------------------------------------------------------
     public void sleepingHandler() {
-        String newTimeOfDay = calculateTimeOfDayString();
-        if (!newTimeOfDay.equals(this.timeOfDay)) {
-            this.timeOfDay = newTimeOfDay;
-            if (!this.isStarving() && !this.isAngry()) {
-                if (this.getSleepSchedules().contains("crepuscular")) {
-                    if (!calculateTimeOfDayString().equals("crepuscular")) {
-                        if (this.getSleepSchedules().contains("diurnal")) {
-                            this.setSleeping(!calculateTimeOfDayString().equals("diurnal"));
-                        } else if (this.getSleepSchedules().contains("nocturnal")) {
-                            this.setSleeping(!calculateTimeOfDayString().equals("nocturnal"));
-                        } else {
-                            this.setSleeping(true);
-                        }
+        if (!this.isStarving() && !this.isAngry()) {
+            if (this.getSleepSchedules().contains("crepuscular")) {
+                if (!calculateTimeOfDayString().equals("crepuscular")) {
+                    if (this.getSleepSchedules().contains("diurnal")) {
+                        this.setSleeping(!calculateTimeOfDayString().equals("diurnal"));
+                    } else if (this.getSleepSchedules().contains("nocturnal")) {
+                        this.setSleeping(!calculateTimeOfDayString().equals("nocturnal"));
                     } else {
-                        this.setSleeping(false);
+                        this.setSleeping(true);
                     }
-                } else if (this.getSleepSchedules().contains("diurnal")) {
-                    this.setSleeping(!calculateTimeOfDayString().equals("diurnal"));
-                } else if (this.getSleepSchedules().contains("nocturnal")) {
-                    this.setSleeping(!calculateTimeOfDayString().equals("nocturnal"));
                 } else {
                     this.setSleeping(false);
                 }
+            } else if (this.getSleepSchedules().contains("diurnal")) {
+                this.setSleeping(!calculateTimeOfDayString().equals("diurnal"));
+            } else if (this.getSleepSchedules().contains("nocturnal")) {
+                this.setSleeping(!calculateTimeOfDayString().equals("nocturnal"));
             } else {
                 this.setSleeping(false);
             }
+        } else {
+            this.setSleeping(false);
         }
     }
 
     // --- Tiredness Ticker ------------------------------------------------------------------------------------------
     public void tirednessHandler() {
+        if (this.firstFeed) {
+            this.setTirednessTicks(0);
+        }
         if (this.getTirednessTicks() < 0) {
             this.setTirednessTicks(0);
         }
@@ -343,6 +344,9 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
                     }
                     this.setRestingTicks(random.nextInt(600) + 600);
                     this.setTirednessTicks(random.nextInt(600) + 2400);
+                    if (this.firstFeed) {
+                        this.firstFeed = false;
+                    }
 
                 }
             } else if (this.isResting()) {
@@ -496,6 +500,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         if (this.getHunger() > maxFood) {
             this.setHunger(maxFood);
         }
+        this.getWorld().playSound(null, this.getSteppingPos(), SoundEvents.ENTITY_GENERIC_EAT.value(), SoundCategory.NEUTRAL, 1.0F, this.getPitch());
     }
 
     // --- Sleeping ------------------------------------------------------------------------------------------
@@ -801,6 +806,10 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         return Math.round(this.getMaxFood() * 0.8F);
     }
 
+    public boolean isCompletelyFull() {
+        return this.getHunger() >= this.getMaxFood();
+    }
+
     public boolean isFull() {
         return this.getHunger() >= this.getMaxFood() * 0.8F;
     }
@@ -837,12 +846,12 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     }
 
     public boolean canEatNutritionally(ItemStack itemStack) {
-        if (this.isFull()) {
+        if (this.isCompletelyFull()) {
             return false;
+        } else if (this.isFavouriteFood(itemStack)) {
+            return true;
         } else {
-            if (this.isFavouriteFood(itemStack)) {
-                return true;
-            } else return this.isHungry() && this.isValidFood(itemStack);
+            return !this.isFull() && this.isValidFood(itemStack);
         }
     }
 

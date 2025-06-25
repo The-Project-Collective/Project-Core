@@ -52,7 +52,7 @@ public class CoreAnimalEatGoal extends Goal {
                 mother = this.getMother(wildlifeEntity.getMotherUUID());
                 return true;
             }
-            if (feeder != null) {
+            if (feeder != null && wildlifeEntity.getWorld().getBlockEntity(feeder.getPos()) != null && this.isTargetPos(this.wildlifeEntity.getWorld(), feeder.getPos())) {
                 this.targetPos = feeder.getPos();
                 return true;
             } else {
@@ -65,6 +65,9 @@ public class CoreAnimalEatGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
+        if (feeder == null || wildlifeEntity.getWorld().getBlockEntity(feeder.getPos()) == null || !this.isTargetPos(this.wildlifeEntity.getWorld(), feeder.getPos())) {
+            return false;
+        }
         if (wildlifeEntity.getHunger() >= wildlifeEntity.getMaxFood()) {
             return false;
         } else {
@@ -102,10 +105,6 @@ public class CoreAnimalEatGoal extends Goal {
         if (this.wildlifeEntity.isBaby() || this.wildlifeEntity.isChild()) {
             this.mother = null;
             this.wildlifeEntity.setPathfindingPenalty(PathNodeType.WATER, this.oldWaterCost);
-            if (wildlifeEntity.firstFeed) {
-                wildlifeEntity.setTirednessTicks(0);
-                wildlifeEntity.firstFeed = false;
-            }
         } else {
             super.stop();
         }
@@ -131,7 +130,7 @@ public class CoreAnimalEatGoal extends Goal {
                 this.reached = false;
                 ++this.tryingTime;
                 if (this.shouldResetPath()) {
-                    this.mob.getNavigation().startMovingTo((double)blockPos.getX() + 0.5, (double)blockPos.getY(), (double)blockPos.getZ() + 0.5, this.speed);
+                    this.mob.getNavigation().startMovingTo((double) blockPos.getX() + 0.5, blockPos.getY(), (double) blockPos.getZ() + 0.5, this.speed);
                 }
             } else {
                 this.reached = true;

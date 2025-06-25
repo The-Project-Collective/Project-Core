@@ -137,7 +137,6 @@ public abstract class CoreSchoolingFishEntity extends CoreFishEntity {
 
     // --- Follow Leader Goal ------------------------------------------------------------------------------------------
     public static class CoreFollowSchoolLeaderGoal extends Goal {
-        private static final int MIN_SEARCH_DELAY = 200;
         private final CoreSchoolingFishEntity fish;
         private int moveDelay;
         private int checkSurroundingDelay;
