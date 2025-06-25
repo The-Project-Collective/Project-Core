@@ -410,11 +410,10 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
                 if (itemStack.getItem().equals(CoreItems.GROWTH_BOOSTING_HORMONE.get())) {
                     if (this.isStunted()) {
                         this.setStunted(false);
-                        this.showEmoteParticle(3);
                     } else {
                         this.setAgeTicks(this.getAgeTicks() + 24000);
-                        this.getWorld().sendEntityStatus(this, (byte)7);
                     }
+                    this.getWorld().sendEntityStatus(this, (byte)7);
                     ItemStack itemStack1 = ItemUsage.exchangeStack(itemStack, player, Items.GLASS_BOTTLE.getDefaultStack());
                     return ActionResult.SUCCESS.withNewHandStack(itemStack1);
                 }
@@ -429,11 +428,10 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
                 if (itemStack.getItem().equals(CoreItems.FERTILITY_TREATMENT.get()) && !this.isPregnant()) {
                     if (this.hasContraceptives()) {
                         this.setContraceptives(false);
-                        this.showEmoteParticle(3);
                     } else {
                         this.setBreedingTicks(0);
-                        this.getWorld().sendEntityStatus(this, (byte)7);
                     }
+                    this.getWorld().sendEntityStatus(this, (byte)7);
                     ItemStack itemStack1 = ItemUsage.exchangeStack(itemStack, player, Items.GLASS_BOTTLE.getDefaultStack());
                     return ActionResult.SUCCESS.withNewHandStack(itemStack1);
                 }
