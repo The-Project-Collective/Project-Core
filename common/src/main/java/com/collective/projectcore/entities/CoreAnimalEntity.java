@@ -27,7 +27,9 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.ServerConfigHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -496,6 +498,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         if (this.getHunger() > maxFood) {
             this.setHunger(maxFood);
         }
+        this.getWorld().playSound(null, this.getSteppingPos(), SoundEvents.ENTITY_GENERIC_EAT.value(), SoundCategory.NEUTRAL, 1.0F, this.getPitch());
     }
 
     // --- Sleeping ------------------------------------------------------------------------------------------
@@ -801,6 +804,10 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         return Math.round(this.getMaxFood() * 0.8F);
     }
 
+    public boolean isCompletelyFull() {
+        return this.getHunger() >= this.getMaxFood();
+    }
+
     public boolean isFull() {
         return this.getHunger() >= this.getMaxFood() * 0.8F;
     }
@@ -837,12 +844,12 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     }
 
     public boolean canEatNutritionally(ItemStack itemStack) {
-        if (this.isFull()) {
+        if (this.isCompletelyFull()) {
             return false;
+        } else if (this.isFavouriteFood(itemStack)) {
+            return true;
         } else {
-            if (this.isFavouriteFood(itemStack)) {
-                return true;
-            } else return this.isHungry() && this.isValidFood(itemStack);
+            return !this.isFull() && this.isValidFood(itemStack);
         }
     }
 
