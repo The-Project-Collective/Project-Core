@@ -28,6 +28,12 @@
 
   "block.project_core.bubble_machine": "Bubble Machine",
 
+  "block.project_core.feeder": "Feeder",
+
+
+  "screenhandler.project_core.feeder": "Feeder",
+
+
   "group.project_core.core_blocks": "Project Blocks: General",
   "group.project_core.core_items": "Project Items: General",
   "group.project_core.husbandry_blocks": "Project Blocks: Husbandry",

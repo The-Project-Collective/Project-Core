@@ -1,7 +1,10 @@
 package com.collective.projectcore.blocks.machines;
 
-import com.collective.projectcore.blockentities.CoreFeederBlockEntity;
+import com.collective.projectcore.blockentities.CoreBlockEntities;
+import com.collective.projectcore.blockentities.FeederBlockEntity;
 import com.collective.projectcore.blocks.CoreBlockWithEntity;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.block.*;
@@ -27,12 +30,26 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public abstract class CoreFeederBlock extends CoreBlockWithEntity {
+public class FeederBlock extends CoreBlockWithEntity {
+
+    public static final MapCodec<FeederBlock> CODEC = RecordCodecBuilder.mapCodec(
+            instance -> instance.group(createSettingsCodec()).apply(instance, FeederBlock::new));
 
     public static final EnumProperty<Direction> FACING = HorizontalFacingBlock.FACING;
 
-    public CoreFeederBlock(Settings settings) {
+    public FeederBlock(Settings settings) {
         super(settings);
+    }
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return CoreBlockEntities.FEEDER_ENTITY.get().instantiate(pos, state);
     }
 
     @Nullable
@@ -42,7 +59,7 @@ public abstract class CoreFeederBlock extends CoreBlockWithEntity {
             return null;
         } else {
             return (lvl, pos, blockState, t) -> {
-                if (t instanceof CoreFeederBlockEntity blockEntity) {
+                if (t instanceof FeederBlockEntity blockEntity) {
                     blockEntity.tick();
                 }
             };
@@ -72,7 +89,7 @@ public abstract class CoreFeederBlock extends CoreBlockWithEntity {
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (state.getBlock() != newState.getBlock()) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof CoreFeederBlockEntity feederEntity) {
+            if (blockEntity instanceof FeederBlockEntity feederEntity) {
                 ItemScatterer.spawn(world, pos, feederEntity);
                 world.updateComparators(pos,this);
             }

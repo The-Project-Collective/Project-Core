@@ -1,6 +1,6 @@
 package com.collective.projectcore.entities.ai.goals;
 
-import com.collective.projectcore.blockentities.CoreFeederBlockEntity;
+import com.collective.projectcore.blockentities.FeederBlockEntity;
 import com.collective.projectcore.entities.CoreAnimalEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.Goal;
@@ -29,7 +29,7 @@ public class CoreAnimalEatGoal extends Goal {
 
     private static final TargetPredicate PARTNER_TARGETING = TargetPredicate.createNonAttackable().setBaseMaxDistance(32.0).ignoreVisibility();
 
-    protected CoreFeederBlockEntity feeder;
+    protected FeederBlockEntity feeder;
     CoreAnimalEntity wildlifeEntity;
     CoreAnimalEntity mother;
     private float oldWaterCost;
@@ -191,8 +191,8 @@ public class CoreAnimalEatGoal extends Goal {
     }
 
     protected boolean isTargetPos(WorldView pLevel, @NotNull BlockPos pPos) {
-        if (pLevel.getBlockEntity(pPos) instanceof CoreFeederBlockEntity) {
-            feeder = (CoreFeederBlockEntity) pLevel.getBlockEntity(pPos);
+        if (pLevel.getBlockEntity(pPos) instanceof FeederBlockEntity) {
+            feeder = (FeederBlockEntity) pLevel.getBlockEntity(pPos);
             if (feeder != null) {
                 return feeder.hasFood(wildlifeEntity);
             }
