@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:glass_bottle",
+    "#project_core:diets/general/all_foods",
+    "minecraft:glistering_melon_slice",
+    "minecraft:bone_meal"
+  ],
+  "result": {
+    "count": 1,
+    "id": "project_core:growth_boosting_hormone"
+  }
+}

@@ -18,6 +18,7 @@ import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsage;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleEffect;
@@ -49,6 +50,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private static final TrackedData<Integer> AGE_TICKS;
     private static final TrackedData<Integer> ANGER_TIME;
     private static final TrackedData<Integer> BREEDING_TICKS;
+    private static final TrackedData<Boolean> CONTRACEPTIVES;
     private static final TrackedData<Integer> ENRICHMENT;
     private static final TrackedData<Integer> ENRICHMENT_COOLDOWN;
     private static final TrackedData<Integer> ENRICHMENT_TICKS;
@@ -68,6 +70,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private static final TrackedData<Integer> PREGNANCY_TICKS;
     private static final TrackedData<Integer> RESTING_TICKS;
     private static final TrackedData<Boolean> SLEEPING;
+    private static final TrackedData<Boolean> STUNTED;
     protected static final TrackedData<Byte> TAMEABLE_FLAGS;
     private static final TrackedData<Integer> TIREDNESS_TICKS;
 
@@ -169,10 +172,10 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     protected void mobTick(ServerWorld world) {
         super.mobTick(world);
         if (!this.getWorld().isClient()) {
-            if (this.doesAge()) {
+            if (this.doesAge() && !this.isStunted()) {
                 ageHandler();
             }
-            if (this.doesBreed() && this.isAdult()) {
+            if (this.doesBreed() && this.isAdult() && !this.hasContraceptives()) {
                 breedingHandler();
                 if (this.getGender() == 1) {
                     pregnancyHandler();
@@ -403,24 +406,58 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
                     }
                 }
             }
+            if (this.doesAge()) {
+                if (itemStack.getItem().equals(CoreItems.GROWTH_BOOSTING_HORMONE.get())) {
+                    if (this.isStunted()) {
+                        this.setStunted(false);
+                    } else {
+                        this.setAgeTicks(this.getAgeTicks() + 24000);
+                    }
+                    this.getWorld().sendEntityStatus(this, (byte)7);
+                    ItemStack itemStack1 = ItemUsage.exchangeStack(itemStack, player, Items.GLASS_BOTTLE.getDefaultStack());
+                    return ActionResult.SUCCESS.withNewHandStack(itemStack1);
+                }
+                if (itemStack.getItem().equals(CoreItems.GROWTH_STUNTING_HORMONE.get()) && !this.isStunted()) {
+                    this.setStunted(true);
+                    this.getWorld().sendEntityStatus(this, (byte)6);
+                    ItemStack itemStack1 = ItemUsage.exchangeStack(itemStack, player, Items.GLASS_BOTTLE.getDefaultStack());
+                    return ActionResult.SUCCESS.withNewHandStack(itemStack1);
+                }
+            }
+            if (this.doesBreed()) {
+                if (itemStack.getItem().equals(CoreItems.FERTILITY_TREATMENT.get()) && !this.isPregnant()) {
+                    if (this.hasContraceptives()) {
+                        this.setContraceptives(false);
+                    } else {
+                        this.setBreedingTicks(0);
+                    }
+                    this.getWorld().sendEntityStatus(this, (byte)7);
+                    ItemStack itemStack1 = ItemUsage.exchangeStack(itemStack, player, Items.GLASS_BOTTLE.getDefaultStack());
+                    return ActionResult.SUCCESS.withNewHandStack(itemStack1);
+                }
+                if (itemStack.getItem().equals(CoreItems.CONTRACEPTIVE_TREATMENT.get()) && !this.hasContraceptives() && !this.isPregnant()) {
+                    this.setContraceptives(true);
+                    if (this.hasGender()) {
+                        if (this.getGender() == 0) {
+                            this.setBreedingTicks(random.nextInt(6000) + 6000);
+                        } else {
+                            this.setBreedingTicks(random.nextInt(12000) + 12000);
+                        }
+                    } else {
+                        this.setBreedingTicks(random.nextInt(12000) + 12000);
+                    }
+                    this.getWorld().sendEntityStatus(this, (byte)6);
+                    ItemStack itemStack1 = ItemUsage.exchangeStack(itemStack, player, Items.GLASS_BOTTLE.getDefaultStack());
+                    return ActionResult.SUCCESS.withNewHandStack(itemStack1);
+                }
+            }
+
             if (player.getMainHandStack().getItem().equals(CoreItems.DEV_TOOL.get())) {
                 player.sendMessage(Text.literal("----------------------"), false);
                 player.sendMessage(Text.literal("Genome: " + this.getGenome()), false);
                 player.sendMessage(Text.literal("Gender: " + switch (this.getGender()) { case 1 -> "Female"; default -> "Male"; }), false);
                 player.sendMessage(Text.literal("Age: " + this.getAgeDays()), false);
-                player.sendMessage(Text.literal("Enrichment / Ticks / Cooldown: " + this.getEnrichment() + " | " + this.getEnrichmentTicks() + " | " + this.getEnrichmentCooldown()), false);
-                player.sendMessage(Text.literal("Hunger / Ticks: " + this.getHunger() + " | " + this.getHungerTicks()), false);
-                player.sendMessage(Text.literal("Parent?: " + this.isParent()), false);
-                player.sendMessage(Text.literal("Offspring: " + this.getOffspring().size() + " | " + this.getOffspringString()), false);
                 player.sendMessage(Text.literal("----------------------"), false);
-            }
-            if (player.getMainHandStack().getItem().equals(Items.STICK)) {
-                this.setAgeTicks(this.getAgeTicks() + 24000);
-                player.sendMessage(Text.literal("New Age: " + this.getAgeDays()), false);
-            }
-            if (player.getMainHandStack().getItem().equals(Items.REDSTONE)) {
-                this.setBreedingTicks(0);
-                player.sendMessage(Text.literal("New Breeding Ticks: " + this.getBreedingTicks()), false);
             }
             if (player.getMainHandStack().getItem().equals(Items.GLOWSTONE_DUST)) {
                 this.setPregnancyTicks(1);
@@ -550,18 +587,22 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     @Override
     public void handleStatus(byte status) {
         if (status == 7) {
-            this.showEmoteParticle(true);
+            this.showEmoteParticle(1);
         } else if (status == 6) {
-            this.showEmoteParticle(false);
+            this.showEmoteParticle(2);
         } else {
             super.handleStatus(status);
         }
     }
 
-    protected void showEmoteParticle(boolean positive) {
-        ParticleEffect particleEffect = ParticleTypes.HEART;
-        if (!positive) {
+    protected void showEmoteParticle(int type) {
+        ParticleEffect particleEffect;
+        if (type == 1) {
+            particleEffect = ParticleTypes.HEART;
+        } else if (type == 2) {
             particleEffect = ParticleTypes.SMOKE;
+        } else {
+            particleEffect = ParticleTypes.HAPPY_VILLAGER;
         }
         for(int i = 0; i < 7; ++i) {
             double d = this.random.nextGaussian() * 0.02;
@@ -623,6 +664,14 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     public boolean isAdult() {
         return this.getAgeDays() >= this.getAdultDays();
+    }
+
+    public boolean isStunted() {
+        return this.dataTracker.get(STUNTED);
+    }
+
+    public void setStunted(boolean stunted) {
+        this.dataTracker.set(STUNTED, stunted);
     }
 
     // --- Anger ------------------------------------------------------------------------------------------
@@ -710,6 +759,14 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     public boolean isParent() {
         return !this.getOffspring().isEmpty();
+    }
+
+    public boolean hasContraceptives() {
+        return this.dataTracker.get(CONTRACEPTIVES);
+    }
+
+    public void setContraceptives(boolean contraceptives) {
+        this.dataTracker.set(CONTRACEPTIVES, contraceptives);
     }
 
     // --- Enrichment ------------------------------------------------------------------------------------------
@@ -1200,6 +1257,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         ANGER_TIME = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         ANGER_TIME_RANGE = TimeHelper.betweenSeconds(20, 39);
         BREEDING_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        CONTRACEPTIVES = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
         ENRICHMENT = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         ENRICHMENT_COOLDOWN = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         ENRICHMENT_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -1219,6 +1277,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         PREGNANCY_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         RESTING_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         SLEEPING = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+        STUNTED = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
         TAMEABLE_FLAGS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.BYTE);
         TIREDNESS_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
@@ -1232,6 +1291,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         builder.add(AGE_TICKS, 0);
         builder.add(ANGER_TIME, 0);
         builder.add(BREEDING_TICKS, 0);
+        builder.add(CONTRACEPTIVES, false);
         builder.add(ENRICHMENT, 0);
         builder.add(ENRICHMENT_COOLDOWN, 0);
         builder.add(ENRICHMENT_TICKS, 0);
@@ -1251,6 +1311,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         builder.add(PREGNANCY_TICKS, 0);
         builder.add(RESTING_TICKS, 0);
         builder.add(SLEEPING, false);
+        builder.add(STUNTED, false);
         builder.add(TAMEABLE_FLAGS, (byte)0);
         builder.add(TIREDNESS_TICKS, 0);
 
@@ -1263,6 +1324,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         nbt.putInt("AgeTicks", this.getAgeTicks());
         this.writeAngerToNbt(nbt);
         nbt.putInt("BreedingTicks", this.getBreedingTicks());
+        nbt.putBoolean("Contraceptives", this.hasContraceptives());
         nbt.putInt("Enrichment", this.getEnrichment());
         nbt.putInt("EnrichmentCooldown", this.getEnrichmentCooldown());
         nbt.putInt("EnrichmentTicks", this.getEnrichmentTicks());
@@ -1284,6 +1346,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         nbt.putInt("PregnancyTicks", this.getPregnancyTicks());
         nbt.putInt("RestingTicks", this.getRestingTicks());
         nbt.putBoolean("Sleeping", this.isSleeping());
+        nbt.putBoolean("Stunted", this.isStunted());
         nbt.putInt("TirednessTicks", this.getTirednessTicks());
 
     }
@@ -1294,6 +1357,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         this.setAgeTicks(nbt.getInt("AgeTicks"));
         this.readAngerFromNbt(this.getWorld(), nbt);
         this.setBreedingTicks(nbt.getInt("BreedingTicks"));
+        this.setContraceptives(nbt.getBoolean("Contraceptives"));
         this.setEnrichment(nbt.getInt("Enrichment"));
         this.setEnrichmentCooldown(nbt.getInt("EnrichmentCooldown"));
         this.setEnrichmentTicks(nbt.getInt("EnrichmentTicks"));
@@ -1311,6 +1375,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         this.setPregnancyTicks(nbt.getInt("PregnancyTicks"));
         this.setRestingTicks(nbt.getInt("RestingTicks"));
         this.setSleeping(nbt.getBoolean("Sleeping"));
+        this.setStunted(nbt.getBoolean("Stunted"));
         this.setTirednessTicks(nbt.getInt("TirednessTicks"));
 
     }

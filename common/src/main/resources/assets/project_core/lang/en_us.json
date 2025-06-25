@@ -1,6 +1,12 @@
 {
   "item.project_core.dev_tool": "Dev Tool",
 
+  "item.project_core.growth_boosting_hormone": "Growth Boosting Hormone",
+  "item.project_core.growth_stunting_hormone": "Growth Stunting Hormone",
+  "item.project_core.fertility_treatment": "Fertility Treatment",
+  "item.project_core.contraceptive_treatment": "Contraceptive Treatment",
+
+
   "block.project_core.gnawing_rock_andesite": "Andesite Gnawing Rock",
   "block.project_core.gnawing_rock_blackstone": "Blackstone Gnawing Rock",
   "block.project_core.gnawing_rock_calcite": "Calcite Gnawing Rock",
@@ -37,6 +43,7 @@
   "group.project_core.core_blocks": "Project Blocks: General",
   "group.project_core.core_items": "Project Items: General",
   "group.project_core.husbandry_blocks": "Project Blocks: Husbandry",
+  "group.project_core.husbandry_items": "Project Items: Husbandry",
 
 
   "tag.item.project_core.diets.general.all_foods": "All Foods",
