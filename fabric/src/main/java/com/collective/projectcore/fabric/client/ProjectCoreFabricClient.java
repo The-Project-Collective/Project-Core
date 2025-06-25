@@ -1,7 +1,10 @@
 package com.collective.projectcore.fabric.client;
 
 import com.collective.projectcore.blocks.CoreBlocks;
+import com.collective.projectcore.screens.handlers.CoreScreenHandlers;
+import com.collective.projectcore.screens.machines.FeederScreen;
 import com.collective.projectcore.util.UtilMethods;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 
@@ -10,6 +13,7 @@ public final class ProjectCoreFabricClient implements ClientModInitializer {
     public void onInitializeClient() {
         // This entrypoint is suitable for setting up client-specific logic, such as rendering.
         registerColourProviders();
+        registerScreens();
     }
 
     public void registerColourProviders() {
@@ -26,5 +30,13 @@ public final class ProjectCoreFabricClient implements ClientModInitializer {
                 CoreBlocks.SCRATCHING_POST_PALE_OAK.get(),
                 CoreBlocks.SCRATCHING_POST_SPRUCE.get(),
                 CoreBlocks.SCRATCHING_POST_WARPED.get());
+    }
+
+    public static void registerScreens() {
+        if (CoreScreenHandlers.SCREEN_HANDLERS.getRegistrar() != null) {
+            if (CoreScreenHandlers.FEEDER_SCREEN_HANDLER.isPresent()) {
+                MenuRegistry.registerScreenFactory(CoreScreenHandlers.FEEDER_SCREEN_HANDLER.get(), FeederScreen::new);
+            }
+        }
     }
 }

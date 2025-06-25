@@ -2,9 +2,9 @@ package com.collective.projectcore.blockentities;
 
 import com.collective.projectcore.blockentities.base.CoreBaseLockableContainerBlockEntity;
 import com.collective.projectcore.entities.CoreAnimalEntity;
+import com.collective.projectcore.screens.handlers.machines.FeederScreenHandler;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SidedInventory;
@@ -24,19 +24,24 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class CoreFeederBlockEntity extends CoreBaseLockableContainerBlockEntity implements SidedInventory, ExtendedMenuProvider {
+public class FeederBlockEntity extends CoreBaseLockableContainerBlockEntity implements SidedInventory, ExtendedMenuProvider {
 
     public static final int INVENTORY_SIZE = 18;
     private DefaultedList<ItemStack> inventory;
 
-    public CoreFeederBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
-        super(blockEntityType, blockPos, blockState);
+    public FeederBlockEntity(BlockPos blockPos, BlockState blockState) {
+        super(CoreBlockEntities.FEEDER_ENTITY.get(), blockPos, blockState);
         this.inventory = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
     }
 
     @Override
     protected Text getContainerName() {
-        return (Text) Text.EMPTY;
+        return Text.translatable("screenhandler.project_core.feeder");
+    }
+
+    @Override
+    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+        return new FeederScreenHandler(syncId, playerInventory, this);
     }
 
     @Override
@@ -137,10 +142,6 @@ public class CoreFeederBlockEntity extends CoreBaseLockableContainerBlockEntity 
         this.inventory = inventory;
     }
 
-    @Override
-    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
-        return null;
-    }
 
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {

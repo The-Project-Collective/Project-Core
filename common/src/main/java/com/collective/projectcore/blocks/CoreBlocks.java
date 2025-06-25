@@ -4,6 +4,7 @@ import com.collective.projectcore.ProjectCore;
 import com.collective.projectcore.blocks.enrichment.BubbleMachineEnrichmentBlock;
 import com.collective.projectcore.blocks.enrichment.GnawingRockEnrichmentBlock;
 import com.collective.projectcore.blocks.enrichment.ScratchingPostEnrichmentBlock;
+import com.collective.projectcore.blocks.machines.FeederBlock;
 import com.collective.projectcore.groups.CoreTabGroups;
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.registries.DeferredRegister;
@@ -58,6 +59,12 @@ public class CoreBlocks {
 
     // --- Other Enrichment ---
     public static final RegistrySupplier<Block> BUBBLE_MACHINE = registerBlock("bubble_machine", () -> new BubbleMachineEnrichmentBlock(AbstractBlock.Settings.copy(Blocks.SMOOTH_STONE).mapColor(MapColor.LIGHT_GRAY).registryKey(getBlockRegistryKey("bubble_machine")).nonOpaque()), "husbandry");
+
+
+
+    // === UTILITY / MACHINES ===
+
+    public static final RegistrySupplier<Block> FEEDER = registerBlock("feeder", () -> new FeederBlock(AbstractBlock.Settings.copy(Blocks.STONE).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("feeder")).nonOpaque()), "husbandry");
 
 
 
