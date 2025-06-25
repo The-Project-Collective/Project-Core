@@ -24,5 +24,6 @@ public class CoreTabGroups {
 
     public static final RegistrySupplier<ItemGroup> HUSBANDRY_BLOCKS = TAB_GROUPS.register("husbandry_blocks", () -> CreativeTabRegistry
             .create(Text.translatable("group.project_core.husbandry_blocks"), () -> new ItemStack(CoreBlocks.GNAWING_ROCK_STONE.get())));
-
+    public static final RegistrySupplier<ItemGroup> HUSBANDRY_ITEMS = TAB_GROUPS.register("husbandry_items", () -> CreativeTabRegistry
+            .create(Text.translatable("group.project_core.husbandry_items"), () -> new ItemStack(CoreItems.GROWTH_BOOSTING_HORMONE.get())));
 }
