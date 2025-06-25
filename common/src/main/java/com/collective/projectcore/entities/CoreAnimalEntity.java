@@ -300,32 +300,28 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     // --- Sleeping Ticker ------------------------------------------------------------------------------------------
     public void sleepingHandler() {
-        String newTimeOfDay = calculateTimeOfDayString();
-        if (!newTimeOfDay.equals(this.timeOfDay)) {
-            this.timeOfDay = newTimeOfDay;
-            if (!this.isStarving() && !this.isAngry()) {
-                if (this.getSleepSchedules().contains("crepuscular")) {
-                    if (!calculateTimeOfDayString().equals("crepuscular")) {
-                        if (this.getSleepSchedules().contains("diurnal")) {
-                            this.setSleeping(!calculateTimeOfDayString().equals("diurnal"));
-                        } else if (this.getSleepSchedules().contains("nocturnal")) {
-                            this.setSleeping(!calculateTimeOfDayString().equals("nocturnal"));
-                        } else {
-                            this.setSleeping(true);
-                        }
+        if (!this.isStarving() && !this.isAngry()) {
+            if (this.getSleepSchedules().contains("crepuscular")) {
+                if (!calculateTimeOfDayString().equals("crepuscular")) {
+                    if (this.getSleepSchedules().contains("diurnal")) {
+                        this.setSleeping(!calculateTimeOfDayString().equals("diurnal"));
+                    } else if (this.getSleepSchedules().contains("nocturnal")) {
+                        this.setSleeping(!calculateTimeOfDayString().equals("nocturnal"));
                     } else {
-                        this.setSleeping(false);
+                        this.setSleeping(true);
                     }
-                } else if (this.getSleepSchedules().contains("diurnal")) {
-                    this.setSleeping(!calculateTimeOfDayString().equals("diurnal"));
-                } else if (this.getSleepSchedules().contains("nocturnal")) {
-                    this.setSleeping(!calculateTimeOfDayString().equals("nocturnal"));
                 } else {
                     this.setSleeping(false);
                 }
+            } else if (this.getSleepSchedules().contains("diurnal")) {
+                this.setSleeping(!calculateTimeOfDayString().equals("diurnal"));
+            } else if (this.getSleepSchedules().contains("nocturnal")) {
+                this.setSleeping(!calculateTimeOfDayString().equals("nocturnal"));
             } else {
                 this.setSleeping(false);
             }
+        } else {
+            this.setSleeping(false);
         }
     }
 
