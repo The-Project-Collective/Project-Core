@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_core:block/traps/box_trap/medium/medium_box_trap"
+  }
+}

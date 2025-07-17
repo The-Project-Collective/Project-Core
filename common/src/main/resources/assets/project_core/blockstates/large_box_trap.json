@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "open=true": {
+      "model": "project_core:block/traps/box_trap/large/large_box_trap_open"
+    },
+    "open=false": {
+      "model": "project_core:block/traps/box_trap/large/large_box_trap"
+    }
+  }
+}

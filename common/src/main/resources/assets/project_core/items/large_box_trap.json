@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_core:block/traps/box_trap/large/large_box_trap"
+  }
+}

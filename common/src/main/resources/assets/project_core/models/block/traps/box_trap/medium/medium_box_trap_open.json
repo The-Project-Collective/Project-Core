@@ -1,0 +1,6 @@
+{
+  "parent": "project_core:block/traps/box_trap/template_box_trap",
+  "textures": {
+    "1": "project_core:block/traps/box_trap/medium/box_trap_medium_open"
+  }
+}

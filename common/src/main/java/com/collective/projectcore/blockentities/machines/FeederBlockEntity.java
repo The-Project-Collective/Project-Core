@@ -1,6 +1,7 @@
-package com.collective.projectcore.blockentities;
+package com.collective.projectcore.blockentities.machines;
 
-import com.collective.projectcore.blockentities.base.CoreBaseLockableContainerBlockEntity;
+import com.collective.projectcore.blockentities.CoreBlockEntities;
+import com.collective.projectcore.blockentities.CoreBaseLockableContainerBlockEntity;
 import com.collective.projectcore.entities.CoreAnimalEntity;
 import com.collective.projectcore.screens.handlers.machines.FeederScreenHandler;
 import dev.architectury.registry.menu.ExtendedMenuProvider;

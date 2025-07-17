@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "project_core:block/traps/box_trap/small/box_trap_small"
+  }
+}
