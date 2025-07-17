@@ -33,10 +33,12 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -112,6 +114,14 @@ public abstract class CoreBoxTrapBlock extends CoreBlockWithEntity {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        return world.getBlockState(pos.offset(Direction.Axis.X, 1)).isAir() &&
+                world.getBlockState(pos.offset(Direction.Axis.X, -1)).isAir() &&
+                world.getBlockState(pos.offset(Direction.Axis.Z, 1)).isAir() &&
+                world.getBlockState(pos.offset(Direction.Axis.Z, -1)).isAir();
     }
 
     @Override
