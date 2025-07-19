@@ -49,6 +49,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private static final TrackedData<Float> AGE_SCALE;
     private static final TrackedData<Integer> AGE_TICKS;
     private static final TrackedData<Integer> ANGER_TIME;
+    private static final TrackedData<String> BIRTH_PARENT_UUID;
     private static final TrackedData<Integer> BREEDING_TICKS;
     private static final TrackedData<Boolean> CONTRACEPTIVES;
     private static final TrackedData<Integer> ENRICHMENT;
@@ -1110,6 +1111,14 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     }
 
     // --- UUIDs ------------------------------------------------------------------------------------------
+    public String getBirthParentUUID() {
+        return this.dataTracker.get(BIRTH_PARENT_UUID);
+    }
+
+    public void setBirthParentUUID(String uuid) {
+        this.dataTracker.set(BIRTH_PARENT_UUID, uuid);
+    }
+
     public String getMotherUUID() {
         return this.dataTracker.get(MOTHER_UUID);
     }
@@ -1256,6 +1265,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         AGE_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         ANGER_TIME = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         ANGER_TIME_RANGE = TimeHelper.betweenSeconds(20, 39);
+        BIRTH_PARENT_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         BREEDING_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
         CONTRACEPTIVES = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
         ENRICHMENT = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -1290,6 +1300,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         builder.add(AGE_SCALE, 0f);
         builder.add(AGE_TICKS, 0);
         builder.add(ANGER_TIME, 0);
+        builder.add(BIRTH_PARENT_UUID, "");
         builder.add(BREEDING_TICKS, 0);
         builder.add(CONTRACEPTIVES, false);
         builder.add(ENRICHMENT, 0);
@@ -1323,6 +1334,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         super.writeCustomDataToNbt(nbt);
         nbt.putInt("AgeTicks", this.getAgeTicks());
         this.writeAngerToNbt(nbt);
+        nbt.putString("BirthParentUUID", this.getBirthParentUUID());
         nbt.putInt("BreedingTicks", this.getBreedingTicks());
         nbt.putBoolean("Contraceptives", this.hasContraceptives());
         nbt.putInt("Enrichment", this.getEnrichment());
@@ -1356,6 +1368,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         super.readCustomDataFromNbt(nbt);
         this.setAgeTicks(nbt.getInt("AgeTicks"));
         this.readAngerFromNbt(this.getWorld(), nbt);
+        this.setBirthParentUUID(nbt.getString("BirthParentUUID"));
         this.setBreedingTicks(nbt.getInt("BreedingTicks"));
         this.setContraceptives(nbt.getBoolean("Contraceptives"));
         this.setEnrichment(nbt.getInt("Enrichment"));

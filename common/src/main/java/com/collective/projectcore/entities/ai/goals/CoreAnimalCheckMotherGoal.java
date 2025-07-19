@@ -33,21 +33,25 @@ public class CoreAnimalCheckMotherGoal extends Goal {
         list.removeIf(animal -> animal.getGender() == 0);
         String animalEntity = "";
         double d = Double.MAX_VALUE;
-        if (!this.animal.getMotherUUID().isEmpty()) {
-            if (this.animal.getWorld() instanceof ServerWorld serverWorld) {
-                if (serverWorld.getEntity(UUID.fromString(this.animal.getMotherUUID())) instanceof CoreAnimalEntity wildlifeEntity) {
-                    if (wildlifeEntity.isAlive()) {
-                        animalEntity = wildlifeEntity.getUuidAsString();
-                    }
-                }
-
-            }
+        if (!this.animal.getBirthParentUUID().isEmpty() && this.animal.getWorld() instanceof ServerWorld serverWorld && serverWorld.getEntity(UUID.fromString(this.animal.getBirthParentUUID())) instanceof CoreAnimalEntity wildlifeEntity && wildlifeEntity.isAlive()) {
+            animalEntity = wildlifeEntity.getUuidAsString();
         } else {
-            for (CoreAnimalEntity animalEntity2 : list) {
-                double e = this.animal.squaredDistanceTo(animalEntity2);
-                if (!(e > d)) {
-                    d = e;
-                    animalEntity = animalEntity2.getUuidAsString();
+            if (!this.animal.getMotherUUID().isEmpty()) {
+                if (this.animal.getWorld() instanceof ServerWorld serverWorld) {
+                    if (serverWorld.getEntity(UUID.fromString(this.animal.getMotherUUID())) instanceof CoreAnimalEntity wildlifeEntity) {
+                        if (wildlifeEntity.isAlive()) {
+                            animalEntity = wildlifeEntity.getUuidAsString();
+                        }
+                    }
+
+                }
+            } else {
+                for (CoreAnimalEntity animalEntity2 : list) {
+                    double e = this.animal.squaredDistanceTo(animalEntity2);
+                    if (!(e > d)) {
+                        d = e;
+                        animalEntity = animalEntity2.getUuidAsString();
+                    }
                 }
             }
         }

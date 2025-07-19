@@ -3,6 +3,8 @@ package com.collective.projectcore.blocks;
 import com.collective.projectcore.blockentities.traps.CoreBoxTrapBlockEntity;
 import com.collective.projectcore.entities.CoreAnimalEntity;
 import com.collective.projectcore.groups.tags.CoreTags;
+import com.collective.projectcore.util.networking.packets.BoxTrapParticlePacket;
+import dev.architectury.networking.NetworkManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
@@ -20,9 +22,11 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -40,6 +44,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldEvents;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 
@@ -135,22 +140,12 @@ public abstract class CoreBoxTrapBlock extends CoreBlockWithEntity {
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (player.isSneaking() || state.get(OPEN)) {
+        if (player.isSneaking() || world.isClient() || state.get(OPEN)) {
             return ActionResult.FAIL;
         }
         else {
-            boolean success = false;
-            if (!world.isClient()) {
-                success = tryReleaseEntity(state, (ServerWorld) world, pos);
-            }
-            if (success) {
-                if (world.isClient()) {
-                    this.handleParticles(ParticleTypes.POOF, world, pos);
-                }
-                return ActionResult.SUCCESS;
-            } else {
-                return ActionResult.FAIL;
-            }
+            boolean success = tryReleaseEntity(state, (ServerWorld) world, pos);
+            return success ? ActionResult.SUCCESS : ActionResult.FAIL;
         }
     }
 
@@ -164,6 +159,7 @@ public abstract class CoreBoxTrapBlock extends CoreBlockWithEntity {
                 world.playSound(null, pos, SoundEvents.BLOCK_BARREL_OPEN, SoundCategory.BLOCKS, 0.3F, 0.8F);
                 world.setBlockState(pos, state.with(OPEN, true));
                 blockEntity.clearEntityData();
+                this.sendTrapParticlePacket(world, pos);
                 return true;
             }
             else {
@@ -175,29 +171,27 @@ public abstract class CoreBoxTrapBlock extends CoreBlockWithEntity {
 
     @Override
     protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-        boolean captured = false;
-        CoreBoxTrapBlockEntity boxEntity = (CoreBoxTrapBlockEntity)world.getBlockEntity(pos);
+        CoreBoxTrapBlockEntity boxEntity = (CoreBoxTrapBlockEntity) world.getBlockEntity(pos);
         if (!world.isClient() && !(entity instanceof PlayerEntity) && entity.isAlive() && entity instanceof LivingEntity) {
             if (boxEntity != null && !boxEntity.isOccupied() && entity instanceof MobEntity mobEntity) {
                 if ((mobEntity instanceof CoreAnimalEntity coreAnimalEntity && coreAnimalEntity.doesAge() && coreAnimalEntity.isAdult()) || (!(mobEntity instanceof CoreAnimalEntity) && !mobEntity.isBaby())) {
                     boxEntity.captureEntity(mobEntity);
                     world.playSound(null, pos, SoundEvents.BLOCK_BARREL_CLOSE, SoundCategory.BLOCKS, 0.3F, 0.8F);
                     world.setBlockState(pos, state.with(OPEN, false));
-                    captured = true;
+                    if (world instanceof ServerWorld serverWorld) {
+                        this.sendTrapParticlePacket(serverWorld, pos);
+                    }
                 }
             }
-        } if (world.isClient() && captured) {
-            this.handleParticles(ParticleTypes.POOF, world, pos);
         }
     }
 
-    public void handleParticles(ParticleEffect particleEffect, World world, BlockPos pos) {
-        Random random = new Random();
-        for(int i = 0; i < 7; ++i) {
-            double d = random.nextFloat() * 0.02;
-            double e = random.nextFloat() * 0.02;
-            double f = random.nextFloat() * 0.02;
-            world.addImportantParticle(particleEffect, pos.getX() + random.nextFloat(), pos.getY() + 2, pos.getZ() + random.nextFloat(), d, e, f);
+    private void sendTrapParticlePacket(ServerWorld world, BlockPos pos) {
+        BoxTrapParticlePacket packet = new BoxTrapParticlePacket(pos);
+        for (ServerPlayerEntity player : world.getPlayers()) {
+            if (player.getBlockPos().isWithinDistance(pos, 32)) { // Optional: only nearby players
+                NetworkManager.sendToPlayer(player, packet);
+            }
         }
     }
 

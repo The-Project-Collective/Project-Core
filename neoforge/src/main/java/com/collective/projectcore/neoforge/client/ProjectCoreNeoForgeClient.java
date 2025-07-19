@@ -1,6 +1,7 @@
 package com.collective.projectcore.neoforge.client;
 
 import com.collective.projectcore.ProjectCore;
+import com.collective.projectcore.ProjectCoreClientCommon;
 import com.collective.projectcore.blocks.CoreBlocks;
 import com.collective.projectcore.screens.handlers.CoreScreenHandlers;
 import com.collective.projectcore.screens.machines.FeederScreen;
@@ -18,6 +19,7 @@ public class ProjectCoreNeoForgeClient {
 
     public ProjectCoreNeoForgeClient(IEventBus modBus) {
         modBus.register(this);
+        ProjectCoreClientCommon.registerCommonClient();
     }
 
     @SubscribeEvent
