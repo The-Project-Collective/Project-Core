@@ -1,6 +1,7 @@
 package com.collective.projectcore.blocks;
 
 import com.collective.projectcore.blockentities.traps.CoreBoxTrapBlockEntity;
+import com.collective.projectcore.entities.CoreAnimalEntity;
 import com.collective.projectcore.groups.tags.CoreTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -134,12 +135,22 @@ public abstract class CoreBoxTrapBlock extends CoreBlockWithEntity {
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (player.isSneaking() || world.isClient() || state.get(OPEN)) {
+        if (player.isSneaking() || state.get(OPEN)) {
             return ActionResult.FAIL;
         }
         else {
-            boolean success = tryReleaseEntity(state, (ServerWorld) world, pos);
-            return success ? ActionResult.SUCCESS : ActionResult.FAIL;
+            boolean success = false;
+            if (!world.isClient()) {
+                success = tryReleaseEntity(state, (ServerWorld) world, pos);
+            }
+            if (success) {
+                if (world.isClient()) {
+                    this.handleParticles(ParticleTypes.POOF, world, pos);
+                }
+                return ActionResult.SUCCESS;
+            } else {
+                return ActionResult.FAIL;
+            }
         }
     }
 
@@ -153,7 +164,6 @@ public abstract class CoreBoxTrapBlock extends CoreBlockWithEntity {
                 world.playSound(null, pos, SoundEvents.BLOCK_BARREL_OPEN, SoundCategory.BLOCKS, 0.3F, 0.8F);
                 world.setBlockState(pos, state.with(OPEN, true));
                 blockEntity.clearEntityData();
-                this.handleParticles(ParticleTypes.POOF, world, pos); // This doesn't work yet.
                 return true;
             }
             else {
@@ -165,14 +175,19 @@ public abstract class CoreBoxTrapBlock extends CoreBlockWithEntity {
 
     @Override
     protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        boolean captured = false;
         CoreBoxTrapBlockEntity boxEntity = (CoreBoxTrapBlockEntity)world.getBlockEntity(pos);
         if (!world.isClient() && !(entity instanceof PlayerEntity) && entity.isAlive() && entity instanceof LivingEntity) {
             if (boxEntity != null && !boxEntity.isOccupied() && entity instanceof MobEntity mobEntity) {
-                boxEntity.captureEntity(mobEntity);
-                world.playSound(null, pos, SoundEvents.BLOCK_BARREL_CLOSE, SoundCategory.BLOCKS, 0.3F, 0.8F);
-                world.setBlockState(pos, state.with(OPEN, false));
-                this.handleParticles(ParticleTypes.POOF, world, pos);
+                if ((mobEntity instanceof CoreAnimalEntity coreAnimalEntity && coreAnimalEntity.doesAge() && coreAnimalEntity.isAdult()) || (!(mobEntity instanceof CoreAnimalEntity) && !mobEntity.isBaby())) {
+                    boxEntity.captureEntity(mobEntity);
+                    world.playSound(null, pos, SoundEvents.BLOCK_BARREL_CLOSE, SoundCategory.BLOCKS, 0.3F, 0.8F);
+                    world.setBlockState(pos, state.with(OPEN, false));
+                    captured = true;
+                }
             }
+        } if (world.isClient() && captured) {
+            this.handleParticles(ParticleTypes.POOF, world, pos);
         }
     }
 
