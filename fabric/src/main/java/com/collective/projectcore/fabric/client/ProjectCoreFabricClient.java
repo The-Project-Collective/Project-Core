@@ -1,5 +1,6 @@
 package com.collective.projectcore.fabric.client;
 
+import com.collective.projectcore.ProjectCoreClientCommon;
 import com.collective.projectcore.blocks.CoreBlocks;
 import com.collective.projectcore.screens.handlers.CoreScreenHandlers;
 import com.collective.projectcore.screens.machines.FeederScreen;
@@ -14,6 +15,7 @@ public final class ProjectCoreFabricClient implements ClientModInitializer {
         // This entrypoint is suitable for setting up client-specific logic, such as rendering.
         registerColourProviders();
         registerScreens();
+        ProjectCoreClientCommon.registerCommonClient();
     }
 
     public void registerColourProviders() {

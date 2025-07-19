@@ -1,7 +1,7 @@
 package com.collective.projectcore.blocks.machines;
 
 import com.collective.projectcore.blockentities.CoreBlockEntities;
-import com.collective.projectcore.blockentities.FeederBlockEntity;
+import com.collective.projectcore.blockentities.machines.FeederBlockEntity;
 import com.collective.projectcore.blocks.CoreBlockWithEntity;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

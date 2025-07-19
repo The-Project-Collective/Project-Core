@@ -5,6 +5,9 @@ import com.collective.projectcore.blocks.enrichment.BubbleMachineEnrichmentBlock
 import com.collective.projectcore.blocks.enrichment.GnawingRockEnrichmentBlock;
 import com.collective.projectcore.blocks.enrichment.ScratchingPostEnrichmentBlock;
 import com.collective.projectcore.blocks.machines.FeederBlock;
+import com.collective.projectcore.blocks.traps.LargeBoxTrapBlock;
+import com.collective.projectcore.blocks.traps.MediumBoxTrapBlock;
+import com.collective.projectcore.blocks.traps.SmallBoxTrapBlock;
 import com.collective.projectcore.groups.CoreTabGroups;
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.registries.DeferredRegister;
@@ -59,6 +62,15 @@ public class CoreBlocks {
 
     // --- Other Enrichment ---
     public static final RegistrySupplier<Block> BUBBLE_MACHINE = registerBlock("bubble_machine", () -> new BubbleMachineEnrichmentBlock(AbstractBlock.Settings.copy(Blocks.SMOOTH_STONE).mapColor(MapColor.LIGHT_GRAY).registryKey(getBlockRegistryKey("bubble_machine")).nonOpaque()), "husbandry");
+
+
+
+    // === HUSBANDRY ===
+
+    // Traps
+    public static final RegistrySupplier<Block> LARGE_BOX_TRAP = registerBlock("large_box_trap", () -> new LargeBoxTrapBlock(AbstractBlock.Settings.copy(Blocks.OAK_WOOD).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("large_box_trap")).nonOpaque()), "husbandry");
+    public static final RegistrySupplier<Block> MEDIUM_BOX_TRAP = registerBlock("medium_box_trap", () -> new MediumBoxTrapBlock(AbstractBlock.Settings.copy(Blocks.OAK_WOOD).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("medium_box_trap")).nonOpaque()), "husbandry");
+    public static final RegistrySupplier<Block> SMALL_BOX_TRAP = registerBlock("small_box_trap", () -> new SmallBoxTrapBlock(AbstractBlock.Settings.copy(Blocks.OAK_WOOD).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("small_box_trap")).nonOpaque()), "husbandry");
 
 
 

@@ -1,6 +1,6 @@
 package com.collective.projectcore.entities.ai.goals;
 
-import com.collective.projectcore.blockentities.FeederBlockEntity;
+import com.collective.projectcore.blockentities.machines.FeederBlockEntity;
 import com.collective.projectcore.entities.CoreAnimalEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.Goal;
