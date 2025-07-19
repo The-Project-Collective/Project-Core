@@ -1,7 +1,7 @@
-package com.collective.projectcore.blocks.traps;
+package com.collective.projectcore.blocks.traps.net_traps;
 
 import com.collective.projectcore.blockentities.CoreBlockEntities;
-import com.collective.projectcore.blocks.CoreBoxTrapBlock;
+import com.collective.projectcore.blocks.traps.CoreNetTrapBlock;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.BlockState;
@@ -10,12 +10,12 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
-public class MediumBoxTrapBlock extends CoreBoxTrapBlock {
+public class MediumNetTrapBlock extends CoreNetTrapBlock {
 
-    public static final MapCodec<MediumBoxTrapBlock> CODEC = RecordCodecBuilder.mapCodec(
-            instance -> instance.group(createSettingsCodec()).apply(instance, MediumBoxTrapBlock::new));
+    public static final MapCodec<MediumNetTrapBlock> CODEC = RecordCodecBuilder.mapCodec(
+            instance -> instance.group(createSettingsCodec()).apply(instance, MediumNetTrapBlock::new));
 
-    public MediumBoxTrapBlock(Settings settings) {
+    public MediumNetTrapBlock(Settings settings) {
         super(settings);
     }
 
@@ -27,7 +27,7 @@ public class MediumBoxTrapBlock extends CoreBoxTrapBlock {
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return CoreBlockEntities.MEDIUM_BOX_TRAP_ENTITY.get().instantiate(pos, state);
+        return CoreBlockEntities.MEDIUM_NET_TRAP_ENTITY.get().instantiate(pos, state);
     }
 
 }

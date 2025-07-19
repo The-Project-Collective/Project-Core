@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "project_core:block/traps/net_trap/medium/medium_net_trap"
+  }
+}

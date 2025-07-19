@@ -45,10 +45,15 @@ public class CoreTags {
 
     // === TRAPS ===
 
-    // Whitelists
+    // Box Trap Whitelists
     public static final TagKey<EntityType<?>> SMALL_BOX_TRAP_WHITELIST = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(ProjectCore.MOD_ID, "traps/box_traps/small_box_trap_whitelist"));
     public static final TagKey<EntityType<?>> MEDIUM_BOX_TRAP_WHITELIST = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(ProjectCore.MOD_ID, "traps/box_traps/medium_box_trap_whitelist"));
     public static final TagKey<EntityType<?>> LARGE_BOX_TRAP_WHITELIST = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(ProjectCore.MOD_ID, "traps/box_traps/large_box_trap_whitelist"));
+
+    // Net Trap Whitelists
+    public static final TagKey<EntityType<?>> SMALL_NET_TRAP_WHITELIST = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(ProjectCore.MOD_ID, "traps/net_traps/small_net_trap_whitelist"));
+    public static final TagKey<EntityType<?>> MEDIUM_NET_TRAP_WHITELIST = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(ProjectCore.MOD_ID, "traps/net_traps/medium_net_trap_whitelist"));
+    public static final TagKey<EntityType<?>> LARGE_NET_TRAP_WHITELIST = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(ProjectCore.MOD_ID, "traps/net_traps/large_net_trap_whitelist"));
 
 
 
