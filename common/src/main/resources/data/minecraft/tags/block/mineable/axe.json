@@ -11,6 +11,10 @@
     "project_core:scratching_post_oak",
     "project_core:scratching_post_pale_oak",
     "project_core:scratching_post_spruce",
-    "project_core:scratching_post_warped"
+    "project_core:scratching_post_warped",
+
+    "project_core:large_box_trap",
+    "project_core:medium_box_trap",
+    "project_core:small_box_trap"
   ]
 }

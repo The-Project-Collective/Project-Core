@@ -19,8 +19,9 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -29,6 +30,7 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
@@ -37,12 +39,12 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 public abstract class CoreBoxTrapBlock extends CoreBlockWithEntity {
 
@@ -83,21 +85,24 @@ public abstract class CoreBoxTrapBlock extends CoreBlockWithEntity {
     }
 
     @Override
-    public void onBroken(WorldAccess world, BlockPos pos, BlockState state) {
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         if (!world.isClient()) {
             BlockEntity be = world.getBlockEntity(pos);
             if (be instanceof CoreBoxTrapBlockEntity trap) {
                 ItemStack stack = new ItemStack(this);
-                if (world instanceof ServerWorld serverWorld) {
-                    RegistryWrapper.WrapperLookup registries = serverWorld.getRegistryManager();
-                    NbtCompound beNbt = new NbtCompound();
-                    trap.writeNbt(beNbt, registries);
+                if (trap.isOccupied()) {
+                    NbtCompound beNbt = trap.createNbtWithId(world.getRegistryManager());
+                    System.out.println("Item NBT: "+beNbt);
                     stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.of(beNbt));
                     ItemScatterer.spawn(Objects.requireNonNull(Objects.requireNonNull(world.getBlockEntity(pos)).getWorld()), pos.getX(), pos.getY(), pos.getZ(), stack);
+                } else {
+                    if (!player.isCreative()) {
+                        ItemScatterer.spawn(Objects.requireNonNull(Objects.requireNonNull(world.getBlockEntity(pos)).getWorld()), pos.getX(), pos.getY(), pos.getZ(), stack);
+                    }
                 }
             }
         }
-        super.onBroken(world, pos, state);
+        return super.onBreak(world, pos, state, player);
     }
 
     @Override
@@ -110,6 +115,9 @@ public abstract class CoreBoxTrapBlock extends CoreBlockWithEntity {
                 if (component != null) {
                     if (world instanceof ServerWorld serverWorld) {
                         trap.readNbt(component.copyNbt(), serverWorld.getRegistryManager());
+                        if (trap.isOccupied()) {
+                            world.setBlockState(pos, state.with(OPEN, false));
+                        }
                     }
                 }
             }
@@ -140,11 +148,12 @@ public abstract class CoreBoxTrapBlock extends CoreBlockWithEntity {
         if (blockEntity != null) {
             MobEntity mob = blockEntity.releaseEntity(world);
             if (mob != null) {
-                mob.refreshPositionAndAngles(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, world.random.nextFloat() * 360F, 0.0F);
+                mob.refreshPositionAndAngles(pos.getX() + 2, pos.getY() + 0.5, pos.getZ() + 2, world.random.nextFloat() * 360F, 0.0F);
                 world.spawnEntity(mob);
-                world.playSound(null, pos, SoundEvents.BLOCK_WOODEN_PRESSURE_PLATE_CLICK_ON, SoundCategory.BLOCKS, 0.3F, 0.8F);
+                world.playSound(null, pos, SoundEvents.BLOCK_BARREL_OPEN, SoundCategory.BLOCKS, 0.3F, 0.8F);
                 world.setBlockState(pos, state.with(OPEN, true));
                 blockEntity.clearEntityData();
+                this.handleParticles(ParticleTypes.POOF, world, pos); // This doesn't work yet.
                 return true;
             }
             else {
@@ -160,9 +169,20 @@ public abstract class CoreBoxTrapBlock extends CoreBlockWithEntity {
         if (!world.isClient() && !(entity instanceof PlayerEntity) && entity.isAlive() && entity instanceof LivingEntity) {
             if (boxEntity != null && !boxEntity.isOccupied() && entity instanceof MobEntity mobEntity) {
                 boxEntity.captureEntity(mobEntity);
-                world.playSound(null, pos, SoundEvents.BLOCK_WOODEN_PRESSURE_PLATE_CLICK_ON, SoundCategory.BLOCKS, 0.3F, 0.8F);
+                world.playSound(null, pos, SoundEvents.BLOCK_BARREL_CLOSE, SoundCategory.BLOCKS, 0.3F, 0.8F);
                 world.setBlockState(pos, state.with(OPEN, false));
+                this.handleParticles(ParticleTypes.POOF, world, pos);
             }
+        }
+    }
+
+    public void handleParticles(ParticleEffect particleEffect, World world, BlockPos pos) {
+        Random random = new Random();
+        for(int i = 0; i < 7; ++i) {
+            double d = random.nextFloat() * 0.02;
+            double e = random.nextFloat() * 0.02;
+            double f = random.nextFloat() * 0.02;
+            world.addImportantParticle(particleEffect, pos.getX() + random.nextFloat(), pos.getY() + 2, pos.getZ() + random.nextFloat(), d, e, f);
         }
     }
 
@@ -170,29 +190,35 @@ public abstract class CoreBoxTrapBlock extends CoreBlockWithEntity {
     @Override
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         NbtComponent nbtComponent = stack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
-        if (nbtComponent == null) return;
-        NbtCompound entityNbt = nbtComponent.getNbt();
-        String entityId = entityNbt.getString("id");
-        if (entityId.isEmpty()) return;
-        EntityType<?> entityType = Registries.ENTITY_TYPE.get(Identifier.of(entityId));
-        tooltip.add(Text.translatable("tooltip.project_core.box_trap.entity", entityId));
-        if (entityNbt.contains("CustomName")) {
-            String customName = entityNbt.getString("CustomName");
-            tooltip.add(Text.translatable("tooltip.project_core.box_trap.entity_name", customName));
-        }
-        if (entityType.isIn(CoreTags.ALL_ENTITIES)) {
-            if (entityType.isIn(CoreTags.ALL_ENTITIES)) {
-                if (entityNbt.contains("Age")) {
-                    int age = entityNbt.getInt("Age");
-                    tooltip.add(Text.translatable("tooltip.project_core.box_trap.entity_age", age));
+        if (nbtComponent != null) {
+            NbtCompound entityNbt = nbtComponent.getNbt().copy().getCompound("EntityTag");
+            String entityId = entityNbt.getString("id");
+            if (!entityId.isEmpty()) {
+                EntityType<?> entityType = Registries.ENTITY_TYPE.get(Identifier.of(entityId));
+                tooltip.add(Text.translatable(entityType.toString()).formatted(Formatting.ITALIC, Formatting.YELLOW));
+                if (entityNbt.contains("CustomName")) {
+                    String customName = entityNbt.getString("CustomName");
+                    tooltip.add(Text.translatable("tooltip.project_core.box_trap.custom_name", customName).formatted(Formatting.ITALIC, Formatting.GRAY));
                 }
-            }
-            if (entityType.isIn(CoreTags.ALL_ENTITIES)) {
-                if (entityNbt.contains("Gender")) {
-                    String gender = entityNbt.getString("Gender");
-                    tooltip.add(Text.translatable("tooltip.project_core.box_trap.entity_gender", gender));
+                if (entityType.isIn(CoreTags.ALL_ENTITIES)) {
+                    if (entityType.isIn(CoreTags.ALL_ENTITIES)) {
+                        if (entityNbt.contains("AgeTicks")) {
+                            int age = entityNbt.getInt("AgeTicks") / 24000;
+                            tooltip.add(Text.translatable("tooltip.project_core.box_trap.age", age).formatted(Formatting.ITALIC, Formatting.GRAY));
+                        }
+                    }
+                    if (entityType.isIn(CoreTags.ALL_ENTITIES)) {
+                        if (entityNbt.contains("Gender")) {
+                            String gender = entityNbt.getInt("Gender") == 0 ? "tooltip.project_core.box_trap.male" : "tooltip.project_core.box_trap.female";
+                            tooltip.add(Text.translatable(gender).formatted(Formatting.ITALIC, Formatting.GRAY));
+                        }
+                    }
                 }
+            } else {
+                tooltip.add(Text.translatable("tooltip.project_core.box_trap.empty").formatted(Formatting.ITALIC, Formatting.GRAY));
             }
+        } else {
+            tooltip.add(Text.translatable("tooltip.project_core.box_trap.empty").formatted(Formatting.ITALIC, Formatting.GRAY));
         }
 
     }

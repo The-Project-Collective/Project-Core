@@ -68,9 +68,9 @@ public class CoreBlocks {
     // === HUSBANDRY ===
 
     // Traps
-    public static final RegistrySupplier<Block> SMALL_BOX_TRAP = registerBlock("small_box_trap", () -> new SmallBoxTrapBlock(AbstractBlock.Settings.copy(Blocks.OAK_WOOD).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("small_box_trap")).nonOpaque()), "husbandry");
-    public static final RegistrySupplier<Block> MEDIUM_BOX_TRAP = registerBlock("medium_box_trap", () -> new MediumBoxTrapBlock(AbstractBlock.Settings.copy(Blocks.OAK_WOOD).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("medium_box_trap")).nonOpaque()), "husbandry");
     public static final RegistrySupplier<Block> LARGE_BOX_TRAP = registerBlock("large_box_trap", () -> new LargeBoxTrapBlock(AbstractBlock.Settings.copy(Blocks.OAK_WOOD).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("large_box_trap")).nonOpaque()), "husbandry");
+    public static final RegistrySupplier<Block> MEDIUM_BOX_TRAP = registerBlock("medium_box_trap", () -> new MediumBoxTrapBlock(AbstractBlock.Settings.copy(Blocks.OAK_WOOD).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("medium_box_trap")).nonOpaque()), "husbandry");
+    public static final RegistrySupplier<Block> SMALL_BOX_TRAP = registerBlock("small_box_trap", () -> new SmallBoxTrapBlock(AbstractBlock.Settings.copy(Blocks.OAK_WOOD).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("small_box_trap")).nonOpaque()), "husbandry");
 
 
 
