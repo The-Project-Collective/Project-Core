@@ -1,6 +1,5 @@
 package com.collective.projectcore.blocks.enrichment;
 
-import com.collective.projectcore.blocks.CoreEnrichmentBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemPlacementContext;

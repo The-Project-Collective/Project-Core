@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "open=true": {
+      "model": "project_core:block/traps/net_trap/large/large_net_trap_open"
+    },
+    "open=false": {
+      "model": "project_core:block/traps/net_trap/large/large_net_trap"
+    }
+  }
+}

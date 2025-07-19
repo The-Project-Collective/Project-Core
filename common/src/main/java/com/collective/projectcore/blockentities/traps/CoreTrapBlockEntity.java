@@ -1,30 +1,64 @@
 package com.collective.projectcore.blockentities.traps;
 
 import com.collective.projectcore.blockentities.CoreBaseBlockEntity;
+import com.collective.projectcore.blocks.traps.CoreTrapBlock;
+import com.collective.projectcore.entities.CoreAnimalEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Objects;
 
-public abstract class CoreBoxTrapBlockEntity extends CoreBaseBlockEntity {
+import static com.collective.projectcore.blocks.traps.CoreTrapBlock.OPEN;
+
+public abstract class CoreTrapBlockEntity extends CoreBaseBlockEntity {
 
     private NbtCompound data;
     private boolean occupied;
 
-    public CoreBoxTrapBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    public CoreTrapBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+    }
+
+    public void tick(World world, BlockState state, CoreTrapBlockEntity trapBlockEntity) {
+        if (world.isClient()) return;
+        BlockPos pos = trapBlockEntity.getPos();
+        Box detectionBox = new Box(pos).expand(0.25);
+        List<LivingEntity> nearby = world.getNonSpectatingEntities(LivingEntity.class, detectionBox);
+        for (LivingEntity entity : nearby) {
+            if (!world.isClient() && !(entity instanceof PlayerEntity) && entity.isAlive() && entity instanceof LivingEntity) {
+                if (!trapBlockEntity.isOccupied() && entity instanceof MobEntity mobEntity && trapBlockEntity.isAllowed(mobEntity)) {
+                    if ((mobEntity instanceof CoreAnimalEntity coreAnimalEntity && coreAnimalEntity.doesAge() && coreAnimalEntity.isAdult()) || (!(mobEntity instanceof CoreAnimalEntity) && !mobEntity.isBaby())) {
+                        trapBlockEntity.captureEntity(mobEntity);
+                        world.playSound(null, pos, SoundEvents.BLOCK_BARREL_CLOSE, SoundCategory.BLOCKS, 0.3F, 0.8F);
+                        world.setBlockState(pos, state.with(OPEN, false));
+                        if (world instanceof ServerWorld serverWorld) {
+                            if (world.getBlockState(pos).getBlock() instanceof CoreTrapBlock coreTrapBlock) {
+                                coreTrapBlock.sendTrapParticlePacket(serverWorld, pos);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void captureEntity(MobEntity entity) {

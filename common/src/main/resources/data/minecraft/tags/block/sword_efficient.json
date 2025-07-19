@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "project_core:large_net_trap",
+    "project_core:medium_net_trap",
+    "project_core:small_net_trap"
+  ]
+}

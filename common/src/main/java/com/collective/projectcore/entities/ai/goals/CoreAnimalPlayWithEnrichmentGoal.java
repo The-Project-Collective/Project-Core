@@ -1,6 +1,6 @@
 package com.collective.projectcore.entities.ai.goals;
 
-import com.collective.projectcore.blocks.CoreEnrichmentBlock;
+import com.collective.projectcore.blocks.enrichment.CoreEnrichmentBlock;
 import com.collective.projectcore.entities.CoreAnimalEntity;
 import net.minecraft.entity.ai.goal.MoveToTargetPosGoal;
 import net.minecraft.sound.SoundCategory;

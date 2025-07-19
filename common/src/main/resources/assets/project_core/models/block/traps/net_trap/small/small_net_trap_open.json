@@ -1,0 +1,6 @@
+{
+  "parent": "project_core:block/traps/net_trap/template_net_trap",
+  "textures": {
+    "1": "project_core:block/traps/net_trap/small/net_trap_small_open"
+  }
+}

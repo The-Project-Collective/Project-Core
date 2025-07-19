@@ -5,10 +5,14 @@ import com.collective.projectcore.blocks.enrichment.BubbleMachineEnrichmentBlock
 import com.collective.projectcore.blocks.enrichment.GnawingRockEnrichmentBlock;
 import com.collective.projectcore.blocks.enrichment.ScratchingPostEnrichmentBlock;
 import com.collective.projectcore.blocks.machines.FeederBlock;
-import com.collective.projectcore.blocks.traps.LargeBoxTrapBlock;
-import com.collective.projectcore.blocks.traps.MediumBoxTrapBlock;
-import com.collective.projectcore.blocks.traps.SmallBoxTrapBlock;
+import com.collective.projectcore.blocks.traps.box_traps.LargeBoxTrapBlock;
+import com.collective.projectcore.blocks.traps.box_traps.MediumBoxTrapBlock;
+import com.collective.projectcore.blocks.traps.box_traps.SmallBoxTrapBlock;
+import com.collective.projectcore.blocks.traps.net_traps.LargeNetTrapBlock;
+import com.collective.projectcore.blocks.traps.net_traps.MediumNetTrapBlock;
+import com.collective.projectcore.blocks.traps.net_traps.SmallNetTrapBlock;
 import com.collective.projectcore.groups.CoreTabGroups;
+import com.collective.projectcore.items.blockitems.NetTrapBlockItem;
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
@@ -65,12 +69,17 @@ public class CoreBlocks {
 
 
 
-    // === HUSBANDRY ===
+    // === TRAPS ===
 
-    // Traps
+    // Box Traps
     public static final RegistrySupplier<Block> LARGE_BOX_TRAP = registerBlock("large_box_trap", () -> new LargeBoxTrapBlock(AbstractBlock.Settings.copy(Blocks.OAK_WOOD).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("large_box_trap")).nonOpaque()), "husbandry");
     public static final RegistrySupplier<Block> MEDIUM_BOX_TRAP = registerBlock("medium_box_trap", () -> new MediumBoxTrapBlock(AbstractBlock.Settings.copy(Blocks.OAK_WOOD).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("medium_box_trap")).nonOpaque()), "husbandry");
     public static final RegistrySupplier<Block> SMALL_BOX_TRAP = registerBlock("small_box_trap", () -> new SmallBoxTrapBlock(AbstractBlock.Settings.copy(Blocks.OAK_WOOD).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("small_box_trap")).nonOpaque()), "husbandry");
+
+    // Net Traps
+    public static final RegistrySupplier<Block> LARGE_NET_TRAP = registerNetTrapBlock("large_net_trap", () -> new LargeNetTrapBlock(AbstractBlock.Settings.copy(Blocks.OAK_WOOD).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("large_net_trap")).nonOpaque()));
+    public static final RegistrySupplier<Block> MEDIUM_NET_TRAP = registerNetTrapBlock("medium_net_trap", () -> new MediumNetTrapBlock(AbstractBlock.Settings.copy(Blocks.OAK_WOOD).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("medium_net_trap")).nonOpaque()));
+    public static final RegistrySupplier<Block> SMALL_NET_TRAP = registerNetTrapBlock("small_net_trap", () -> new SmallNetTrapBlock(AbstractBlock.Settings.copy(Blocks.OAK_WOOD).mapColor(MapColor.BROWN).requiresTool().registryKey(getBlockRegistryKey("small_net_trap")).nonOpaque()));
 
 
 
@@ -92,6 +101,12 @@ public class CoreBlocks {
         return toReturn;
     }
 
+    private static <T extends Block> RegistrySupplier<T> registerNetTrapBlock(String name, Supplier<T> block) {
+        RegistrySupplier<T> toReturn = BLOCKS.register(name, block);
+        registerNetTrapBlockItem(name, toReturn);
+        return toReturn;
+    }
+
     @SuppressWarnings("UnstableApiUsage")
     private static <T extends Block> void registerCoreBlockItem(String name, RegistrySupplier<T> block) {
         BLOCK_ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Settings().arch$tab(CoreTabGroups.CORE_BLOCKS).registryKey(getItemRegistryKey(name)).useBlockPrefixedTranslationKey()));
@@ -100,6 +115,12 @@ public class CoreBlocks {
     @SuppressWarnings("UnstableApiUsage")
     private static <T extends Block> void registerHusbandryBlockItem(String name, RegistrySupplier<T> block) {
         BLOCK_ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Settings().arch$tab(CoreTabGroups.HUSBANDRY_BLOCKS).registryKey(getItemRegistryKey(name)).useBlockPrefixedTranslationKey()));
+        //BLOCK_ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Settings().arch$tab(husbandry ? CoreTabGroups.HUSBANDRY_BLOCKS : null).registryKey(getItemRegistryKey(name)).useBlockPrefixedTranslationKey()));
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private static <T extends Block> void registerNetTrapBlockItem(String name, RegistrySupplier<T> block) {
+        BLOCK_ITEMS.register(name, () -> new NetTrapBlockItem(block.get(), new Item.Settings().arch$tab(CoreTabGroups.HUSBANDRY_BLOCKS).registryKey(getItemRegistryKey(name)).useBlockPrefixedTranslationKey()));
         //BLOCK_ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Settings().arch$tab(husbandry ? CoreTabGroups.HUSBANDRY_BLOCKS : null).registryKey(getItemRegistryKey(name)).useBlockPrefixedTranslationKey()));
     }
 
