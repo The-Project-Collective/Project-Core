@@ -10,7 +10,7 @@ import net.minecraft.util.math.BlockPos;
 public record BoxTrapParticlePacket(BlockPos pos) implements CustomPayload {
 
     public static final Id<BoxTrapParticlePacket> ID =
-            CustomPayload.id("box_trap_particle");
+            new CustomPayload.Id<>(Identifier.of(ProjectCore.MOD_ID, "box_trap_particle"));
 
     @Override
     public Id<? extends CustomPayload> getId() {
