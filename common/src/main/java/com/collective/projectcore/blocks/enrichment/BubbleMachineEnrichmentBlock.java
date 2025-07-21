@@ -70,8 +70,10 @@ public class BubbleMachineEnrichmentBlock extends CoreEnrichmentBlock {
 
     @Override
     protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        if (state.get(POWERED) && !world.isReceivingRedstonePower(pos)) {
-            world.setBlockState(pos, state.cycle(POWERED), 2);
+        if (state.get(POWERED)) {
+            if (!world.isReceivingRedstonePower(pos)) {
+                world.setBlockState(pos, state.cycle(POWERED), 2);
+            }
         }
     }
 
@@ -97,4 +99,10 @@ public class BubbleMachineEnrichmentBlock extends CoreEnrichmentBlock {
             }
         }
     }
+
+    @Override
+    public void playEnrichmentSound(World world, BlockPos pos) {
+        world.playSound(null, pos, SoundEvents.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, SoundCategory.BLOCKS, 1.0F, 1.0F);
+    }
+
 }

@@ -1,6 +1,8 @@
 package com.collective.projectcore.entities.enrichment;
 
 import com.collective.projectcore.items.CoreItems;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.item.Item;
@@ -27,6 +29,24 @@ public class SnuffleLogEnrichmentEntity extends CoreEnrichmentEntity {
             case PALE_OAK -> CoreItems.SNUFFLE_LOG_PALE_OAK.get();
             case SPRUCE -> CoreItems.SNUFFLE_LOG_SPRUCE.get();
             case WARPED -> CoreItems.SNUFFLE_LOG_WARPED.get();
+        };
+    }
+
+    @Override
+    public BlockState getBlockStateParticlesForEnrichmentType(int type) {
+        EnrichmentLogType logType = EnrichmentLogType.fromId(type);
+        return switch (logType) {
+            case ACACIA -> Blocks.ACACIA_LOG.getDefaultState();
+            case BIRCH -> Blocks.BIRCH_LOG.getDefaultState();
+            case CHERRY -> Blocks.CHERRY_LOG.getDefaultState();
+            case CRIMSON -> Blocks.CRIMSON_STEM.getDefaultState();
+            case DARK_OAK -> Blocks.DARK_OAK_LOG.getDefaultState();
+            case JUNGLE -> Blocks.JUNGLE_LOG.getDefaultState();
+            case MANGROVE -> Blocks.MANGROVE_LOG.getDefaultState();
+            case OAK -> Blocks.OAK_LOG.getDefaultState();
+            case PALE_OAK -> Blocks.PALE_OAK_LOG.getDefaultState();
+            case SPRUCE -> Blocks.SPRUCE_LOG.getDefaultState();
+            case WARPED -> Blocks.WARPED_STEM.getDefaultState();
         };
     }
 

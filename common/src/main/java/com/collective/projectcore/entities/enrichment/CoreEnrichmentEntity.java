@@ -1,5 +1,7 @@
 package com.collective.projectcore.entities.enrichment;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -19,6 +21,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldEvents;
 
 import java.util.List;
 
@@ -82,10 +85,7 @@ public abstract class CoreEnrichmentEntity extends Entity {
                 (this.getZ() - interactor.getZ()) * 0.1
         );
         this.addVelocity(push);
-        if (this.getWorld() instanceof ServerWorld serverWorld) {
-            serverWorld.spawnParticles(ParticleTypes.HAPPY_VILLAGER, getX(), getY() + 0.5, getZ(), 5, 0.2, 0.2, 0.2, 0.0);
-            this.getWorld().playSound(null, getBlockPos(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.NEUTRAL, 0.6F, 1.2F);
-        }
+        this.getWorld().syncWorldEvent(WorldEvents.BLOCK_BROKEN, this.getBlockPos(), Block.getRawIdFromState(this.getBlockStateParticlesForEnrichmentType(this.getEnrichmentType())));
     }
 
     @Override
@@ -153,6 +153,8 @@ public abstract class CoreEnrichmentEntity extends Entity {
     }
 
     public abstract Item getItemForEnrichmentType(int type);
+
+    public abstract BlockState getBlockStateParticlesForEnrichmentType(int type);
 
     public int getEnrichmentType() {
         return this.dataTracker.get(ENRICHMENT_TYPE);

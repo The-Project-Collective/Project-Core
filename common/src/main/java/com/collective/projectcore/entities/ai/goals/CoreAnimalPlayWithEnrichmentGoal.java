@@ -21,6 +21,7 @@ public class CoreAnimalPlayWithEnrichmentGoal extends MoveToTargetPosGoal {
     protected CoreEnrichmentEntity enrichmentEntity;
     boolean enrichEntity;
     CoreAnimalEntity coreAnimalEntity;
+    protected BlockPos enrichmentBlockPos;
 
     public CoreAnimalPlayWithEnrichmentGoal(CoreAnimalEntity coreAnimalEntity, double speed, int range) {
         super(coreAnimalEntity, speed, range);
@@ -75,7 +76,7 @@ public class CoreAnimalPlayWithEnrichmentGoal extends MoveToTargetPosGoal {
                 if (this.coreAnimalEntity.getEnrichment() > this.coreAnimalEntity.getMaxEnrichment()) {
                     this.coreAnimalEntity.setEnrichment(this.coreAnimalEntity.getMaxEnrichment());
                 }
-                this.coreAnimalEntity.getWorld().playSound(null, this.coreAnimalEntity.getSteppingPos(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.NEUTRAL, 1.0F, this.coreAnimalEntity.getPitch());
+                this.enrichmentBlock.playEnrichmentSoundAndParticles(this.coreAnimalEntity.getWorld(), this.enrichmentBlockPos);
                 this.coreAnimalEntity.setEnrichmentCooldown(this.random.nextInt(600) + 1000);
             }
         }
@@ -105,6 +106,7 @@ public class CoreAnimalPlayWithEnrichmentGoal extends MoveToTargetPosGoal {
     protected boolean isTargetPos(WorldView pLevel, @NotNull BlockPos pPos) {
         if (pLevel.getBlockState(pPos).getBlock() instanceof CoreEnrichmentBlock && pLevel.getBlockState(pPos).isIn(this.coreAnimalEntity.getAllowedEnrichment())) {
             this.enrichmentBlock = (CoreEnrichmentBlock)pLevel.getBlockState(pPos).getBlock();
+            this.enrichmentBlockPos = pPos;
             return true;
         } else {
             return false;

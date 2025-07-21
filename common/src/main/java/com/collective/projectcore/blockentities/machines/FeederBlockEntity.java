@@ -10,10 +10,14 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.particle.ItemStackParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
@@ -103,13 +107,16 @@ public class FeederBlockEntity extends CoreBaseLockableContainerBlockEntity impl
                         if (entity.getHunger() > maxFood) {
                             entity.setHunger(maxFood);
                         }
-                        stack.decrement(1);
                         flag = true;
                     } else {
                         flag = false;
                     }
                     if (flag) {
+                        if (entity.getWorld() instanceof ServerWorld serverWorld) {
+                            serverWorld.spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, stack), entity.getX(), entity.getY() + 1.0, entity.getZ(), 6, 0.15, 0.15, 0.15, 0.05);
+                        }
                         entity.getWorld().playSound(null, entity.getSteppingPos(), SoundEvents.ENTITY_GENERIC_EAT.value(), SoundCategory.NEUTRAL, 1.0F, entity.getPitch());
+                        stack.decrement(1);
                         if (entity.getWorld() != null) {
                             markDirty();
                         }

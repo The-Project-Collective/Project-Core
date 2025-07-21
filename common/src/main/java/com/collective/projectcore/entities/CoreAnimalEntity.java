@@ -21,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsage;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -528,7 +529,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     // --- Hunger ------------------------------------------------------------------------------------------
     public void handFeed(ItemStack itemStack, PlayerEntity player) {
-        itemStack.decrementUnlessCreative(1, player);
         int amount = this.getFoodValue(itemStack);
         this.setHunger(this.getHunger() + amount);
         int maxFood = this.getLowMaxFood();
@@ -538,7 +538,11 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         if (this.getHunger() > maxFood) {
             this.setHunger(maxFood);
         }
+        if (this.getWorld() instanceof ServerWorld serverWorld) {
+            serverWorld.spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, itemStack), this.getX(), this.getY() + 1.0, this.getZ(), 6, 0.15, 0.15, 0.15, 0.05);
+        }
         this.getWorld().playSound(null, this.getSteppingPos(), SoundEvents.ENTITY_GENERIC_EAT.value(), SoundCategory.NEUTRAL, 1.0F, this.getPitch());
+        itemStack.decrementUnlessCreative(1, player);
     }
 
     // --- Sleeping ------------------------------------------------------------------------------------------
