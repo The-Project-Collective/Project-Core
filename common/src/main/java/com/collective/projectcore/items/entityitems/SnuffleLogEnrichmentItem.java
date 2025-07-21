@@ -5,9 +5,12 @@ import com.collective.projectcore.entities.enrichment.SnuffleLogEnrichmentEntity
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -15,6 +18,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+
+import java.util.List;
 
 public class SnuffleLogEnrichmentItem extends Item {
 
@@ -45,5 +50,11 @@ public class SnuffleLogEnrichmentItem extends Item {
             }
         }
         return ActionResult.PASS;
+    }
+
+    @Override
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        super.appendTooltip(stack, context, tooltip, type);
+        tooltip.add(Text.translatable("tooltip.project_core.snuffle_log").formatted(Formatting.ITALIC, Formatting.GRAY));
     }
 }

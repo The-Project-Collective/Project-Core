@@ -1,0 +1,6 @@
+{
+  "parent": "project_core:entity/enrichment/template_snuffle_log_item",
+  "textures": {
+    "1": "project_core:item/enrichment/entity/snuffle_log/snuffle_log_mangrove"
+  }
+}

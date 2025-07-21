@@ -248,6 +248,7 @@ public abstract class CoreTrapBlock extends CoreBlockWithEntity {
     @SuppressWarnings("deprecation")
     @Override
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
+        super.appendTooltip(stack, context, tooltip, options);
         NbtComponent nbtComponent = stack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
         if (nbtComponent != null) {
             NbtCompound entityNbt = nbtComponent.getNbt().copy().getCompound("EntityTag");
