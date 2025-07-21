@@ -1169,6 +1169,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     public abstract TagKey<Block> getAllowedEnrichment();
 
+    public abstract TagKey<EntityType<?>> getAllowedEnrichmentEntities();
+
     // --- General ------------------------------------------------------------------------------------------
     @Override
     public abstract int getLimitPerChunk();

@@ -3,6 +3,9 @@ package com.collective.projectcore.neoforge.client;
 import com.collective.projectcore.ProjectCore;
 import com.collective.projectcore.ProjectCoreClientCommon;
 import com.collective.projectcore.blocks.CoreBlocks;
+import com.collective.projectcore.entities.CoreEntities;
+import com.collective.projectcore.models.entity.enrichment.SnuffleLogEnrichmentEntityModel;
+import com.collective.projectcore.renderers.entity.SnuffleLogEnrichmentEntityRenderer;
 import com.collective.projectcore.screens.handlers.CoreScreenHandlers;
 import com.collective.projectcore.screens.machines.FeederScreen;
 import com.collective.projectcore.util.UtilMethods;
@@ -12,6 +15,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 @Mod(value = ProjectCore.MOD_ID, dist = Dist.CLIENT)
@@ -20,6 +24,11 @@ public class ProjectCoreNeoForgeClient {
     public ProjectCoreNeoForgeClient(IEventBus modBus) {
         modBus.register(this);
         ProjectCoreClientCommon.registerCommonClient();
+    }
+
+    @SubscribeEvent
+    public void registerModelLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(SnuffleLogEnrichmentEntityModel.LAYER_LOCATION, SnuffleLogEnrichmentEntityModel::getTexturedModelData);
     }
 
     @SubscribeEvent
@@ -41,6 +50,12 @@ public class ProjectCoreNeoForgeClient {
                         CoreBlocks.SCRATCHING_POST_WARPED.get()
                 )
         );
+    }
+
+    @SubscribeEvent
+    public void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(CoreEntities.SNUFFLE_LOG_ENTITY.get(), SnuffleLogEnrichmentEntityRenderer::new);
+
     }
 
     @SubscribeEvent
