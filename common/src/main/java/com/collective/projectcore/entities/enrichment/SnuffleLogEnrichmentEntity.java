@@ -4,7 +4,6 @@ import com.collective.projectcore.items.CoreItems;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
-import net.minecraft.entity.data.TrackedData;
 import net.minecraft.item.Item;
 import net.minecraft.world.World;
 
@@ -50,5 +49,36 @@ public class SnuffleLogEnrichmentEntity extends CoreEnrichmentEntity {
         };
     }
 
+    public enum EnrichmentLogType {
+        ACACIA(0, "acacia"),
+        BIRCH(1, "birch"),
+        CHERRY(2, "cherry"),
+        CRIMSON(3, "crimson"),
+        DARK_OAK(4, "dark_oak"),
+        JUNGLE(5, "jungle"),
+        MANGROVE(6, "mangrove"),
+        OAK(7, "oak"),
+        PALE_OAK(8, "pale_oak"),
+        SPRUCE(9, "spruce"),
+        WARPED(10, "warped");
 
+
+        private final int id;
+        private final String textureName;
+
+        EnrichmentLogType(int id, String textureName) {
+            this.id = id;
+            this.textureName = textureName;
+        }
+
+        public int getId() { return id; }
+        public String getTextureName() { return textureName; }
+
+        public static EnrichmentLogType fromId(int id) {
+            for (EnrichmentLogType type : values()) {
+                if (type.id == id) return type;
+            }
+            return OAK;
+        }
+    }
 }

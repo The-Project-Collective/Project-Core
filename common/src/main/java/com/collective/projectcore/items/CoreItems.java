@@ -4,6 +4,7 @@ import com.collective.projectcore.ProjectCore;
 import com.collective.projectcore.groups.CoreTabGroups;
 import com.collective.projectcore.items.base.CoreBaseItem;
 import com.collective.projectcore.items.entityitems.SnuffleLogEnrichmentItem;
+import com.collective.projectcore.items.entityitems.ToyBallEnrichmentItem;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.item.Item;
@@ -32,8 +33,23 @@ public class CoreItems {
     public static final RegistrySupplier<Item> SNUFFLE_LOG_SPRUCE = ITEMS.register("snuffle_log_spruce", () -> new SnuffleLogEnrichmentItem(getItemSettings("snuffle_log_spruce", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 9));
     public static final RegistrySupplier<Item> SNUFFLE_LOG_WARPED = ITEMS.register("snuffle_log_warped", () -> new SnuffleLogEnrichmentItem(getItemSettings("snuffle_log_warped", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 10));
 
-
-    // Floating Puzzle Feeder
+    // Toy Balls
+    public static final RegistrySupplier<Item> TOY_BALL_WHITE = ITEMS.register("toy_ball_white", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_white", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 0));
+    public static final RegistrySupplier<Item> TOY_BALL_LIGHT_GRAY = ITEMS.register("toy_ball_light_gray", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_light_gray", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 1));
+    public static final RegistrySupplier<Item> TOY_BALL_GRAY = ITEMS.register("toy_ball_gray", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_gray", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 2));
+    public static final RegistrySupplier<Item> TOY_BALL_BLACK = ITEMS.register("toy_ball_black", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_black", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 3));
+    public static final RegistrySupplier<Item> TOY_BALL_BROWN = ITEMS.register("toy_ball_brown", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_brown", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 4));
+    public static final RegistrySupplier<Item> TOY_BALL_RED = ITEMS.register("toy_ball_red", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_red", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 5));
+    public static final RegistrySupplier<Item> TOY_BALL_ORANGE = ITEMS.register("toy_ball_orange", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_orange", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 6));
+    public static final RegistrySupplier<Item> TOY_BALL_YELLOW = ITEMS.register("toy_ball_yellow", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_yellow", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 7));
+    public static final RegistrySupplier<Item> TOY_BALL_LIME = ITEMS.register("toy_ball_lime", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_lime", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 8));
+    public static final RegistrySupplier<Item> TOY_BALL_GREEN = ITEMS.register("toy_ball_green", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_green", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 9));
+    public static final RegistrySupplier<Item> TOY_BALL_CYAN = ITEMS.register("toy_ball_cyan", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_cyan", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 10));
+    public static final RegistrySupplier<Item> TOY_BALL_LIGHT_BLUE = ITEMS.register("toy_ball_light_blue", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_light_blue", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 11));
+    public static final RegistrySupplier<Item> TOY_BALL_BLUE = ITEMS.register("toy_ball_blue", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_blue", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 12));
+    public static final RegistrySupplier<Item> TOY_BALL_PURPLE = ITEMS.register("toy_ball_purple", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_purple", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 13));
+    public static final RegistrySupplier<Item> TOY_BALL_MAGENTA = ITEMS.register("toy_ball_magenta", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_magenta", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 14));
+    public static final RegistrySupplier<Item> TOY_BALL_PINK = ITEMS.register("toy_ball_pink", () -> new ToyBallEnrichmentItem(getItemSettings("toy_ball_pink", new Item.Settings().maxCount(64).arch$tab(getHusbandryBlocksGroup())), 15));
 
 
 

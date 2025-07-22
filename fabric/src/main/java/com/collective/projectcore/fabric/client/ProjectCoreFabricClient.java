@@ -4,7 +4,9 @@ import com.collective.projectcore.ProjectCoreClientCommon;
 import com.collective.projectcore.blocks.CoreBlocks;
 import com.collective.projectcore.entities.CoreEntities;
 import com.collective.projectcore.models.entity.enrichment.SnuffleLogEnrichmentEntityModel;
+import com.collective.projectcore.models.entity.enrichment.ToyBallEnrichmentEntityModel;
 import com.collective.projectcore.renderers.entity.SnuffleLogEnrichmentEntityRenderer;
+import com.collective.projectcore.renderers.entity.ToyBallEnrichmentEntityRenderer;
 import com.collective.projectcore.screens.handlers.CoreScreenHandlers;
 import com.collective.projectcore.screens.machines.FeederScreen;
 import com.collective.projectcore.util.UtilMethods;
@@ -26,10 +28,12 @@ public final class ProjectCoreFabricClient implements ClientModInitializer {
 
     public static void registerModelLayers() {
         EntityModelLayerRegistry.registerModelLayer(SnuffleLogEnrichmentEntityModel.LAYER_LOCATION, SnuffleLogEnrichmentEntityModel::getTexturedModelData);
+        EntityModelLayerRegistry.registerModelLayer(ToyBallEnrichmentEntityModel.LAYER_LOCATION, ToyBallEnrichmentEntityModel::getTexturedModelData);
     }
 
     public static void registerEntityRenderers() {
         EntityRendererRegistry.register(CoreEntities.SNUFFLE_LOG_ENTITY.get(), SnuffleLogEnrichmentEntityRenderer::new);
+        EntityRendererRegistry.register(CoreEntities.TOY_BALL_ENTITY.get(), ToyBallEnrichmentEntityRenderer::new);
     }
 
     public void registerColourProviders() {

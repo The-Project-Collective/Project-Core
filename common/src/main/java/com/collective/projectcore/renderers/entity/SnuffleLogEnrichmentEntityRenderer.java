@@ -47,19 +47,13 @@ public class SnuffleLogEnrichmentEntityRenderer extends EntityRenderer<SnuffleLo
         SnuffleLogEnrichmentEntity entity = state.getEntity();
         Identifier texture = TEXTURES.getOrDefault(entity.getEnrichmentType(), TEXTURES.get(0));
         matrices.push();
-
-        matrices.translate(0, 0.2, 0); // Move model origin up to entity center
+        matrices.translate(0, 0.2, 0);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-entity.getYaw()));
-
         float tickDelta = state.age - (int) state.age;
-        float roll = MathHelper.lerp(tickDelta, entity.getPreviousRollAngle(), entity.getRollAngle());
-
-// This is critical — rotate BEFORE render
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(MathHelper.wrapDegrees(roll)));
-
+        float rollX = MathHelper.lerp(tickDelta, entity.getPreviousRollAngleX(), entity.getRollAngleX());
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(MathHelper.wrapDegrees(rollX)));
         VertexConsumer consumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(texture));
         this.model.getRootPart().render(matrices, consumer, light, OverlayTexture.DEFAULT_UV);
-
         matrices.pop();
         super.render(state, matrices, vertexConsumers, light);
     }

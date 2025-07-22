@@ -18,6 +18,24 @@
   "item.project_core.snuffle_log_spruce": "Spruce Snuffle Log",
   "item.project_core.snuffle_log_warped": "Warped Snuffle Log",
 
+  "item.project_core.toy_ball_white": "White Toy Ball",
+  "item.project_core.toy_ball_light_gray": "Light Gray Toy Ball",
+  "item.project_core.toy_ball_gray": "Grey Toy Ball",
+  "item.project_core.toy_ball_black": "Black Toy Ball",
+  "item.project_core.toy_ball_brown": "Brown Toy Ball",
+  "item.project_core.toy_ball_red": "Red Toy Ball",
+  "item.project_core.toy_ball_orange": "Orange Toy Ball",
+  "item.project_core.toy_ball_yellow": "Yellow Toy Ball",
+  "item.project_core.toy_ball_lime": "Lime Toy Ball",
+  "item.project_core.toy_ball_green": "Green Toy Ball",
+  "item.project_core.toy_ball_cyan": "Cyan Toy Ball",
+  "item.project_core.toy_ball_light_blue": "Light Blue Toy Ball",
+  "item.project_core.toy_ball_blue": "Blue Toy Ball",
+  "item.project_core.toy_ball_purple": "Purple Toy Ball",
+  "item.project_core.toy_ball_magenta": "Magenta Toy Ball",
+  "item.project_core.toy_ball_pink": "Pink Toy Ball",
+
+
 
   "block.project_core.gnawing_rock_andesite": "Andesite Gnawing Rock",
   "block.project_core.gnawing_rock_blackstone": "Blackstone Gnawing Rock",
@@ -87,7 +105,7 @@
   "tooltip.project_core.trap.male": "Male",
   "tooltip.project_core.trap.female": "Female",
 
-  "tooltip.project_core.snuffle_log": "Shift + Right Click to pick up once placed.",
+  "tooltip.project_core.enrichment_entity": "Shift + Right Click to pick up once placed.",
 
 
   "warning.project_core.trap.failed_release": "Warning! Can't release mob because there isn't a safe location nearby!"

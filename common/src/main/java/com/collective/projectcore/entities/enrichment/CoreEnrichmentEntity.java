@@ -12,7 +12,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -28,8 +27,10 @@ import java.util.List;
 public abstract class CoreEnrichmentEntity extends Entity {
 
     public static final TrackedData<Integer> ENRICHMENT_TYPE;
-    public static final TrackedData<Float> ROLL_ANGLE;
-    public static final TrackedData<Float> PREVIOUS_ROLL_ANGLE;
+    public static final TrackedData<Float> ROLL_ANGLE_X;
+    public static final TrackedData<Float> PREVIOUS_ROLL_ANGLE_X;
+    public static final TrackedData<Float> ROLL_ANGLE_Z;
+    public static final TrackedData<Float> PREVIOUS_ROLL_ANGLE_Z;
 
     private Vec3d previousVelocity = Vec3d.ZERO;
 
@@ -64,7 +65,7 @@ public abstract class CoreEnrichmentEntity extends Entity {
             }
             this.setVelocity(velocity);
             this.move(MovementType.SELF, velocity);
-            this.setPreviousRollAngle(this.getRollAngle());
+            this.setPreviousRollAngleX(this.getRollAngleX());
             double dx = velocity.x;
             double dz = velocity.z;
             double horizontalSpeed = Math.sqrt(dx * dx + dz * dz);
@@ -73,7 +74,7 @@ public abstract class CoreEnrichmentEntity extends Entity {
                 float deltaAngle = (float) ((horizontalSpeed / (2 * Math.PI * radius)) * 360f);
                 double cross = (0 * dx) - (1 * dz);
                 boolean isClockwise = cross < 0;
-                this.setRollAngle(this.getRollAngle() + (isClockwise ? deltaAngle : -deltaAngle));
+                this.setRollAngleX(this.getRollAngleX() + (isClockwise ? deltaAngle : -deltaAngle));
             }
         }
     }
@@ -136,20 +137,36 @@ public abstract class CoreEnrichmentEntity extends Entity {
         return super.createSpawnPacket(entityTrackerEntry);
     }
 
-    public float getRollAngle() {
-        return this.dataTracker.get(ROLL_ANGLE);
+    public float getRollAngleX() {
+        return this.dataTracker.get(ROLL_ANGLE_X);
     }
 
-    public void setRollAngle(float angle) {
-        this.dataTracker.set(ROLL_ANGLE, angle);
+    public void setRollAngleX(float angle) {
+        this.dataTracker.set(ROLL_ANGLE_X, angle);
     }
 
-    public float getPreviousRollAngle() {
-        return this.dataTracker.get(PREVIOUS_ROLL_ANGLE);
+    public float getPreviousRollAngleX() {
+        return this.dataTracker.get(PREVIOUS_ROLL_ANGLE_X);
     }
 
-    public void setPreviousRollAngle(float angle) {
-        this.dataTracker.set(PREVIOUS_ROLL_ANGLE, angle);
+    public void setPreviousRollAngleX(float angle) {
+        this.dataTracker.set(PREVIOUS_ROLL_ANGLE_X, angle);
+    }
+
+    public float getRollAngleZ() {
+        return this.dataTracker.get(ROLL_ANGLE_Z);
+    }
+
+    public void setRollAngleZ(float angle) {
+        this.dataTracker.set(ROLL_ANGLE_Z, angle);
+    }
+
+    public float getPreviousRollAngleZ() {
+        return this.dataTracker.get(PREVIOUS_ROLL_ANGLE_Z);
+    }
+
+    public void setPreviousRollAngleZ(float angle) {
+        this.dataTracker.set(PREVIOUS_ROLL_ANGLE_Z, angle);
     }
 
     public abstract Item getItemForEnrichmentType(int type);
@@ -180,66 +197,42 @@ public abstract class CoreEnrichmentEntity extends Entity {
 
     static {
         ENRICHMENT_TYPE = DataTracker.registerData(CoreEnrichmentEntity.class, TrackedDataHandlerRegistry.INTEGER);
-        ROLL_ANGLE = DataTracker.registerData(CoreEnrichmentEntity.class, TrackedDataHandlerRegistry.FLOAT);
-        PREVIOUS_ROLL_ANGLE = DataTracker.registerData(CoreEnrichmentEntity.class, TrackedDataHandlerRegistry.FLOAT);
+        ROLL_ANGLE_X = DataTracker.registerData(CoreEnrichmentEntity.class, TrackedDataHandlerRegistry.FLOAT);
+        PREVIOUS_ROLL_ANGLE_X = DataTracker.registerData(CoreEnrichmentEntity.class, TrackedDataHandlerRegistry.FLOAT);
+        ROLL_ANGLE_Z = DataTracker.registerData(CoreEnrichmentEntity.class, TrackedDataHandlerRegistry.FLOAT);
+        PREVIOUS_ROLL_ANGLE_Z = DataTracker.registerData(CoreEnrichmentEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
     }
 
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         builder.add(ENRICHMENT_TYPE, 0);
-        builder.add(ROLL_ANGLE, 0f);
-        builder.add(PREVIOUS_ROLL_ANGLE, 0f);
+        builder.add(ROLL_ANGLE_X, 0f);
+        builder.add(PREVIOUS_ROLL_ANGLE_X, 0f);
+        builder.add(ROLL_ANGLE_Z, 0f);
+        builder.add(PREVIOUS_ROLL_ANGLE_Z, 0f);
 
     }
 
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
         nbt.putInt("EnrichmentType", this.getEnrichmentType());
-        nbt.putFloat("RollAngle", this.getRollAngle());
-        nbt.putFloat("PreviousRollAngle", this.getPreviousRollAngle());
+        nbt.putFloat("RollAngleX", this.getRollAngleX());
+        nbt.putFloat("PreviousRollAngleX", this.getPreviousRollAngleX());
+        nbt.putFloat("RollAngleZ", this.getRollAngleZ());
+        nbt.putFloat("PreviousRollAngleZ", this.getPreviousRollAngleZ());
 
     }
 
     @Override
     protected void writeCustomDataToNbt(NbtCompound nbt) {
         this.setEnrichmentType(nbt.getInt("EnrichmentType"));
-        this.setRollAngle(nbt.getFloat("RollAngle"));
-        this.setPreviousRollAngle(nbt.getFloat("PreviousRollAngle"));
+        this.setRollAngleX(nbt.getFloat("RollAngleX"));
+        this.setPreviousRollAngleX(nbt.getFloat("PreviousRollAngleX"));
+        this.setRollAngleZ(nbt.getFloat("RollAngleZ"));
+        this.setPreviousRollAngleZ(nbt.getFloat("PreviousRollAngleZ"));
 
     }
 
-    public enum EnrichmentLogType {
-        ACACIA(0, "acacia"),
-        BIRCH(1, "birch"),
-        CHERRY(2, "cherry"),
-        CRIMSON(3, "crimson"),
-        DARK_OAK(4, "dark_oak"),
-        JUNGLE(5, "jungle"),
-        MANGROVE(6, "mangrove"),
-        OAK(7, "oak"),
-        PALE_OAK(8, "pale_oak"),
-        SPRUCE(9, "spruce"),
-        WARPED(10, "warped");
-
-
-        private final int id;
-        private final String textureName;
-
-        EnrichmentLogType(int id, String textureName) {
-            this.id = id;
-            this.textureName = textureName;
-        }
-
-        public int getId() { return id; }
-        public String getTextureName() { return textureName; }
-
-        public static EnrichmentLogType fromId(int id) {
-            for (EnrichmentLogType type : values()) {
-                if (type.id == id) return type;
-            }
-            return OAK;
-        }
-    }
 }
 

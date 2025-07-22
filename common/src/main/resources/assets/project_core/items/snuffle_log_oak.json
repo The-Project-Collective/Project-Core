@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "project_core:entity/enrichment/snuffle_log_item_oak"
+    "model": "project_core:entity/enrichment/snuffle_log/snuffle_log_item_oak"
   }
 }

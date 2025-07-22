@@ -55,6 +55,6 @@ public class SnuffleLogEnrichmentItem extends Item {
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         super.appendTooltip(stack, context, tooltip, type);
-        tooltip.add(Text.translatable("tooltip.project_core.snuffle_log").formatted(Formatting.ITALIC, Formatting.GRAY));
+        tooltip.add(Text.translatable("tooltip.project_core.enrichment_entity").formatted(Formatting.ITALIC, Formatting.GRAY));
     }
 }
