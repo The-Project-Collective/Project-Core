@@ -1,0 +1,6 @@
+{
+  "parent": "project_core:entity/enrichment/template_toy_ball_item",
+  "textures": {
+    "1": "project_core:item/enrichment/entity/toy_ball/toy_ball_magenta"
+  }
+}

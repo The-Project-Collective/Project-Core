@@ -2,20 +2,38 @@ package com.collective.projectcore.fabric.client;
 
 import com.collective.projectcore.ProjectCoreClientCommon;
 import com.collective.projectcore.blocks.CoreBlocks;
+import com.collective.projectcore.entities.CoreEntities;
+import com.collective.projectcore.models.entity.enrichment.SnuffleLogEnrichmentEntityModel;
+import com.collective.projectcore.models.entity.enrichment.ToyBallEnrichmentEntityModel;
+import com.collective.projectcore.renderers.entity.SnuffleLogEnrichmentEntityRenderer;
+import com.collective.projectcore.renderers.entity.ToyBallEnrichmentEntityRenderer;
 import com.collective.projectcore.screens.handlers.CoreScreenHandlers;
 import com.collective.projectcore.screens.machines.FeederScreen;
 import com.collective.projectcore.util.UtilMethods;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 
 public final class ProjectCoreFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        // This entrypoint is suitable for setting up client-specific logic, such as rendering.
+        registerModelLayers();
+        registerEntityRenderers();
         registerColourProviders();
         registerScreens();
         ProjectCoreClientCommon.registerCommonClient();
+    }
+
+    public static void registerModelLayers() {
+        EntityModelLayerRegistry.registerModelLayer(SnuffleLogEnrichmentEntityModel.LAYER_LOCATION, SnuffleLogEnrichmentEntityModel::getTexturedModelData);
+        EntityModelLayerRegistry.registerModelLayer(ToyBallEnrichmentEntityModel.LAYER_LOCATION, ToyBallEnrichmentEntityModel::getTexturedModelData);
+    }
+
+    public static void registerEntityRenderers() {
+        EntityRendererRegistry.register(CoreEntities.SNUFFLE_LOG_ENTITY.get(), SnuffleLogEnrichmentEntityRenderer::new);
+        EntityRendererRegistry.register(CoreEntities.TOY_BALL_ENTITY.get(), ToyBallEnrichmentEntityRenderer::new);
     }
 
     public void registerColourProviders() {

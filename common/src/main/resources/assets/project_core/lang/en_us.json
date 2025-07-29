@@ -6,6 +6,36 @@
   "item.project_core.fertility_treatment": "Fertility Treatment",
   "item.project_core.contraceptive_treatment": "Contraceptive Treatment",
 
+  "item.project_core.snuffle_log_acacia": "Acacia Snuffle Log",
+  "item.project_core.snuffle_log_birch": "Birch Snuffle Log",
+  "item.project_core.snuffle_log_cherry": "Cherry Snuffle Log",
+  "item.project_core.snuffle_log_crimson": "Crimson Snuffle Log",
+  "item.project_core.snuffle_log_dark_oak": "Dark Oak Snuffle Log",
+  "item.project_core.snuffle_log_jungle": "Jungle Snuffle Log",
+  "item.project_core.snuffle_log_mangrove": "Mangrove Snuffle Log",
+  "item.project_core.snuffle_log_oak": "Oak Snuffle Log",
+  "item.project_core.snuffle_log_pale_oak": "Pale Oak Snuffle Log",
+  "item.project_core.snuffle_log_spruce": "Spruce Snuffle Log",
+  "item.project_core.snuffle_log_warped": "Warped Snuffle Log",
+
+  "item.project_core.toy_ball_white": "White Toy Ball",
+  "item.project_core.toy_ball_light_gray": "Light Gray Toy Ball",
+  "item.project_core.toy_ball_gray": "Grey Toy Ball",
+  "item.project_core.toy_ball_black": "Black Toy Ball",
+  "item.project_core.toy_ball_brown": "Brown Toy Ball",
+  "item.project_core.toy_ball_red": "Red Toy Ball",
+  "item.project_core.toy_ball_orange": "Orange Toy Ball",
+  "item.project_core.toy_ball_yellow": "Yellow Toy Ball",
+  "item.project_core.toy_ball_lime": "Lime Toy Ball",
+  "item.project_core.toy_ball_green": "Green Toy Ball",
+  "item.project_core.toy_ball_cyan": "Cyan Toy Ball",
+  "item.project_core.toy_ball_light_blue": "Light Blue Toy Ball",
+  "item.project_core.toy_ball_blue": "Blue Toy Ball",
+  "item.project_core.toy_ball_purple": "Purple Toy Ball",
+  "item.project_core.toy_ball_magenta": "Magenta Toy Ball",
+  "item.project_core.toy_ball_pink": "Pink Toy Ball",
+
+
 
   "block.project_core.gnawing_rock_andesite": "Andesite Gnawing Rock",
   "block.project_core.gnawing_rock_blackstone": "Blackstone Gnawing Rock",
@@ -45,14 +75,12 @@
   "block.project_core.small_net_trap": "Small Net Trap",
 
 
-
   "screenhandler.project_core.feeder": "Feeder",
 
 
-  "group.project_core.core_blocks": "Project Blocks: General",
-  "group.project_core.core_items": "Project Items: General",
-  "group.project_core.husbandry_blocks": "Project Blocks: Husbandry",
-  "group.project_core.husbandry_items": "Project Items: Husbandry",
+  "group.project_core.project_blocks": "Project Blocks",
+  "group.project_core.project_items": "Project Items",
+  "group.project_core.project_entities": "Project Entities",
 
 
   "tag.item.project_core.diets.general.all_foods": "All Foods",
@@ -71,13 +99,13 @@
   "tag.block.project_core.enrichment.scratching_posts": "Scratching Posts",
 
 
-
   "tooltip.project_core.trap.empty": "Empty",
   "tooltip.project_core.trap.custom_name": "Named %s",
   "tooltip.project_core.trap.age": "%s Days Old",
   "tooltip.project_core.trap.male": "Male",
   "tooltip.project_core.trap.female": "Female",
 
+  "tooltip.project_core.enrichment_entity": "Shift + Right Click to pick up once placed.",
 
 
   "warning.project_core.trap.failed_release": "Warning! Can't release mob because there isn't a safe location nearby!"

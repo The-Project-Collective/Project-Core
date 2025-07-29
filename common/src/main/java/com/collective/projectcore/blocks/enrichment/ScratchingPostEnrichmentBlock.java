@@ -1,9 +1,7 @@
 package com.collective.projectcore.blocks.enrichment;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
+import com.collective.projectcore.items.CoreItems;
+import net.minecraft.block.*;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.DyeItem;
@@ -21,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldEvents;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 
@@ -113,5 +112,32 @@ public class ScratchingPostEnrichmentBlock extends CoreEnrichmentBlock {
     @Override
     protected BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
+    }
+
+    @Override
+    public void playEnrichmentSoundAndParticles(World world, BlockPos pos) {
+        world.syncWorldEvent(WorldEvents.BLOCK_BROKEN, pos, Block.getRawIdFromState(this.getWoolTypeState(world, pos)));
+    }
+
+    public BlockState getWoolTypeState(World world, BlockPos pos) {
+        BlockState blockState = world.getBlockState(pos);
+        return switch (blockState.get(COLOUR)) {
+            case WHITE -> Blocks.WHITE_WOOL.getDefaultState();
+            case ORANGE -> Blocks.ORANGE_WOOL.getDefaultState();
+            case MAGENTA -> Blocks.MAGENTA_WOOL.getDefaultState();
+            case LIGHT_BLUE -> Blocks.LIGHT_BLUE_WOOL.getDefaultState();
+            case YELLOW -> Blocks.YELLOW_WOOL.getDefaultState();
+            case LIME -> Blocks.LIME_WOOL.getDefaultState();
+            case PINK -> Blocks.PINK_WOOL.getDefaultState();
+            case GRAY -> Blocks.GRAY_WOOL.getDefaultState();
+            case LIGHT_GRAY -> Blocks.LIGHT_GRAY_WOOL.getDefaultState();
+            case CYAN -> Blocks.CYAN_WOOL.getDefaultState();
+            case PURPLE -> Blocks.PURPLE_WOOL.getDefaultState();
+            case BLUE -> Blocks.BLUE_WOOL.getDefaultState();
+            case BROWN -> Blocks.BROWN_WOOL.getDefaultState();
+            case GREEN -> Blocks.GREEN_WOOL.getDefaultState();
+            case RED -> Blocks.RED_WOOL.getDefaultState();
+            case BLACK -> Blocks.BLACK_WOOL.getDefaultState();
+        };
     }
 }
