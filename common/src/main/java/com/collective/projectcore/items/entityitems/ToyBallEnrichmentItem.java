@@ -1,7 +1,7 @@
 package com.collective.projectcore.items.entityitems;
 
 import com.collective.projectcore.entities.CoreEntities;
-import com.collective.projectcore.entities.enrichment.SnuffleLogEnrichmentEntity;
+import com.collective.projectcore.entities.enrichment.ToyBallEnrichmentEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -37,7 +37,7 @@ public class ToyBallEnrichmentItem extends Item {
             BlockHitResult hit = raycast(world, player, RaycastContext.FluidHandling.NONE);
             if (hit.getType() == HitResult.Type.BLOCK) {
                 BlockPos spawnPos = hit.getBlockPos().offset(hit.getSide());
-                SnuffleLogEnrichmentEntity entity = new SnuffleLogEnrichmentEntity(CoreEntities.TOY_BALL_ENTITY.get(), world);
+                ToyBallEnrichmentEntity entity = new ToyBallEnrichmentEntity(CoreEntities.TOY_BALL_ENTITY.get(), world);
                 entity.setPosition(Vec3d.ofCenter(spawnPos));
                 entity.setYaw(player.getYaw());
                 entity.setEnrichmentType(woolType);

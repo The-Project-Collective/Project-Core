@@ -179,6 +179,8 @@ public abstract class CoreEnrichmentEntity extends Entity {
 
     public void setEnrichmentType(int type) {
         this.dataTracker.set(ENRICHMENT_TYPE, type);
+        System.out.println("Set Type: "+type);
+        System.out.println("Set Enrichment: "+this.getEnrichmentType());
     }
 
     @Override
@@ -216,21 +218,21 @@ public abstract class CoreEnrichmentEntity extends Entity {
 
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
-        nbt.putInt("EnrichmentType", this.getEnrichmentType());
-        nbt.putFloat("RollAngleX", this.getRollAngleX());
-        nbt.putFloat("PreviousRollAngleX", this.getPreviousRollAngleX());
-        nbt.putFloat("RollAngleZ", this.getRollAngleZ());
-        nbt.putFloat("PreviousRollAngleZ", this.getPreviousRollAngleZ());
+        this.setEnrichmentType(nbt.getInt("EnrichmentType"));
+        this.setRollAngleX(nbt.getFloat("RollAngleX"));
+        this.setPreviousRollAngleZ(nbt.getFloat("PreviousRollAngleY"));
+        this.setRollAngleZ(nbt.getFloat("RollAngleZ"));
+        this.setPreviousRollAngleZ(nbt.getFloat("PreviousRollAngleZ"));
 
     }
 
     @Override
     protected void writeCustomDataToNbt(NbtCompound nbt) {
-        this.setEnrichmentType(nbt.getInt("EnrichmentType"));
-        this.setRollAngleX(nbt.getFloat("RollAngleX"));
-        this.setPreviousRollAngleX(nbt.getFloat("PreviousRollAngleX"));
-        this.setRollAngleZ(nbt.getFloat("RollAngleZ"));
-        this.setPreviousRollAngleZ(nbt.getFloat("PreviousRollAngleZ"));
+        nbt.putInt("EnrichmentType", this.getEnrichmentType());
+        nbt.putFloat("RollAngleX", this.getRollAngleX());
+        nbt.putFloat("PreviousRollAngleX", this.getPreviousRollAngleX());
+        nbt.putFloat("RollAngleZ", this.getRollAngleZ());
+        nbt.putFloat("PreviousRollAngleZ", this.getPreviousRollAngleZ());
 
     }
 

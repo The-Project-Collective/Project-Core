@@ -7,6 +7,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.item.Item;
+import net.minecraft.registry.tag.FluidTags;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -66,7 +68,7 @@ public class ToyBallEnrichmentEntity extends CoreEnrichmentEntity {
 
     @Override
     public void tick() {
-        super.tick();
+        this.baseTick();
         if (!this.getWorld().isClient()) {
             Vec3d velocity = this.getVelocity();
             List<LivingEntity> nearbyEntities = this.getWorld().getNonSpectatingEntities(
@@ -81,18 +83,24 @@ public class ToyBallEnrichmentEntity extends CoreEnrichmentEntity {
                     velocity = velocity.add(pushDir);
                 }
             }
-            boolean inWater = this.isTouchingWater();
-            if (inWater) {
-                double upwardVelocityCap = 0.1;
-                if (velocity.y < upwardVelocityCap) {
-                    velocity = velocity.add(0.0, 0.03, 0.0);
-                }
-                velocity = new Vec3d(velocity.x * 0.8, velocity.y, velocity.z * 0.8);
-                double waterSurfaceY = this.getBlockPos().getY() + 1.0;
-                if (this.getY() < waterSurfaceY - 0.3) {
-                    velocity = new Vec3d(velocity.x, Math.max(velocity.y, 0.02), velocity.z);
+            if (this.isSubmergedIn(FluidTags.WATER)) {
+                double fluidHeight = this.getWorld().getFluidState(this.getBlockPos()).getHeight(this.getWorld(), this.getBlockPos());
+                double waterSurfaceY = this.getBlockPos().getY() + fluidHeight;
+                double depth = MathHelper.clamp(waterSurfaceY - this.getY(), 0.0, 1.0);
+
+                // Apply buoyant force proportional to how deep the entity is
+                double buoyancy = 0.1 * depth;
+                velocity = velocity.add(0.0, buoyancy, 0.0);
+
+                // Apply drag to smooth movement
+                velocity = new Vec3d(velocity.x * 0.85, velocity.y * 0.9, velocity.z * 0.85);
+
+                // Cap upward velocity to avoid overshooting
+                if (velocity.y > 0.15) {
+                    velocity = new Vec3d(velocity.x, 0.15, velocity.z);
                 }
             } else {
+                // Out of water = apply gravity and drag
                 velocity = velocity.add(0.0, -0.04, 0.0);
             }
             double maxSpeed = 0.3;
@@ -106,8 +114,10 @@ public class ToyBallEnrichmentEntity extends CoreEnrichmentEntity {
             this.setPreviousRollAngleX(this.getRollAngleX());
             this.setPreviousRollAngleZ(this.getRollAngleZ());
             double dx = velocity.x;
+            double dy = velocity.y;
             double dz = velocity.z;
             double horizontalSpeed = Math.sqrt(dx * dx + dz * dz);
+            double verticalSpeed = Math.sqrt(dy * dy);
             if (horizontalSpeed > 0.001) {
                 float radius = 0.25f;
                 float deltaAngle = (float) ((horizontalSpeed / (2 * Math.PI * radius)) * 360f);
@@ -115,7 +125,16 @@ public class ToyBallEnrichmentEntity extends CoreEnrichmentEntity {
                 float deltaAngleZ = dx > 0 ? deltaAngle : -deltaAngle;
                 this.setRollAngleX(this.getRollAngleX() + deltaAngleX);
                 this.setRollAngleZ(this.getRollAngleZ() + deltaAngleZ);
+            } else if (verticalSpeed > 0.001) {
+                float radius = 0.25f;
+                verticalSpeed = 0.01;
+                float deltaAngle = (float) ((verticalSpeed / (2 * Math.PI * radius)) * 360f);
+                float deltaAngleX = dz > 0 ? -deltaAngle : deltaAngle;
+                float deltaAngleZ = dx > 0 ? deltaAngle : -deltaAngle;
+                this.setRollAngleX(this.getRollAngleX() + deltaAngleX);
+                this.setRollAngleZ(this.getRollAngleZ() + deltaAngleZ);
             }
+
         }
     }
 
