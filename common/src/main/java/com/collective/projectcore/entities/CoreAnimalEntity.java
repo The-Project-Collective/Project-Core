@@ -2,9 +2,12 @@ package com.collective.projectcore.entities;
 
 import com.collective.projectcore.groups.tags.CoreTags;
 import com.collective.projectcore.items.CoreItems;
+import com.mojang.authlib.GameProfile;
+import dev.architectury.event.events.common.TickEvent;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -24,8 +27,10 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerConfigHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -67,6 +72,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     private static final TrackedData<String> MATE_UUID;
     private static final TrackedData<String> MOTHER_UUID;
     private static final TrackedData<String> OFFSPRING;
+    private static final TrackedData<String> OWNER_DISPLAY_NAME;
     protected static final TrackedData<Optional<UUID>> OWNER_UUID;
     private static final TrackedData<String> PACK;
     private static final TrackedData<Integer> PREGNANCY_TICKS;
@@ -1063,6 +1069,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     public void setOwner(PlayerEntity player) {
         this.setTamed(true);
         this.setOwnerUuid(player.getUuid());
+        this.setOwnerDisplayName(calculateOwnerDisplayName());
         if (player instanceof ServerPlayerEntity serverPlayerEntity) {
             Criteria.TAME_ANIMAL.trigger(serverPlayerEntity, this);
         }
@@ -1083,6 +1090,24 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         } else {
             this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b & -5));
         }
+    }
+
+    public String getOwnerDisplayName() {
+        return this.dataTracker.get(OWNER_DISPLAY_NAME);
+    }
+
+    public void setOwnerDisplayName(String displayName) {
+        this.dataTracker.set(OWNER_DISPLAY_NAME, displayName);
+    }
+
+    public String calculateOwnerDisplayName() {
+        if (this.getOwnerUuid() != null) {
+            PlayerEntity player = this.getWorld().getPlayerByUuid(this.getOwnerUuid());
+            if (player != null && player.getDisplayName() != null) {
+                return player.getDisplayName().getString();
+            }
+        }
+        return "";
     }
 
     // --- Tiredness ------------------------------------------------------------------------------------------
@@ -1179,6 +1204,16 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     @Override
     public abstract int getLimitPerChunk();
 
+    public abstract Text getIRLInfo();
+
+    public abstract Text getConservationStatus();
+
+    public abstract Text getNativeBiomes();
+
+    public abstract int getCompendiumDisplaySize();
+
+    public abstract Text getDietName();
+
     // --- Genome ------------------------------------------------------------------------------------------
     public abstract String calculateGenome();
 
@@ -1198,6 +1233,10 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     public abstract float getAttributeCoeff(RegistryEntry<EntityAttribute> attribute);
 
+    public abstract String evaluateStatGenetics(int statGeneIndex);
+
+    public abstract List<Text> getCompendiumGenes();
+
     // --- Home Pos ------------------------------------------------------------------------------------------
     public abstract boolean isMigratory();
 
@@ -1210,12 +1249,17 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     public abstract TagKey<Item> getSpecificDiet();
 
+    // --- Names ------------------------------------------------------------------------------------------
+    public abstract String getScientificName();
+
     // --- Leash ------------------------------------------------------------------------------------------
     @Override
     public abstract boolean canBeLeashed();
 
     // --- Pack Mechanics ------------------------------------------------------------------------------------------
     public abstract int getMaxGroupSize();
+
+    public abstract Text getGroupLeadershipType();
 
     // --- Pregnancy ------------------------------------------------------------------------------------------
     public abstract int getGestationTicks();
@@ -1288,6 +1332,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         MATE_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         MOTHER_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         OFFSPRING = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
+        OWNER_DISPLAY_NAME = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         OWNER_UUID = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
         PACK = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.STRING);
         PREGNANCY_TICKS = DataTracker.registerData(CoreAnimalEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -1323,6 +1368,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         builder.add(MATE_UUID, "");
         builder.add(MOTHER_UUID, "");
         builder.add(OFFSPRING, "");
+        builder.add(OWNER_DISPLAY_NAME, "");
         builder.add(OWNER_UUID, Optional.empty());
         builder.add(PACK, "");
         builder.add(PREGNANCY_TICKS, 0);
@@ -1359,6 +1405,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         nbt.putString("Offspring", this.getOffspringString());
         if (this.getOwnerUuid() != null) {
             nbt.putUuid("Owner", this.getOwnerUuid());
+            nbt.putString("OwnerDisplayName", this.getOwnerDisplayName());
         }
         nbt.putString("Pack", this.getPackString());
         nbt.putInt("PregnancyTicks", this.getPregnancyTicks());
@@ -1390,6 +1437,7 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
         this.setMotherUUID(nbt.getString("MotherUUID"));
         this.setOffspringString(nbt.getString("Offspring"));
         this.readTamingFromNBT(nbt);
+        this.setOwnerDisplayName(nbt.getString("OwnerDisplayName"));
         this.setPackString(nbt.getString("Pack"));
         this.setPregnancyTicks(nbt.getInt("PregnancyTicks"));
         this.setRestingTicks(nbt.getInt("RestingTicks"));

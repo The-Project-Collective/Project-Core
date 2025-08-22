@@ -179,8 +179,6 @@ public abstract class CoreEnrichmentEntity extends Entity {
 
     public void setEnrichmentType(int type) {
         this.dataTracker.set(ENRICHMENT_TYPE, type);
-        System.out.println("Set Type: "+type);
-        System.out.println("Set Enrichment: "+this.getEnrichmentType());
     }
 
     @Override

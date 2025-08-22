@@ -8,6 +8,7 @@ import com.collective.projectcore.models.entity.enrichment.SnuffleLogEnrichmentE
 import com.collective.projectcore.models.entity.enrichment.ToyBallEnrichmentEntityModel;
 import com.collective.projectcore.renderers.entity.SnuffleLogEnrichmentEntityRenderer;
 import com.collective.projectcore.renderers.entity.ToyBallEnrichmentEntityRenderer;
+import com.collective.projectcore.screens.CompendiumScreen;
 import com.collective.projectcore.screens.handlers.CoreScreenHandlers;
 import com.collective.projectcore.screens.machines.FeederScreen;
 import com.collective.projectcore.util.UtilMethods;
@@ -65,6 +66,7 @@ public class ProjectCoreNeoForgeClient {
     @SubscribeEvent
     public void registerMenuScreensEvent(RegisterMenuScreensEvent event) {
         event.register(CoreScreenHandlers.FEEDER_SCREEN_HANDLER.get(), FeederScreen::new);
+        event.register(CoreScreenHandlers.COMPENDIUM_SCREEN_HANDLER.get(), CompendiumScreen::new);
 
     }
 
