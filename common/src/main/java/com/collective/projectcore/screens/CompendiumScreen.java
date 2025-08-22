@@ -287,28 +287,38 @@ public class CompendiumScreen extends HandledScreen<CompendiumScreenHandler> {
         context.enableScissor(x1, y1, x2, y2);
         float i = (float)Math.atan((g - mouseX) / 40.0F);
         float j = (float)Math.atan((h - mouseY) / 40.0F);
-        Quaternionf quaternionf = (new Quaternionf()).rotateZ(3.1415927F);
-        Quaternionf quaternionf2 = (new Quaternionf()).rotateX(j * 20.0F * 0.017453292F);
-        quaternionf.mul(quaternionf2);
-        float k = entity.bodyYaw;
-        float l = entity.getYaw();
-        float m = entity.getPitch();
-        float n = entity.prevHeadYaw;
-        float o = entity.headYaw;
-        entity.bodyYaw = 180.0F + i * 20.0F;
-        entity.setYaw(180.0F + i * 40.0F);
-        entity.setPitch(-j * 20.0F);
-        entity.headYaw = entity.getYaw();
-        entity.prevHeadYaw = entity.getYaw();
-        float p = entity.getScale();
-        Vector3f vector3f = new Vector3f(0.0F, entity.getHeight() / 2.0F + f * p, 0.0F);
-        float q = (float)size / p;
-        drawEntity(context, g, h, q, vector3f, quaternionf, quaternionf2, entity);
-        entity.bodyYaw = k;
-        entity.setYaw(l);
-        entity.setPitch(m);
-        entity.prevHeadYaw = n;
-        entity.headYaw = o;
+        float savedBodyYaw = entity.bodyYaw;
+        float savedPrevBodyYaw = entity.prevBodyYaw;
+        float savedYaw = entity.getYaw();
+        float savedPitch = entity.getPitch();
+        float savedHeadYaw = entity.headYaw;
+        float savedPrevHeadYaw = entity.prevHeadYaw;
+        float relativeHead = net.minecraft.util.math.MathHelper.wrapDegrees(savedHeadYaw - savedBodyYaw);
+        float newBodyYaw = net.minecraft.util.math.MathHelper.wrapDegrees(180.0F + i * 20.0F);
+        float newYaw = net.minecraft.util.math.MathHelper.wrapDegrees(180.0F + i * 40.0F);
+        float newPitch = -j * 20.0F;
+        entity.bodyYaw = newBodyYaw;
+        entity.prevBodyYaw = newBodyYaw;
+        entity.setYaw(newYaw);
+        entity.setPitch(newPitch);
+        float clampedRel = net.minecraft.util.math.MathHelper.clamp(relativeHead, -75.0F, 75.0F);
+        entity.headYaw = entity.bodyYaw + clampedRel;
+        entity.prevHeadYaw = entity.headYaw;
+        float scale = entity.getScale();
+        Vector3f offset = new Vector3f(0.0F, entity.getHeight() / 2.0F + f * scale, 0.0F);
+        float q = (float)size / scale;
+        drawEntity(
+                context, g, h, q, offset,
+                new Quaternionf().rotateZ((float)Math.PI),
+                new Quaternionf().rotateX(j * 20.0F * 0.017453292F),
+                entity
+        );
+        entity.bodyYaw = savedBodyYaw;
+        entity.prevBodyYaw = savedPrevBodyYaw;
+        entity.setYaw(savedYaw);
+        entity.setPitch(savedPitch);
+        entity.headYaw = savedHeadYaw;
+        entity.prevHeadYaw = savedPrevHeadYaw;
         context.disableScissor();
     }
 
