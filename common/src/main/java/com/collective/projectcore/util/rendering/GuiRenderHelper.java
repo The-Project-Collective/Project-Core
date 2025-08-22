@@ -1,10 +1,8 @@
 package com.collective.projectcore.util.rendering;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -107,9 +105,10 @@ public class GuiRenderHelper {
     ) {
         MinecraftClient client = MinecraftClient.getInstance();
         TextRenderer textRenderer = client.textRenderer;
+        int ySpacing = 8;
         int totalRows = (int) Math.ceil(text.size() / (double) cols);
-        int gridHeight = rowsVisible * 10;
-        int maxScroll = Math.max(0, (totalRows - rowsVisible) * 10);
+        int gridHeight = rowsVisible * ySpacing;
+        int maxScroll = Math.max(0, (totalRows - rowsVisible) * ySpacing);
         int gridWidth = cols * spacing;
         scrollOffset = (int) (scrollOffset - (mouseWheelDelta * 10));
         scrollOffset = clamp(scrollOffset, 0, maxScroll);
@@ -118,12 +117,12 @@ public class GuiRenderHelper {
             int col = i % cols;
             int row = i / cols;
             int x = startX + col * spacing;
-            int y = startY + row * 10 - scrollOffset;
+            int y = startY + row * ySpacing - scrollOffset;
             if (y + spacing < startY || y > startY + gridHeight) continue;
             drawScaledText(context, textRenderer, text.get(i), x, y, scale, 0xFF397064);
         }
         context.disableScissor();
-        int scrollbarX = startX + gridWidth - 14;
+        int scrollbarX = startX + gridWidth + 3;
         int scrollbarWidth = 2;
         if (text.size() > cols * rowsVisible) {
             fillRect(context, scrollbarX, startY, scrollbarWidth, gridHeight, 0xFFF5D69F);

@@ -2,7 +2,6 @@ package com.collective.projectcore.screens;
 
 import com.collective.projectcore.ProjectCore;
 import com.collective.projectcore.entities.CoreAnimalEntity;
-import com.collective.projectcore.groups.tags.CoreTags;
 import com.collective.projectcore.screens.handlers.CompendiumScreenHandler;
 import com.collective.projectcore.util.UtilMethods;
 import com.collective.projectcore.util.rendering.GuiRenderHelper;
@@ -22,11 +21,11 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.Objects;
@@ -146,21 +145,16 @@ public class CompendiumScreen extends HandledScreen<CompendiumScreenHandler> {
         int page2TextYBottom = 142;
         int textColour = 0x397064;
         if (entity != null && entity.isAlive()) {
-            this.drawScaledCentredText(context, this.textRenderer, Text.translatable(entity.getType().getTranslationKey()), page1XCentre, 21, 1.0f, textColour);
+            this.drawScaledCentredText(context, this.textRenderer, Text.translatable(entity.getType().getTranslationKey()), page1XCentre, 21, 0.8f, textColour);
             if (entity instanceof CoreAnimalEntity animal) {
-                this.drawScaledCentredText(context, this.textRenderer, Text.translatable(animal.getScientificName()), page1XCentre, page1YSection, 0.65f, textColour);
+                this.drawScaledCentredText(context, this.textRenderer, Text.translatable(animal.getScientificName()).formatted(Formatting.ITALIC), page1XCentre, page1YSection, 0.65f, textColour);
             }
             if (entity.hasCustomName()) {
-                this.drawScaledCentredText(context, this.textRenderer, Text.translatable("screen.project_core.creature_compendium.custom_name", Objects.requireNonNull(entity.getCustomName()).getString()), page1XCentre, page1YSection + 8, 0.65f, textColour);
+                this.drawScaledCentredText(context, this.textRenderer, Text.translatable("screen.project_core.creature_compendium.custom_name", Objects.requireNonNull(entity.getCustomName()).getString()), page1XCentre, page1YSection + 10, 0.65f, textColour);
             }
             if (entity instanceof CoreAnimalEntity animal) {
-                this.drawScaledCentredText(context, this.textRenderer, (animal.getOwnerDisplayName() != null ? Text.translatable("screen.project_core.creature_compendium.owner", animal.getOwnerDisplayName()) : Text.translatable("screen.project_core.creature_compendium.owner.untamed")), page1XCentre, page1YSection + 24, 0.65f, textColour);
+                this.drawScaledCentredText(context, this.textRenderer, (!animal.getOwnerDisplayName().isEmpty() ? Text.translatable("screen.project_core.creature_compendium.owner", animal.getOwnerDisplayName()) : Text.translatable("screen.project_core.creature_compendium.owner.untamed")), page1XCentre, page1YSection + 20, 0.65f, textColour);
             }
-            // Testing
-            this.drawScaledCentredText(context, this.textRenderer, Text.literal("Test"), page1XCentre, page1YSection, 0.65f, textColour);
-            this.drawScaledCentredText(context, this.textRenderer, Text.literal("Test"), page1XCentre, page1YSection + 10, 0.65f, textColour);
-            this.drawScaledCentredText(context, this.textRenderer, Text.literal("Test"), page1XCentre, page1YSection + 20, 0.65f, textColour);
-
             switch (currentPage) {
                 case 0 -> {
                     this.drawScaledCentredText(context, this.textRenderer, Text.translatable("screen.project_core.creature_compendium.stats"), page2XCentre, 42, 0.65f, textColour);
@@ -183,9 +177,9 @@ public class CompendiumScreen extends HandledScreen<CompendiumScreenHandler> {
                             scrollOffset = GuiRenderHelper.drawScrollableTextGrid(
                                     context,
                                     animal.getCompendiumGenes(),
-                                    page2TextX, page2TextY + 10,
-                                    3, 5,
-                                    32,
+                                    page2TextX, page2TextY + 12,
+                                    1, 5,
+                                    76,
                                     0.65f,
                                     scrollOffset,
                                     mouseWheelDelta
@@ -204,13 +198,14 @@ public class CompendiumScreen extends HandledScreen<CompendiumScreenHandler> {
                     this.drawScaledCentredText(context, this.textRenderer, Text.translatable("screen.project_core.creature_compendium.info"), page2XCentre, 42, 0.65f, textColour);
                     if (entity instanceof CoreAnimalEntity animal) {
                         this.drawScaledText(context, Text.translatable("screen.project_core.creature_compendium.adult_age", animal.getAdultDays()), page2TextX, page2TextY, 0.65f, textColour);
-                        this.drawScaledText(context, Text.translatable("screen.project_core.creature_compendium.group_leadership", animal.getGroupLeadershipType()), page2TextX, page2TextY + 8, 0.65f, textColour);
-                        this.drawScaledText(context, Text.translatable("screen.project_core.creature_compendium.monogamy", animal.isMonogamous() ? Text.translatable("screen.project_core.creature_compendium.true") : Text.translatable("screen.project_core.creature_compendium.false")), page2TextX, page2TextY + 16, 0.65f, textColour);
-                        this.drawScaledText(context, Text.translatable("screen.project_core.creature_compendium.group_size", animal.getMaxGroupSize()), page2TextX, page2TextY + 24, 0.65f, textColour);
-                        this.drawScaledText(context, Text.translatable("screen.project_core.creature_compendium.offspring", animal.getMinOffspring(), animal.getMaxOffspring(), animal.rareOffspring() ? Text.translatable("screen.project_core.creature_compendium.offspring.rare") : ""), page2TextX, page2TextY + 32, 0.65f, textColour);
+                        this.drawScaledText(context, Text.translatable("screen.project_core.creature_compendium.monogamy", animal.isMonogamous() ? Text.translatable("screen.project_core.creature_compendium.true") : Text.translatable("screen.project_core.creature_compendium.false")), page2TextX, page2TextY + 8, 0.65f, textColour);
+                        this.drawScaledText(context, Text.translatable("screen.project_core.creature_compendium.group_size", animal.getMaxGroupSize()), page2TextX, page2TextY + 16, 0.65f, textColour);
+                        this.drawScaledText(context, Text.translatable("screen.project_core.creature_compendium.offspring", animal.getMinOffspring(), animal.getMaxOffspring(), animal.rareOffspring() ? Text.translatable("screen.project_core.creature_compendium.offspring.rare") : ""), page2TextX, page2TextY + 24, 0.65f, textColour);
+                        this.drawScaledText(context, Text.translatable("screen.project_core.creature_compendium.schedule"), page2TextX, page2TextY + 32, 0.65f, textColour);
+                        this.drawScaledText(context, animal.getScheduleName(), page2TextX, page2TextY + 40, 0.65f, textColour);
                         this.drawScaledText(context, Text.translatable("screen.project_core.creature_compendium.diet.favourite"), page2TextX, page2TextY + 48, 0.65f, textColour);
                         int startXFav = page2TextX + 56;
-                        int startYFav = page2TextY + 46;
+                        int startYFav = page2TextY + 47;
                         int spacing = 9;
                         List<Item> fav_food_items = UtilMethods.getItemsFromTag(animal.getSpecificDiet());
                         for (int i = 0; i < fav_food_items.size(); i++) {
@@ -239,7 +234,17 @@ public class CompendiumScreen extends HandledScreen<CompendiumScreenHandler> {
                     this.drawScaledCentredText(context, this.textRenderer, Text.translatable("screen.project_core.creature_compendium.irl"), page2XCentre, 42, 0.65f, textColour);
                     if (entity instanceof CoreAnimalEntity animal) {
                         this.drawScaledText(context, Text.translatable("screen.project_core.creature_compendium.conservation_status", animal.getConservationStatus()), page2TextX, page2TextY, 0.6f, textColour);
-                        this.drawScaledText(context, animal.getIRLInfo(), page2TextX, page2TextY + 16, 0.5f, textColour);
+                        scrollOffset = GuiRenderHelper.drawScrollableTextGrid(
+                                context,
+                                animal.getIRLInfo(),
+                                page2TextX, page2TextY + 12,
+                                1, 10,
+                                76,
+                                0.5f,
+                                scrollOffset,
+                                mouseWheelDelta
+                        );
+                        mouseWheelDelta = 0;
                     }
                 }
             }

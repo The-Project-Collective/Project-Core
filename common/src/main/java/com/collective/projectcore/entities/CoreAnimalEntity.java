@@ -1204,15 +1204,11 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
     @Override
     public abstract int getLimitPerChunk();
 
-    public abstract Text getIRLInfo();
+    public abstract List<Text> getIRLInfo();
 
     public abstract Text getConservationStatus();
 
-    public abstract Text getNativeBiomes();
-
     public abstract int getCompendiumDisplaySize();
-
-    public abstract Text getDietName();
 
     // --- Genome ------------------------------------------------------------------------------------------
     public abstract String calculateGenome();
@@ -1249,6 +1245,8 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     public abstract TagKey<Item> getSpecificDiet();
 
+    public abstract Text getScheduleName();
+
     // --- Names ------------------------------------------------------------------------------------------
     public abstract String getScientificName();
 
@@ -1258,8 +1256,6 @@ public abstract class CoreAnimalEntity extends AnimalEntity implements Angerable
 
     // --- Pack Mechanics ------------------------------------------------------------------------------------------
     public abstract int getMaxGroupSize();
-
-    public abstract Text getGroupLeadershipType();
 
     // --- Pregnancy ------------------------------------------------------------------------------------------
     public abstract int getGestationTicks();
