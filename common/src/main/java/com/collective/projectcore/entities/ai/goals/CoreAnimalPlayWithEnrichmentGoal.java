@@ -71,7 +71,7 @@ public class CoreAnimalPlayWithEnrichmentGoal extends MoveToTargetPosGoal {
                     this.coreAnimalEntity.getWorld().playSound(null, this.coreAnimalEntity.getSteppingPos(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.NEUTRAL, 1.0F, this.coreAnimalEntity.getPitch());
                     this.coreAnimalEntity.setEnrichmentCooldown(this.random.nextInt(600) + 1000);
                 }
-            } else {
+            } else if (this.enrichmentBlock != null) {
                 this.coreAnimalEntity.setEnrichment(this.coreAnimalEntity.getEnrichment() + enrichAmount);
                 if (this.coreAnimalEntity.getEnrichment() > this.coreAnimalEntity.getMaxEnrichment()) {
                     this.coreAnimalEntity.setEnrichment(this.coreAnimalEntity.getMaxEnrichment());

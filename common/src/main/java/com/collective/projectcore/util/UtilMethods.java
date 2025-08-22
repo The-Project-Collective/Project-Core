@@ -2,8 +2,14 @@ package com.collective.projectcore.util;
 
 import com.collective.projectcore.blocks.enrichment.ScratchingPostEnrichmentBlock;
 import net.minecraft.block.BlockState;
+import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
+
+import java.util.List;
 
 public class UtilMethods {
 
@@ -26,5 +32,12 @@ public class UtilMethods {
             return state.get(ScratchingPostEnrichmentBlock.COLOUR).getFireworkColor();
         }
         return -1;
+    }
+
+    public static List<Item> getItemsFromTag(TagKey<Item> tagKey) {
+        return Registries.ITEM.getOrThrow(tagKey)
+                .stream()
+                .map(RegistryEntry::value)
+                .toList();
     }
 }

@@ -17,4 +17,11 @@ public class CoreScreenHandlers {
     // Machines
     public static final RegistrySupplier<ScreenHandlerType<FeederScreenHandler>> FEEDER_SCREEN_HANDLER =
             SCREEN_HANDLERS.register("feeder", () -> new ScreenHandlerType<>(FeederScreenHandler::new, FeatureFlags.DEFAULT_ENABLED_FEATURES));
+
+
+    // === ITEMS ===
+
+    // Husbandry
+    public static final RegistrySupplier<ScreenHandlerType<CompendiumScreenHandler>> COMPENDIUM_SCREEN_HANDLER =
+            SCREEN_HANDLERS.register("creature_compendium", () -> new ScreenHandlerType<>(CompendiumScreenHandler::new, FeatureFlags.DEFAULT_ENABLED_FEATURES));
 }

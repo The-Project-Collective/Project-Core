@@ -1,5 +1,6 @@
 package com.collective.projectcore.fabric;
 
+import com.collective.projectcore.fabric.events.ProjectCoreFabricEvents;
 import net.fabricmc.api.ModInitializer;
 
 import com.collective.projectcore.ProjectCore;
@@ -13,5 +14,6 @@ public final class ProjectCoreFabric implements ModInitializer {
 
         // Run our common setup.
         ProjectCore.init();
+        ProjectCoreFabricEvents.init();
     }
 }

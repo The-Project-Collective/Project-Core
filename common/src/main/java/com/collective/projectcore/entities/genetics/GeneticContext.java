@@ -1,6 +1,7 @@
 package com.collective.projectcore.entities.genetics;
 
 import com.collective.projectcore.util.UtilMethods;
+import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -208,6 +209,44 @@ public interface GeneticContext {
         } else {
             return statValue;
         }
+    }
+
+    /**
+     * Evaluates the quality of the stat genetics, mainly used for the creature compendium screen.
+     *
+     * @param genome of the entity.
+     * @param geneIndex of the stat gene for that specific stat.
+     * @return a translatable string of the stat quality.
+     */
+    default Text evaluateStat(String genome, int geneIndex) {
+        String alleles = this.getAlleles(genome, geneIndex);
+        List<String> alleleList = List.of(alleles.substring(0, 0), alleles.substring(1, 1));
+        List<Float> coeffList = new ArrayList<>();
+        for (String allele : alleleList) {
+            float coeff = switch (allele) {
+                case "A" -> 7;
+                case "B" -> 6;
+                case "C" -> 5;
+                case "D" -> 4;
+                case "d" -> 3;
+                case "c" -> 2;
+                case "b" -> 1;
+                case "a" -> 0;
+                default -> 8;
+            };
+            coeffList.add(coeff);
+        }
+        if (coeffList.size() == 2) {
+            float coeffValue = (coeffList.getFirst() + coeffList.get(1)) / 2;
+            if (coeffValue == 14) return Text.translatable("genetics.project_core.stats.best");
+            if (coeffValue < 14 && coeffValue >= 12) return Text.translatable("genetics.project_core.stats.fantastic");
+            if (coeffValue < 12 && coeffValue >= 9) return Text.translatable("genetics.project_core.stats.good");
+            if (coeffValue < 9 && coeffValue >= 6) return Text.translatable("genetics.project_core.stats.okay");
+            if (coeffValue < 6 && coeffValue >= 3) return Text.translatable("genetics.project_core.stats.poor");
+            if (coeffValue < 3 && coeffValue >= 1) return Text.translatable("genetics.project_core.stats.terrible");
+            if (coeffValue == 0) return Text.translatable("genetics.project_core.stats.worst");
+        }
+        return Text.literal("N/A");
     }
 
     /**

@@ -1,6 +1,8 @@
 {
   "item.project_core.dev_tool": "Dev Tool",
 
+  "item.project_core.creature_compendium": "Creature Compendium",
+
   "item.project_core.growth_boosting_hormone": "Growth Boosting Hormone",
   "item.project_core.growth_stunting_hormone": "Growth Stunting Hormone",
   "item.project_core.fertility_treatment": "Fertility Treatment",
@@ -34,6 +36,7 @@
   "item.project_core.toy_ball_purple": "Purple Toy Ball",
   "item.project_core.toy_ball_magenta": "Magenta Toy Ball",
   "item.project_core.toy_ball_pink": "Pink Toy Ball",
+
 
 
 
@@ -75,12 +78,74 @@
   "block.project_core.small_net_trap": "Small Net Trap",
 
 
+
   "screenhandler.project_core.feeder": "Feeder",
+
+
+
+  "screen.project_core.creature_compendium.title": "Creature Compendium",
+
+  "screen.project_core.creature_compendium.stats": "Statistics",
+  "screen.project_core.creature_compendium.genetics": "Genetics",
+  "screen.project_core.creature_compendium.info": "Species Info",
+  "screen.project_core.creature_compendium.irl": "Real Life Info",
+
+  "screen.project_core.creature_compendium.custom_name": "Nicknamed %s",
+  "screen.project_core.creature_compendium.owner": "Tamed By %s",
+  "screen.project_core.creature_compendium.owner.untamed": "Untamed",
+
+  "screen.project_core.creature_compendium.health": "Health: %s/%s",
+  "screen.project_core.creature_compendium.age": "Age: %s Days Old",
+  "screen.project_core.creature_compendium.gender": "Gender: %s",
+  "screen.project_core.creature_compendium.gender.male": "Male",
+  "screen.project_core.creature_compendium.gender.female": "Female",
+  "screen.project_core.creature_compendium.hunger": "Hunger: %s/%s",
+  "screen.project_core.creature_compendium.enrichment": "Enrichment: %s/%s",
+  "screen.project_core.creature_compendium.pregnant": "Pregnant?: %s",
+  "screen.project_core.creature_compendium.stunted": "Stunted?: %s",
+  "screen.project_core.creature_compendium.contraceptive": "On Contraceptives?: %s",
+
+  "screen.project_core.creature_compendium.genes": "Genes:",
+  "screen.project_core.creature_compendium.genome.size": "Size: %s",
+  "screen.project_core.creature_compendium.genome.health": "Health: %s",
+  "screen.project_core.creature_compendium.genome.speed": "Speed: %s",
+  "screen.project_core.creature_compendium.genome.attack_damage": "Attack Damage: %s",
+
+  "screen.project_core.creature_compendium.adult_age": "Adult Age: %s",
+  "screen.project_core.creature_compendium.schedule": "Sleep Schedule:",
+  "screen.project_core.creature_compendium.monogamy": "Monogamous?: %s",
+  "screen.project_core.creature_compendium.group_size": "Max Group Size: %s",
+  "screen.project_core.creature_compendium.offspring": "No. of Offspring: %s-%s %s",
+  "screen.project_core.creature_compendium.offspring.rare": "(Rare)",
+  "screen.project_core.creature_compendium.diet.favourite": "Favourite Foods:",
+  "screen.project_core.creature_compendium.diet": "All Allowed Foods:",
+
+  "screen.project_core.creature_compendium.conservation_status": "IUCN: %s",
+
+  "screen.project_core.creature_compendium.true": "Yes",
+  "screen.project_core.creature_compendium.false": "No",
+  "screen.project_core.creature_compendium.na": "N/A",
+
+  "screen.project_core.creature_compendium.schedule.diurnal": "Diurnal",
+  "screen.project_core.creature_compendium.schedule.nocturnal": "Nocturnal",
+  "screen.project_core.creature_compendium.schedule.crepuscular": "Crepuscular",
+  "screen.project_core.creature_compendium.schedule.cathermal": "Cathermal",
+
+  "screen.project_core.creature_compendium.conservation_status.ex": "Extinct",
+  "screen.project_core.creature_compendium.conservation_status.ew": "Wild Extinct",
+  "screen.project_core.creature_compendium.conservation_status.cr": "Critically Endangered",
+  "screen.project_core.creature_compendium.conservation_status.en": "Endangered",
+  "screen.project_core.creature_compendium.conservation_status.vu": "Vulnerable",
+  "screen.project_core.creature_compendium.conservation_status.nt": "Near Threatened",
+  "screen.project_core.creature_compendium.conservation_status.lc": "Least Concern",
+  "screen.project_core.creature_compendium.conservation_status.dd": "Data Deficient",
+
 
 
   "group.project_core.project_blocks": "Project Blocks",
   "group.project_core.project_items": "Project Items",
   "group.project_core.project_entities": "Project Entities",
+
 
 
   "tag.item.project_core.diets.general.all_foods": "All Foods",
@@ -99,6 +164,7 @@
   "tag.block.project_core.enrichment.scratching_posts": "Scratching Posts",
 
 
+
   "tooltip.project_core.trap.empty": "Empty",
   "tooltip.project_core.trap.custom_name": "Named %s",
   "tooltip.project_core.trap.age": "%s Days Old",
@@ -108,6 +174,16 @@
   "tooltip.project_core.enrichment_entity": "Shift + Right Click to pick up once placed.",
 
 
-  "warning.project_core.trap.failed_release": "Warning! Can't release mob because there isn't a safe location nearby!"
 
+  "warning.project_core.trap.failed_release": "Warning! Can't release mob because there isn't a safe location nearby!",
+
+
+
+  "genetics.project_core.stats.best": "Best",
+  "genetics.project_core.stats.fantastic": "Fantastic",
+  "genetics.project_core.stats.good": "Good",
+  "genetics.project_core.stats.okay": "Okay",
+  "genetics.project_core.stats.poor": "Poor",
+  "genetics.project_core.stats.terrible": "Terrible",
+  "genetics.project_core.stats.worst": "Worst"
 }
